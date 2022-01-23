@@ -106,10 +106,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _showDialog(BuildContext context) {
-    VoidCallback continueCallBack = () => {
-          Navigator.of(context).pop(),
-          // code on continue comes here
-        };
     BlurryDialog alert = BlurryDialog("Forgot Password?",
         "PLease contact your hospital administrator to reset your password.");
 
