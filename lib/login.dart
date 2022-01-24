@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hcais/alertDialog_widget.dart';
+import 'package:hcais/components/alertDialog_widget.dart';
 import 'package:hcais/home.dart';
 
 class LoginPage extends StatefulWidget {
