@@ -27,16 +27,46 @@ class _SsiFormPageState extends State<SsiFormPage> {
     final fields = args.fields;
     final List<CoolStep> steps = [];
     List<Widget> data = [];
-    fields.forEach((each) => {
+    fields.forEach((step) => {
           data = [],
-          if (each is List)
+          if (step is List)
             {
-              each.forEach((eachItem) => {
-                    if (eachItem['type'] == 'textfield')
+              step.forEach((field) => {
+                    if (field['type'] == 'text')
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: Text(
+                            field['description'].toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.normal),
+                          ),
+                        )),
+                      }
+                    else if (field['type'] == 'textfield')
                       {
                         data.add(_buildTextField(
-                            labelText: eachItem['label'].toString()))
+                          labelText: field['label'].toString(),
+                          validator: (value) {
+                            if (field['is_required'] == true) {
+                              if (value?.isEmpty ?? true) {
+                                return field['label'].toString() +
+                                    " is required";
+                              }
+                              return null;
+                            }
+                          },
+                          // controller: _nameCtrl,
+                        ))
                       }
+                    // else if (field['type'] == 'dropdown')
+                    //   {
+                    //     data.add(_buildSelector(
+                    //       context: context,
+                    //       name: field['label'].toString(),
+                    //     ))
+                    //   }
                   }),
               steps.add(CoolStep(
                   title: 'Hospital Information',
