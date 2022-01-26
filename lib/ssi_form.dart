@@ -25,94 +25,9 @@ class _SsiFormPageState extends State<SsiFormPage> {
     final args = ModalRoute.of(context)!.settings.arguments as Arguments;
     // final Map dataFromHospitalScreen = ModalRoute.of(context).settings.arguments;
     final fields = args.fields;
-    print(fields);
-    final List<CoolStep> steps1 = [];
-    var a = [
-      [
-        {
-          "name": "hcai_definition",
-          "description":
-              "SSI or Surgical Site Infection is an infection that occurs after surgery in the part of the body where the surgery took place.",
-          "label": "HCAI",
-          "type": "text",
-          "options": [],
-          "is_required": false,
-          "has_help_label": false,
-          "help_label_text": null
-        },
-        {
-          "name": "hospital_name",
-          "description": "Pakistan Institute of Medical Sciences (PIMS)",
-          "label": "Hospital Name",
-          "type": "text",
-          "options_from": "array",
-          "options": [],
-          "is_required": false,
-          "has_help_label": false,
-          "help_label_text": null
-        },
-        {
-          "name": "department",
-          "description": "Department where the HCAI occured",
-          "label": "Department",
-          "type": "dropdown",
-          "options": [
-            "Department 1",
-            "Department 2",
-            "Department 3",
-            "Department 4",
-            "Department 5"
-          ],
-          "is_required": true,
-          "has_help_label": false,
-          "help_label_text": null
-        },
-        {
-          "name": "unit_or_ward",
-          "description": "Ward or Unit where the HCAI occured",
-          "label": "Unit / Ward",
-          "type": "textfield",
-          "options": [],
-          "is_required": true,
-          "has_help_label": false,
-          "help_label_text": null
-        }
-      ],
-      [
-        {
-          "name": "cnic",
-          "description": "CNIC of the patient",
-          "label": "CNIC",
-          "type": "textfield",
-          "options": [],
-          "is_required": true,
-          "has_help_label": true,
-          "help_label_text": "CNIC of the patient"
-        },
-        {
-          "name": "pcr_or_mr_number",
-          "description": "PCR / MR number of the patient",
-          "label": "PCR / MR Number",
-          "type": "textfield",
-          "options": [],
-          "is_required": true,
-          "has_help_label": true,
-          "help_label_text": "PCR / MR number of the patient"
-        },
-        {
-          "name": "patient_name",
-          "description": "Patient Name",
-          "label": "Patient Name",
-          "type": "textfield",
-          "options": [],
-          "is_required": true,
-          "has_help_label": false,
-          "help_label_text": null
-        }
-      ]
-    ];
+    final List<CoolStep> steps = [];
     List<Widget> data = [];
-    a.forEach((each) => {
+    fields.forEach((each) => {
           data = [],
           if (each is List)
             {
@@ -123,7 +38,7 @@ class _SsiFormPageState extends State<SsiFormPage> {
                             labelText: eachItem['label'].toString()))
                       }
                   }),
-              steps1.add(CoolStep(
+              steps.add(CoolStep(
                   title: 'Hospital Information',
                   subtitle: 'Please fill the hospital information below',
                   content: Form(key: _formKey, child: Column(children: data)),
@@ -141,7 +56,7 @@ class _SsiFormPageState extends State<SsiFormPage> {
       onCompleted: () {
         print('Steps completed!');
       },
-      steps: steps1,
+      steps: steps,
       config: CoolStepperConfig(
         backText: 'PREV',
       ),
@@ -211,47 +126,3 @@ class _SsiFormPageState extends State<SsiFormPage> {
     );
   }
 }
-
-// class _SsiFormPageState extends State<SsiFormPage> {
-//   final _formKey = GlobalKey<FormState>();
-//   String? selectedRole = 'Writer';
-//   final TextEditingController _nameCtrl = TextEditingController();
-//   final TextEditingController _emailCtrl = TextEditingController();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final formName = Padding(
-//       padding: EdgeInsets.fromLTRB(10.0, 45.0, 10.0, 15.0),
-//       child: Text(
-//         'Surgical Site Inspections (SSIs) Form',
-//         textAlign: TextAlign.center,
-//         style: TextStyle(
-//           fontSize: 28.0,
-//           color: Colors.white,
-//         ),
-//       ),
-//     );
-
-//     final body = Container(
-//       width: MediaQuery.of(context).size.width,
-//       padding: EdgeInsets.all(28.0),
-//       decoration: BoxDecoration(
-//         gradient: LinearGradient(
-//           colors: [
-//             Colors.blue,
-//             Colors.lightBlueAccent,
-//           ],
-//         ),
-//       ),
-//       child: Column(
-//         children: <Widget>[
-//           formName,
-//         ],
-//       ),
-//     );
-
-//     return Scaffold(
-//       body: body,
-//     );
-//   }
-// }
