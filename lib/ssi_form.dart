@@ -60,13 +60,13 @@ class _SsiFormPageState extends State<SsiFormPage> {
                           // controller: _nameCtrl,
                         ))
                       }
-                    // else if (field['type'] == 'dropdown')
-                    //   {
-                    //     data.add(_buildSelector(
-                    //       context: context,
-                    //       name: field['label'].toString(),
-                    //     ))
-                    //   }
+                    else if (field['type'] == 'dropdown')
+                      {
+                        //     data.add(_buildSelector(
+                        //       context: context,
+                        //       name: field['label'].toString(),
+                        //     ))
+                      }
                   }),
               steps.add(CoolStep(
                   title: 'Hospital Information',
@@ -115,6 +115,30 @@ class _SsiFormPageState extends State<SsiFormPage> {
         ),
         validator: validator,
         controller: controller,
+      ),
+    );
+  }
+
+  Widget _buildDropDown({
+    String? labelText,
+    List<String>? items,
+    String? selectedItem,
+    ValueChanged<String>? onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: DropdownButtonFormField(
+        decoration: InputDecoration(
+          labelText: labelText,
+        ),
+        value: selectedItem,
+        items: items?.map((item) {
+          return DropdownMenuItem(
+            value: item,
+            child: Text(item),
+          );
+        })?.toList(),
+        onChanged: onChanged,
       ),
     );
   }
