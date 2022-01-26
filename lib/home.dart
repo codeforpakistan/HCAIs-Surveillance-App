@@ -1,8 +1,28 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hcais/ssi_form.dart';
+import 'package:hcais/utils/constants.dart';
+import 'package:http/http.dart' as http;
+
+import 'args/Arguments.dart';
 
 class HomePage extends StatelessWidget {
   static String tag = 'home-page';
+
+  Future<List> getHcais() async {
+    var data = [];
+    var url = Constants.BASE_URL + "/hcai";
+    var response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+    data = json.decode(utf8.decode(response.bodyBytes));
+    return data.toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,109 +60,9 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
-    final surgicalSiteInfections = OutlinedButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(SsiFormPage.tag);
-        },
-        style: OutlinedButton.styleFrom(
-          minimumSize: Size(100, 40),
-          side: BorderSide(
-            width: 1.0,
-            color: Colors.white,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(25, 15, 25, 15),
-          child: Text("Surgical Site Infections (SSIs)",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                height: 1.5,
-              )),
-        ));
-    final ventilatorAssociatedInfections = OutlinedButton(
-      onPressed: () {
-        // Respond to button press
-      },
-      style: OutlinedButton.styleFrom(
-        minimumSize: Size(100, 40),
-        side: BorderSide(
-          width: 1.0,
-          color: Colors.white,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(25, 15, 25, 15),
-        child: Text("Ventilator-Associated Infections (VAIs)",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
-              height: 1.5,
-            )),
-      ),
-    );
-    final catheterAssociatedUrinaryTractInfections = OutlinedButton(
-      onPressed: () {
-        // Respond to button press
-      },
-      style: OutlinedButton.styleFrom(
-        minimumSize: Size(100, 40),
-        side: BorderSide(
-          width: 1.0,
-          color: Colors.white,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(25, 15, 25, 15),
-        child: Text("Catheter-Associated Urinary Tract Infections (CAUTIs)",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
-              height: 1.5,
-            )),
-      ),
-    );
-    final centralLineAssociatedBloodstreamInfections = OutlinedButton(
-      onPressed: () {
-        // Respond to button press
-      },
-      style: OutlinedButton.styleFrom(
-        minimumSize: Size(100, 40),
-        side: BorderSide(
-          width: 1.0,
-          color: Colors.white,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(5, 15, 5, 15),
-        child: Text("Central Line-Associated Bloodstream Infections (CLABIs)",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
-              height: 1.5,
-            )),
-      ),
-    );
-    final hcaiButtons = Padding(
-        padding: EdgeInsets.all(0.0),
-        child: Column(
-          children: [
-            surgicalSiteInfections,
-            SizedBox(height: 18.0),
-            ventilatorAssociatedInfections,
-            SizedBox(height: 18.0),
-            catheterAssociatedUrinaryTractInfections,
-            SizedBox(height: 18.0),
-            centralLineAssociatedBloodstreamInfections,
-            SizedBox(height: 18.0),
-          ],
-        ));
 
-    final body = Container(
+    return Scaffold(
+        body: Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(28.0),
       decoration: BoxDecoration(
@@ -153,17 +73,55 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      child: Column(
-        children: <Widget>[
-          hospitalIcon,
-          hospitalName,
-          hcaiButtons,
-        ],
-      ),
-    );
-
-    return Scaffold(
-      body: body,
-    );
+      child: Column(children: <Widget>[
+        hospitalIcon,
+        hospitalName,
+        FutureBuilder(
+            future: getHcais(),
+            builder: (context, AsyncSnapshot<List> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.done:
+                  if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.hasError.toString()));
+                  }
+                  return new ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 12.0),
+                            child: OutlinedButton(
+                                child: Padding(
+                                  padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                  child: Text(
+                                      snapshot.data?[index]['title']
+                                          ?.toUpperCase(),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.0,
+                                        height: 1.5,
+                                      )),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  minimumSize: Size(100, 40),
+                                  side: BorderSide(
+                                    width: 1.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(
+                                      SsiFormPage.tag,
+                                      arguments: Arguments(
+                                          snapshot.data?[index]['fields']));
+                                }));
+                      });
+                default:
+                  return Center(child: CircularProgressIndicator());
+              }
+            }),
+      ]),
+    ));
   }
 }
