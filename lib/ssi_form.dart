@@ -137,7 +137,7 @@ class _SsiFormPageState extends State<SsiFormPage> {
             value: item,
             child: Text(item),
           );
-        })?.toList(),
+        }).toList(),
         onChanged: onChanged,
       ),
     );
