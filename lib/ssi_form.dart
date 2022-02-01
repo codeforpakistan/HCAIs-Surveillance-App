@@ -17,8 +17,13 @@ class SsiFormPage extends StatefulWidget {
 class _SsiFormPageState extends State<SsiFormPage> {
   final _formKey = GlobalKey<FormState>();
   String? selectedRole = 'Writer';
-  final TextEditingController _nameCtrl = TextEditingController();
-  final TextEditingController _emailCtrl = TextEditingController();
+  // List<Map<String, dynamic>> _values;
+
+  @override
+  void initState() {
+    super.initState();
+    // _values = [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,15 +62,15 @@ class _SsiFormPageState extends State<SsiFormPage> {
                               return null;
                             }
                           },
-                          // controller: _nameCtrl,
+                          controller: new TextEditingController(),
                         ))
                       }
                     else if (field['type'] == 'dropdown')
                       {
-                        //     data.add(_buildSelector(
-                        //       context: context,
-                        //       name: field['label'].toString(),
-                        //     ))
+                        // data.add(_buildSelector(
+                        //   context: context,
+                        //   name: field['label'].toString(),
+                        // ))
                       }
                   }),
               steps.add(CoolStep(
@@ -113,32 +118,9 @@ class _SsiFormPageState extends State<SsiFormPage> {
         decoration: InputDecoration(
           labelText: labelText,
         ),
+        onChanged: (data) => {print(data)},
         validator: validator,
         controller: controller,
-      ),
-    );
-  }
-
-  Widget _buildDropDown({
-    String? labelText,
-    List<String>? items,
-    String? selectedItem,
-    ValueChanged<String>? onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: DropdownButtonFormField(
-        decoration: InputDecoration(
-          labelText: labelText,
-        ),
-        value: selectedItem,
-        items: items?.map((item) {
-          return DropdownMenuItem(
-            value: item,
-            child: Text(item),
-          );
-        }).toList(),
-        onChanged: onChanged,
       ),
     );
   }
@@ -179,4 +161,8 @@ class _SsiFormPageState extends State<SsiFormPage> {
       ),
     );
   }
+
+  // _onUpdate(int key, String val) {
+  //   _value.add()
+  // }
 }
