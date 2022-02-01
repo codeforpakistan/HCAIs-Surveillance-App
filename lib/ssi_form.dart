@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
 
@@ -17,12 +19,13 @@ class SsiFormPage extends StatefulWidget {
 class _SsiFormPageState extends State<SsiFormPage> {
   final _formKey = GlobalKey<FormState>();
   String? selectedRole = 'Writer';
-  // List<Map<String, dynamic>> _values;
+  List<Map<String, dynamic>> _values = [];
+  List<TextEditingController> _controllers = [];
+  String _result = '';
 
   @override
   void initState() {
     super.initState();
-    // _values = [];
   }
 
   @override
@@ -31,7 +34,10 @@ class _SsiFormPageState extends State<SsiFormPage> {
     // final Map dataFromHospitalScreen = ModalRoute.of(context).settings.arguments;
     final fields = args.fields;
     final List<CoolStep> steps = [];
+    final List<Map<String, TextEditingController>> ctrls = [];
     List<Widget> data = [];
+    var label = '';
+    int count = -1;
     fields.forEach((step) => {
           data = [],
           if (step is List)
@@ -51,26 +57,27 @@ class _SsiFormPageState extends State<SsiFormPage> {
                       }
                     else if (field['type'] == 'textfield')
                       {
+                        label = field['label'].toString(),
+                        count++,
+                        ctrls.insert(
+                            count, {label: new TextEditingController()}),
+                        print(ctrls[count][label]),
                         data.add(_buildTextField(
-                          labelText: field['label'].toString(),
-                          validator: (value) {
-                            if (field['is_required'] == true) {
-                              if (value?.isEmpty ?? true) {
-                                return field['label'].toString() +
-                                    " is required";
+                            labelText: field['label'].toString(),
+                            validator: (value) {
+                              if (field['is_required'] == true) {
+                                if (value?.isEmpty ?? true) {
+                                  return field['label'].toString() +
+                                      " is required";
+                                }
+                                return null;
                               }
-                              return null;
-                            }
-                          },
-                          controller: new TextEditingController(),
-                        ))
+                            },
+                            controller: ctrls[count][label]))
                       }
                     else if (field['type'] == 'dropdown')
                       {
-                        // data.add(_buildSelector(
-                        //   context: context,
-                        //   name: field['label'].toString(),
-                        // ))
+                        // data.add(_buildDropDown(content, ))
                       }
                   }),
               steps.add(CoolStep(
@@ -89,7 +96,7 @@ class _SsiFormPageState extends State<SsiFormPage> {
     final stepper = CoolStepper(
       showErrorSnackbar: false,
       onCompleted: () {
-        print('Steps completed!');
+        print(_result);
       },
       steps: steps,
       config: CoolStepperConfig(
@@ -115,22 +122,27 @@ class _SsiFormPageState extends State<SsiFormPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: TextFormField(
+        validator: validator,
         decoration: InputDecoration(
           labelText: labelText,
         ),
-        onChanged: (data) => {print(data)},
-        validator: validator,
-        controller: controller,
+        onChanged: (data) => {_onUpdate(labelText, data)},
       ),
     );
   }
+
+  // Widget _buildDropDown({
+  //   BuildContext? context,
+  //   required String name,
+  // }) {
+
+  // }
 
   Widget _buildSelector({
     BuildContext? context,
     required String name,
   }) {
     final isActive = name == selectedRole;
-
     return Expanded(
       child: AnimatedContainer(
         duration: Duration(milliseconds: 200),
@@ -162,7 +174,16 @@ class _SsiFormPageState extends State<SsiFormPage> {
     );
   }
 
-  // _onUpdate(int key, String val) {
-  //   _value.add()
-  // }
+  _onUpdate(String? key, String val) {
+    Map<String, dynamic> json = {'key': key, 'value': val};
+    _values.add(json);
+    setState(() {
+      _result = _prettyPrint(_values);
+    });
+  }
+
+  String _prettyPrint(jsonObj) {
+    var encoder = JsonEncoder.withIndent(' ');
+    return encoder.convert(jsonObj);
+  }
 }
