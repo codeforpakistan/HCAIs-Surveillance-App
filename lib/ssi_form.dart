@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
-
 import 'args/Arguments.dart';
 
 class SsiFormPage extends StatefulWidget {
@@ -19,9 +18,9 @@ class SsiFormPage extends StatefulWidget {
 class _SsiFormPageState extends State<SsiFormPage> {
   final _formKey = GlobalKey<FormState>();
   String? selectedRole = 'Writer';
-  List<Map<String, dynamic>> _values = [];
-  List<TextEditingController> _controllers = [];
-  String _result = '';
+  var _values = {};
+  var _result = {};
+  String _selectedLocation = '';
 
   @override
   void initState() {
@@ -31,13 +30,9 @@ class _SsiFormPageState extends State<SsiFormPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    // final Map dataFromHospitalScreen = ModalRoute.of(context).settings.arguments;
     final fields = args.fields;
     final List<CoolStep> steps = [];
-    final List<Map<String, TextEditingController>> ctrls = [];
     List<Widget> data = [];
-    var label = '';
-    int count = -1;
     fields.forEach((step) => {
           data = [],
           if (step is List)
@@ -57,11 +52,6 @@ class _SsiFormPageState extends State<SsiFormPage> {
                       }
                     else if (field['type'] == 'textfield')
                       {
-                        label = field['label'].toString(),
-                        count++,
-                        ctrls.insert(
-                            count, {label: new TextEditingController()}),
-                        print(ctrls[count][label]),
                         data.add(_buildTextField(
                             labelText: field['label'].toString(),
                             validator: (value) {
@@ -72,12 +62,18 @@ class _SsiFormPageState extends State<SsiFormPage> {
                                 }
                                 return null;
                               }
-                            },
-                            controller: ctrls[count][label]))
+                            })),
                       }
                     else if (field['type'] == 'dropdown')
                       {
-                        // data.add(_buildDropDown(content, ))
+                        _selectedLocation = field['options'][0],
+                        data.add(
+                          _buildDropDown(
+                              labelText: field['label'].toString(),
+                              options:
+                                  List<String>.from(field['options'] as List),
+                              value: field['options'][0]),
+                        ),
                       }
                   }),
               steps.add(CoolStep(
@@ -117,7 +113,6 @@ class _SsiFormPageState extends State<SsiFormPage> {
   Widget _buildTextField({
     String? labelText,
     FormFieldValidator<String>? validator,
-    TextEditingController? controller,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
@@ -131,12 +126,33 @@ class _SsiFormPageState extends State<SsiFormPage> {
     );
   }
 
-  // Widget _buildDropDown({
-  //   BuildContext? context,
-  //   required String name,
-  // }) {
-
-  // }
+  Widget _buildDropDown({
+    required String labelText,
+    required List<String> options,
+    required String value,
+  }) {
+    return DropdownButtonFormField(
+      hint: Text(labelText),
+      value: value,
+      onSaved: (String? newValue) => {
+        setState(() {
+          value = newValue!;
+        })
+      },
+      onChanged: (String? newValue) {
+        setState(() {
+          value = newValue!;
+          _onUpdate(labelText, newValue);
+        });
+      },
+      items: options.map((value) {
+        return DropdownMenuItem<String>(
+          child: new Text(value),
+          value: value,
+        );
+      }).toList(),
+    );
+  }
 
   Widget _buildSelector({
     BuildContext? context,
@@ -174,11 +190,10 @@ class _SsiFormPageState extends State<SsiFormPage> {
     );
   }
 
-  _onUpdate(String? key, String val) {
-    Map<String, dynamic> json = {'key': key, 'value': val};
-    _values.add(json);
+  _onUpdate(String? key, String? val) {
+    _values[key] = val;
     setState(() {
-      _result = _prettyPrint(_values);
+      _result = _values;
     });
   }
 
