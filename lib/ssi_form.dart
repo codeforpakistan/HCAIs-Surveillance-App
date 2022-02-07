@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
 import 'args/Arguments.dart';
@@ -20,7 +18,6 @@ class _SsiFormPageState extends State<SsiFormPage> {
   String? selectedRole = 'Writer';
   var _values = {};
   var _result = {};
-  String _selectedLocation = '';
 
   @override
   void initState() {
@@ -66,7 +63,6 @@ class _SsiFormPageState extends State<SsiFormPage> {
                       }
                     else if (field['type'] == 'dropdown')
                       {
-                        _selectedLocation = field['options'][0],
                         data.add(
                           _buildDropDown(
                               labelText: field['label'].toString(),
@@ -154,51 +150,46 @@ class _SsiFormPageState extends State<SsiFormPage> {
     );
   }
 
-  Widget _buildSelector({
-    BuildContext? context,
-    required String name,
-  }) {
-    final isActive = name == selectedRole;
-    return Expanded(
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          color: isActive ? Theme.of(context!).primaryColor : null,
-          border: Border.all(
-            width: 0,
-          ),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: RadioListTile(
-          value: name,
-          activeColor: Colors.white,
-          groupValue: selectedRole,
-          onChanged: (String? v) {
-            setState(() {
-              selectedRole = v;
-            });
-          },
-          title: Text(
-            name,
-            style: TextStyle(
-              color: isActive ? Colors.white : null,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildSelector({
+  //   BuildContext? context,
+  //   required String name,
+  // }) {
+  //   final isActive = name == selectedRole;
+  //   return Expanded(
+  //     child: AnimatedContainer(
+  //       duration: Duration(milliseconds: 200),
+  //       curve: Curves.easeInOut,
+  //       decoration: BoxDecoration(
+  //         color: isActive ? Theme.of(context!).primaryColor : null,
+  //         border: Border.all(
+  //           width: 0,
+  //         ),
+  //         borderRadius: BorderRadius.circular(8.0),
+  //       ),
+  //       child: RadioListTile(
+  //         value: name,
+  //         activeColor: Colors.white,
+  //         groupValue: selectedRole,
+  //         onChanged: (String? v) {
+  //           setState(() {
+  //             selectedRole = v;
+  //           });
+  //         },
+  //         title: Text(
+  //           name,
+  //           style: TextStyle(
+  //             color: isActive ? Colors.white : null,
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   _onUpdate(String? key, String? val) {
     _values[key] = val;
     setState(() {
       _result = _values;
     });
-  }
-
-  String _prettyPrint(jsonObj) {
-    var encoder = JsonEncoder.withIndent(' ');
-    return encoder.convert(jsonObj);
   }
 }
