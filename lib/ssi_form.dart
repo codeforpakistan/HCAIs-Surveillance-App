@@ -57,8 +57,8 @@ class _SsiFormPageState extends State<SsiFormPage> {
                                   return field['label'].toString() +
                                       " is required";
                                 }
-                                return null;
                               }
+                              return null;
                             })),
                       }
                     else if (field['type'] == 'dropdown')
