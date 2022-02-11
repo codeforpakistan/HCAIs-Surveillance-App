@@ -86,18 +86,18 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     else if (field['type'] == 'textfield')
                       {
                         data.add(_buildTextField(
-                            labelText: field['label'].toString(),
-                            validator: (value) {
-                              if (field['is_required'] == true) {
-                                if (value?.isEmpty ?? true) {
-                                  return field['label'].toString() +
-                                      " is required";
-                                }
+                          labelText: field['label'].toString(),
+                          validator: (value) {
+                            if (field['is_required'] == true) {
+                              if (value?.isEmpty ?? true) {
+                                return field['label'].toString() +
+                                    " is required";
                               }
-                              return null;
-                            },    myController: new TextEditingController(),
-,                            
-                            )),
+                            }
+                            return null;
+                          },
+                          myController: new TextEditingController(),
+                        )),
                       }
                     else if (field['type'] == 'dropdown')
                       {
