@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:hcais/ssi_form.dart';
+import 'package:hcais/hcai_form.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
 
   Future<List> getHcais() async {
     var data = [];
-    var url = Constants.BASE_URL + "/hcai";
+    var url = Constants.BASE_URL + "/get-hcai-titles";
     var response = await http.get(
       Uri.parse(url),
       headers: {
@@ -82,7 +82,11 @@ class HomePage extends StatelessWidget {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   if (snapshot.hasError) {
-                    return Center(child: Text(snapshot.hasError.toString()));
+                    return Center(
+                        child: Text(
+                      snapshot.error.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ));
                   }
                   return new ListView.builder(
                       shrinkWrap: true,
@@ -112,13 +116,11 @@ class HomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   Navigator.of(context).pushNamed(
-                                      SsiFormPage.tag,
+                                      HcaiFormPage.tag,
                                       arguments: new Arguments(
-                                          snapshot.data?[index]['steps']
-                                              as List<dynamic>,
-                                          snapshot.data?[index]['title'],
-                                          snapshot.data?[index]
-                                              ['description']));
+                                          "620670583a041b3f01d53335",
+                                          "61f92deb3c83fe9672181b7f",
+                                          snapshot.data?[index]['_id']));
                                 }));
                       });
                 default:

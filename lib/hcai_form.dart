@@ -1,19 +1,23 @@
+import 'dart:convert';
+
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
+import 'package:hcais/utils/constants.dart';
 import 'args/Arguments.dart';
+import 'package:http/http.dart' as http;
 
-class SsiFormPage extends StatefulWidget {
-  SsiFormPage({Key? key, this.title}) : super(key: key);
+class HcaiFormPage extends StatefulWidget {
+  HcaiFormPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
   static String tag = 'ssi-form-page';
 
   @override
-  _SsiFormPageState createState() => _SsiFormPageState();
+  _HcaiFormPageState createState() => _HcaiFormPageState();
 }
 
-class _SsiFormPageState extends State<SsiFormPage> {
+class _HcaiFormPageState extends State<HcaiFormPage> {
   final _formKey = GlobalKey<FormState>();
   String? selectedRole = 'Writer';
   var _values = {};
@@ -27,10 +31,40 @@ class _SsiFormPageState extends State<SsiFormPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    // final hcai = args;
-    // print(hcai);
-    List<dynamic> allSteps = args.steps;
-    print(allSteps);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title?.toUpperCase() ?? 'SSI FORM'),
+      ),
+      body: Container(
+        child: FutureBuilder(
+            future: getHcaiForm(args.hcaiId, args.hospitalId),
+            builder: (context, AsyncSnapshot<List> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.done:
+                  if (snapshot.hasError) {
+                    print(snapshot.error.toString());
+                    return Padding(
+                      padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                      child: Center(child: Text(snapshot.error.toString())),
+                    );
+                  }
+                  return new ListView.builder(
+                      shrinkWrap: false,
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return _formWizard(snapshot.data?.first);
+                      });
+                default:
+                  return Center(child: CircularProgressIndicator());
+              }
+            }),
+      ),
+    );
+  }
+
+  Widget _formWizard(Map<String, dynamic> hcaiForm) {
+    List<dynamic> allSteps = hcaiForm["steps"];
     final List<CoolStep> steps = [];
     List<Widget> data = [];
     allSteps.forEach((step) => {
@@ -64,20 +98,20 @@ class _SsiFormPageState extends State<SsiFormPage> {
                               return null;
                             })),
                       }
-                    else if (field['type'] == 'dropdown')
-                      {
-                        data.add(
-                          _buildDropDown(
-                              labelText: field['label'].toString(),
-                              options:
-                                  List<String>.from(field['options'] as List),
-                              value: field['options'][0]),
-                        ),
-                      }
+                    // else if (field['type'] == 'dropdown')
+                    //   {
+                    //     data.add(
+                    //       _buildDropDown(
+                    //           labelText: field['label'].toString(),
+                    //           options: List<Map<String, dynamic>>.from(
+                    //               field['options'] as List),
+                    //           value: field['options'][0].name.toString()),
+                    //     ),
+                    //   }
                   }),
               steps.add(CoolStep(
-                  title: step.title,
-                  subtitle: step.description,
+                  title: step['stepTitle'].toString(),
+                  subtitle: step['stepDescription'].toString(),
                   content: Form(key: _formKey, child: Column(children: data)),
                   validation: () {
                     if (!_formKey.currentState!.validate()) {
@@ -87,8 +121,7 @@ class _SsiFormPageState extends State<SsiFormPage> {
                   })),
             }
         });
-
-    final stepper = CoolStepper(
+    return CoolStepper(
       showErrorSnackbar: false,
       onCompleted: () {
         print(_result);
@@ -96,15 +129,6 @@ class _SsiFormPageState extends State<SsiFormPage> {
       steps: steps,
       config: CoolStepperConfig(
         backText: 'PREV',
-      ),
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title?.toUpperCase() ?? 'SSI FORM'),
-      ),
-      body: Container(
-        child: stepper,
       ),
     );
   }
@@ -127,7 +151,7 @@ class _SsiFormPageState extends State<SsiFormPage> {
 
   Widget _buildDropDown({
     required String labelText,
-    required List<String> options,
+    required List<Map<String, dynamic>> options,
     required String value,
   }) {
     return DropdownButtonFormField(
@@ -145,9 +169,9 @@ class _SsiFormPageState extends State<SsiFormPage> {
         });
       },
       items: options.map((value) {
-        return DropdownMenuItem<String>(
-          child: new Text(value),
-          value: value,
+        return DropdownMenuItem(
+          value: value['name'].toString(),
+          child: Text(value['name'].toString()),
         );
       }).toList(),
     );
@@ -195,4 +219,18 @@ class _SsiFormPageState extends State<SsiFormPage> {
       _result = _values;
     });
   }
+}
+
+Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
+  var data = [];
+  var url = Constants.BASE_URL + "/hcai/" + hospitalId + "/" + hcaiId;
+  var response = await http.get(
+    Uri.parse(url),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  );
+  data = json.decode(utf8.decode(response.bodyBytes));
+  return data.toList();
 }

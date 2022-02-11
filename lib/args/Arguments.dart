@@ -1,6 +1,6 @@
 class Arguments {
-  List<dynamic> steps = [];
-  final title;
-  final description;
-  Arguments(this.steps, this.title, this.description);
+  final userId;
+  final hospitalId;
+  final hcaiId;
+  Arguments(this.userId, this.hospitalId, this.hcaiId);
 }
