@@ -48,13 +48,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
                       child: Center(child: Text(snapshot.error.toString())),
                     );
+                  } else if (snapshot.hasData) {
+                    return _formWizard(snapshot.data?.first);
+                  } else {
+                    return Center(child: CircularProgressIndicator());
                   }
-                  return new ListView.builder(
-                      shrinkWrap: false,
-                      itemCount: snapshot.data?.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return _formWizard(snapshot.data?.first);
-                      });
                 default:
                   return Center(child: CircularProgressIndicator());
               }
