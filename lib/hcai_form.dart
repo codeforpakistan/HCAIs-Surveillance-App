@@ -95,7 +95,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                 }
                               }
                               return null;
-                            })),
+                            },    myController: new TextEditingController(),
+,                            
+                            )),
                       }
                     else if (field['type'] == 'dropdown')
                       {
@@ -141,6 +143,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Widget _buildTextField({
     String? labelText,
     FormFieldValidator<String>? validator,
+    required TextEditingController myController,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
@@ -149,7 +152,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         decoration: InputDecoration(
           labelText: labelText,
         ),
-        onChanged: (data) => {_onUpdate(labelText, data)},
+        controller: myController,
+        onChanged: (data) => {print(data)},
       ),
     );
   }
