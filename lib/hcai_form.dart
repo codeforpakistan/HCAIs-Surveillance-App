@@ -157,14 +157,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       onSaved: (String? newValue) => {
         setState(() {
           value = newValue!;
-        })
+        }),
+        _onUpdate(labelText, newValue)
       },
-      onChanged: (String? newValue) {
-        setState(() {
-          value = newValue!;
-          _onUpdate(labelText, newValue);
-        });
-      },
+      onChanged: (String? newValue) {},
       items: options.map((value) {
         return DropdownMenuItem(
           value: value['name'].toString(),
@@ -173,42 +169,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       }).toList(),
     );
   }
-
-  // Widget _buildSelector({
-  //   BuildContext? context,
-  //   required String name,
-  // }) {
-  //   final isActive = name == selectedRole;
-  //   return Expanded(
-  //     child: AnimatedContainer(
-  //       duration: Duration(milliseconds: 200),
-  //       curve: Curves.easeInOut,
-  //       decoration: BoxDecoration(
-  //         color: isActive ? Theme.of(context!).primaryColor : null,
-  //         border: Border.all(
-  //           width: 0,
-  //         ),
-  //         borderRadius: BorderRadius.circular(8.0),
-  //       ),
-  //       child: RadioListTile(
-  //         value: name,
-  //         activeColor: Colors.white,
-  //         groupValue: selectedRole,
-  //         onChanged: (String? v) {
-  //           setState(() {
-  //             selectedRole = v;
-  //           });
-  //         },
-  //         title: Text(
-  //           name,
-  //           style: TextStyle(
-  //             color: isActive ? Colors.white : null,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   _onUpdate(String? key, String? val) {
     _values[key] = val;
