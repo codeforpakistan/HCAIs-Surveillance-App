@@ -1,4 +1,6 @@
 class Arguments {
-  final List<dynamic> fields;
-  Arguments(this.fields);
+  List<dynamic> steps = [];
+  final title;
+  final description;
+  Arguments(this.steps, this.title, this.description);
 }

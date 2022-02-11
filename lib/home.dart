@@ -113,8 +113,12 @@ class HomePage extends StatelessWidget {
                                 onPressed: () {
                                   Navigator.of(context).pushNamed(
                                       SsiFormPage.tag,
-                                      arguments: Arguments(
-                                          snapshot.data?[index]['fields']));
+                                      arguments: new Arguments(
+                                          snapshot.data?[index]['steps']
+                                              as List<dynamic>,
+                                          snapshot.data?[index]['title'],
+                                          snapshot.data?[index]
+                                              ['description']));
                                 }));
                       });
                 default:

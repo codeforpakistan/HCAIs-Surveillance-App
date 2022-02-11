@@ -27,14 +27,17 @@ class _SsiFormPageState extends State<SsiFormPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    final fields = args.fields;
+    // final hcai = args;
+    // print(hcai);
+    List<dynamic> allSteps = args.steps;
+    print(allSteps);
     final List<CoolStep> steps = [];
     List<Widget> data = [];
-    fields.forEach((step) => {
+    allSteps.forEach((step) => {
           data = [],
-          if (step is List)
+          if (step['fields'] is List)
             {
-              step.forEach((field) => {
+              step['fields'].forEach((field) => {
                     if (field['type'] == 'text')
                       {
                         data.add(Padding(
@@ -73,8 +76,8 @@ class _SsiFormPageState extends State<SsiFormPage> {
                       }
                   }),
               steps.add(CoolStep(
-                  title: 'Hospital Information',
-                  subtitle: 'Please fill the hospital information below',
+                  title: step.title,
+                  subtitle: step.description,
                   content: Form(key: _formKey, child: Column(children: data)),
                   validation: () {
                     if (!_formKey.currentState!.validate()) {
