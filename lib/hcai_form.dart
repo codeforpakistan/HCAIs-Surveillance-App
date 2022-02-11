@@ -65,7 +65,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     List<dynamic> allSteps = hcaiForm["steps"];
     final List<CoolStep> steps = [];
     List<Widget> data = [];
-    allSteps.forEach((step) => {
+    var objToConstruct;
+    allSteps.asMap().forEach((index, step) => {
           data = [],
           if (step['fields'] is List)
             {
@@ -106,10 +107,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         ),
                       }
                   }),
+              if (index == 0)
+                {
+                  objToConstruct =
+                      Form(key: _formKey, child: Column(children: data))
+                }
+              else
+                {objToConstruct = Form(child: Column(children: data))},
               steps.add(CoolStep(
                   title: step['stepTitle'].toString(),
                   subtitle: step['stepDescription'].toString(),
-                  content: Form(key: _formKey, child: Column(children: data)),
+                  content: objToConstruct,
                   validation: () {
                     if (!_formKey.currentState!.validate()) {
                       return 'Fill form correctly';
