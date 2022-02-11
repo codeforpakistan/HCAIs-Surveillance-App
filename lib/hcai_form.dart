@@ -96,16 +96,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               return null;
                             })),
                       }
-                    // else if (field['type'] == 'dropdown')
-                    //   {
-                    //     data.add(
-                    //       _buildDropDown(
-                    //           labelText: field['label'].toString(),
-                    //           options: List<Map<String, dynamic>>.from(
-                    //               field['options'] as List),
-                    //           value: field['options'][0].name.toString()),
-                    //     ),
-                    //   }
+                    else if (field['type'] == 'dropdown')
+                      {
+                        data.add(
+                          _buildDropDown(
+                              labelText: field['label'].toString(),
+                              options: field['options'],
+                              value: field['options'][0]['name']),
+                        ),
+                      }
                   }),
               steps.add(CoolStep(
                   title: step['stepTitle'].toString(),
@@ -149,7 +148,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildDropDown({
     required String labelText,
-    required List<Map<String, dynamic>> options,
+    required List<dynamic> options,
     required String value,
   }) {
     return DropdownButtonFormField(
