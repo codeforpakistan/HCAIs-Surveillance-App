@@ -3,8 +3,10 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:hcais/utils/constants.dart';
+import 'package:hcais/utils/helper.dart';
 import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
+import 'package:date_field/date_field.dart';
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
@@ -63,6 +65,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _formWizard(Map<String, dynamic> hcaiForm, context) {
     List<dynamic> allSteps = hcaiForm["steps"];
+    DateTime? selectedDate = DateTime.now();
     final List<CoolStep> steps = [];
     List<Widget> data = [];
     var objToConstruct;
@@ -117,6 +120,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               options: field['options']),
                         )),
                       }
+                    else if (field['type'] == 'datefield')
+                      {
+                        data.add(_buildDateField(
+                            hint: field['label'].toString(),
+                            selectedDate: selectedDate,
+                            type: 'date'))
+                      }
+                    else if (field['type'] == 'timefield')
+                      {
+                        data.add(_buildDateField(
+                            hint: field['label'].toString(),
+                            selectedDate: selectedDate,
+                            type: 'name'))
+                      }
                   }),
               if (index == 0)
                 {
@@ -149,6 +166,19 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         backText: 'PREV',
       ),
     );
+  }
+
+  Widget _buildDateField(
+      {required String hint, required DateTime selectedDate, type: String}) {
+    return DateTimeField(
+        decoration: InputDecoration(hintText: hint),
+        selectedDate: selectedDate,
+        mode: type == 'time'
+            ? DateTimeFieldPickerMode.time
+            : DateTimeFieldPickerMode.date,
+        onDateSelected: (DateTime value) {
+          selectedDate = value;
+        });
   }
 
   Widget _buildTextField({
@@ -189,7 +219,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       items: options.map((value) {
         return DropdownMenuItem(
           value: value['name'].toString(),
-          child: Text(value['name'].toString()),
+          child: Text(Helper.truncateString(value['name'].toString(), 40)),
         );
       }).toList(),
     );
@@ -223,13 +253,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         onChanged: (value) => {selected = value!.toString()},
       ),
     );
-
-    // RadioListTile(
-    //   value: value,
-    //   groupValue: groupValue,
-    //   onChanged: (value) => {print(value)},
-    //   title: Text(title),
-    // );
   }
 
   _onUpdate(String? key, String? val) {
@@ -246,7 +269,7 @@ sendData(context) {
       animType: AnimType.LEFTSLIDE,
       headerAnimationLoop: false,
       dialogType: DialogType.SUCCES,
-      showCloseIcon: true,
+      showCloseIcon: false,
       title: 'Succes',
       desc: 'Submitted!',
       onDissmissCallback: (type) {
