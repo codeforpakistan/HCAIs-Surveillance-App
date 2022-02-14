@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:hcais/utils/constants.dart';
@@ -49,7 +49,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       child: Center(child: Text(snapshot.error.toString())),
                     );
                   } else if (snapshot.hasData) {
-                    return _formWizard(snapshot.data?.first);
+                    return _formWizard(snapshot.data?.first, context);
                   } else {
                     return Center(child: CircularProgressIndicator());
                   }
@@ -61,11 +61,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  Widget _formWizard(Map<String, dynamic> hcaiForm) {
+  Widget _formWizard(Map<String, dynamic> hcaiForm, context) {
     List<dynamic> allSteps = hcaiForm["steps"];
     final List<CoolStep> steps = [];
     List<Widget> data = [];
-    allSteps.forEach((step) => {
+    var objToConstruct;
+    allSteps.asMap().forEach((index, step) => {
           data = [],
           if (step['fields'] is List)
             {
@@ -94,7 +95,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                 }
                               }
                               return null;
-                            })),
+                            },
+                            myController: new TextEditingController())),
                       }
                     else if (field['type'] == 'dropdown')
                       {
@@ -105,23 +107,42 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               value: field['options'][0]['name']),
                         ),
                       }
+                    else if (field['type'] == 'radiofield')
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildRadioButton(
+                              context: context,
+                              title: field['label'].toString(),
+                              options: field['options']),
+                        )),
+                      }
                   }),
-              steps.add(CoolStep(
-                  title: step['stepTitle'].toString(),
-                  subtitle: step['stepDescription'].toString(),
-                  content: Form(key: _formKey, child: Column(children: data)),
-                  validation: () {
-                    if (!_formKey.currentState!.validate()) {
-                      return 'Fill form correctly';
-                    }
-                    return null;
-                  })),
+              if (index == 0)
+                {
+                  objToConstruct =
+                      Form(key: _formKey, child: Column(children: data))
+                }
+              else
+                {objToConstruct = Form(child: Column(children: data))},
+              if (data.length > 0)
+                {
+                  steps.add(CoolStep(
+                      title: step['stepTitle'].toString(),
+                      subtitle: step['stepDescription'].toString(),
+                      content: objToConstruct,
+                      validation: () {
+                        return null;
+                      })),
+                }
             }
         });
     return CoolStepper(
       showErrorSnackbar: false,
       onCompleted: () {
-        print(_result);
+        sendData(context);
+        print('Steps completed!');
+        print(this._result);
       },
       steps: steps,
       config: CoolStepperConfig(
@@ -133,6 +154,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Widget _buildTextField({
     String? labelText,
     FormFieldValidator<String>? validator,
+    required TextEditingController myController,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
@@ -141,7 +163,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         decoration: InputDecoration(
           labelText: labelText,
         ),
-        onChanged: (data) => {_onUpdate(labelText, data)},
+        controller: myController,
+        onSaved: (newValue) => {
+          _onUpdate(labelText, newValue),
+        },
       ),
     );
   }
@@ -157,14 +182,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       onSaved: (String? newValue) => {
         setState(() {
           value = newValue!;
-        })
+        }),
+        _onUpdate(labelText, value)
       },
-      onChanged: (String? newValue) {
-        setState(() {
-          value = newValue!;
-          _onUpdate(labelText, newValue);
-        });
-      },
+      onChanged: (String? newValue) {},
       items: options.map((value) {
         return DropdownMenuItem(
           value: value['name'].toString(),
@@ -174,41 +195,42 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  // Widget _buildSelector({
-  //   BuildContext? context,
-  //   required String name,
-  // }) {
-  //   final isActive = name == selectedRole;
-  //   return Expanded(
-  //     child: AnimatedContainer(
-  //       duration: Duration(milliseconds: 200),
-  //       curve: Curves.easeInOut,
-  //       decoration: BoxDecoration(
-  //         color: isActive ? Theme.of(context!).primaryColor : null,
-  //         border: Border.all(
-  //           width: 0,
-  //         ),
-  //         borderRadius: BorderRadius.circular(8.0),
-  //       ),
-  //       child: RadioListTile(
-  //         value: name,
-  //         activeColor: Colors.white,
-  //         groupValue: selectedRole,
-  //         onChanged: (String? v) {
-  //           setState(() {
-  //             selectedRole = v;
-  //           });
-  //         },
-  //         title: Text(
-  //           name,
-  //           style: TextStyle(
-  //             color: isActive ? Colors.white : null,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildRadioButton(
+      {required BuildContext context,
+      required String title,
+      required List<dynamic> options}) {
+    List<Widget> list = [];
+    list.add(Text(title,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    options.forEach((each) => {
+          list.add(_buildTile(
+              title: each['name'], value: 0, selected: options[0]['name']))
+        });
+    return Column(
+      children: list,
+    );
+  }
+
+  Widget _buildTile(
+      {required String title, required int value, String? selected}) {
+    return ListTile(
+      title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
+      leading: Radio(
+        value: title,
+        groupValue: value,
+        activeColor: Color(0xFF6200EE),
+        onChanged: (value) => {selected = value!.toString()},
+      ),
+    );
+
+    // RadioListTile(
+    //   value: value,
+    //   groupValue: groupValue,
+    //   onChanged: (value) => {print(value)},
+    //   title: Text(title),
+    // );
+  }
 
   _onUpdate(String? key, String? val) {
     _values[key] = val;
@@ -216,6 +238,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       _result = _values;
     });
   }
+}
+
+sendData(context) {
+  AwesomeDialog(
+      context: context,
+      animType: AnimType.LEFTSLIDE,
+      headerAnimationLoop: false,
+      dialogType: DialogType.SUCCES,
+      showCloseIcon: true,
+      title: 'Succes',
+      desc: 'Submitted!',
+      onDissmissCallback: (type) {
+        debugPrint('Dialog Dissmiss from callback $type');
+      })
+    ..show();
 }
 
 Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
