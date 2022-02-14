@@ -8,6 +8,8 @@ import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
 
+import 'components/alertDialog_widget.dart';
+
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
 
@@ -112,7 +114,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                 }
                                 return null;
                               },
-                              myController: new TextEditingController()),
+                              myController: new TextEditingController(),
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please enter text'),
                         )),
                       }
                     else if (field['type'] == 'dropdown')
@@ -122,7 +127,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           child: _buildDropDown(
                               labelText: field['label'].toString(),
                               options: field['options'],
-                              value: field['options'][0]['name']),
+                              value: field['options'][0]['name'],
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please select an option'),
                         )),
                       }
                     else if (field['type'] == 'radiofield')
@@ -152,6 +160,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           child: _buildDateField(
                               hint: field['label'].toString(),
                               selectedDate: selectedDate,
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please select a date',
                               type: 'date'),
                         ))
                       }
@@ -162,7 +173,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           child: _buildDateField(
                               hint: field['label'].toString(),
                               selectedDate: selectedDate,
-                              type: 'name'),
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please select a date',
+                              type: 'time'),
                         ))
                       }
                   }),
@@ -200,13 +214,26 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   Widget _buildDateField(
-      {required String hint, required DateTime selectedDate, type: String}) {
+      {required String hint,
+      required DateTime selectedDate,
+      required bool hasHelpLabel,
+      required String helpLabelText,
+      type: String}) {
     List<Widget> list = [];
     list.add(Text(hint,
         textAlign: TextAlign.left,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     list.add(DateTimeField(
-        decoration: InputDecoration(hintText: hint),
+        decoration: InputDecoration(
+            hintText: hint,
+            suffixIcon: hasHelpLabel
+                ? IconButton(
+                    icon: Icon(Icons.info_outline),
+                    onPressed: () {
+                      _showDialog(context, helpLabelText);
+                    },
+                  )
+                : null),
         selectedDate: selectedDate,
         mode: type == 'time'
             ? DateTimeFieldPickerMode.time
@@ -224,6 +251,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     String? labelText,
     FormFieldValidator<String>? validator,
     required TextEditingController myController,
+    required bool hasHelpLabel,
+    required String helpLabelText,
   }) {
     List<Widget> list = [];
     list.add(Text(labelText!,
@@ -232,8 +261,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     list.add(TextFormField(
       validator: validator,
       decoration: InputDecoration(
-        labelText: labelText,
-      ),
+          labelText: labelText,
+          suffixIcon: hasHelpLabel
+              ? IconButton(
+                  icon: Icon(Icons.info_outline),
+                  onPressed: () {
+                    _showDialog(context, helpLabelText);
+                  },
+                )
+              : null),
       controller: myController,
       onSaved: (newValue) => {
         _onUpdate(labelText, newValue),
@@ -249,12 +285,24 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required String labelText,
     required List<dynamic> options,
     required String value,
+    required bool hasHelpLabel,
+    required String helpLabelText,
   }) {
     List<Widget> list = [];
     list.add(Text(labelText,
         textAlign: TextAlign.left,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     list.add(DropdownButtonFormField(
+      decoration: InputDecoration(
+          labelText: labelText,
+          suffixIcon: hasHelpLabel
+              ? IconButton(
+                  icon: Icon(Icons.info_outline),
+                  onPressed: () {
+                    _showDialog(context, helpLabelText);
+                  },
+                )
+              : null),
       isExpanded: true,
       hint: Text(labelText),
       value: value,
@@ -337,6 +385,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         activeColor: Color(0xFF6200EE),
         onChanged: (value) => {selected = value!.toString()},
       ),
+    );
+  }
+
+  _showDialog(BuildContext context, String message) {
+    BlurryDialog alert = BlurryDialog("Information", message);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 
