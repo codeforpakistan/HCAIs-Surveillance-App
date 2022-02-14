@@ -1,4 +1,6 @@
 class Arguments {
-  final List<dynamic> fields;
-  Arguments(this.fields);
+  final userId;
+  final hospitalId;
+  final hcaiId;
+  Arguments(this.userId, this.hospitalId, this.hcaiId);
 }
