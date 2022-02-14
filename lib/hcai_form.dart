@@ -3,8 +3,12 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:hcais/utils/constants.dart';
+import 'package:hcais/utils/helper.dart';
 import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
+import 'package:date_field/date_field.dart';
+
+import 'components/alertDialog_widget.dart';
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
@@ -63,11 +67,23 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _formWizard(Map<String, dynamic> hcaiForm, context) {
     List<dynamic> allSteps = hcaiForm["steps"];
+    DateTime? selectedDate = DateTime.now();
     final List<CoolStep> steps = [];
     List<Widget> data = [];
     var objToConstruct;
     allSteps.asMap().forEach((index, step) => {
           data = [],
+          if (index == 0)
+            {
+              data.add(Padding(
+                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                child: Text(
+                  hcaiForm['description'].toString(),
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+                ),
+              )),
+            },
           if (step['fields'] is List)
             {
               step['fields'].forEach((field) => {
@@ -77,35 +93,45 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                           child: Text(
                             field['description'].toString(),
-                            textAlign: TextAlign.center,
+                            textAlign: TextAlign.left,
                             style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.normal),
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         )),
                       }
                     else if (field['type'] == 'textfield')
                       {
-                        data.add(_buildTextField(
-                            labelText: field['label'].toString(),
-                            validator: (value) {
-                              if (field['is_required'] == true) {
-                                if (value?.isEmpty ?? true) {
-                                  return field['label'].toString() +
-                                      " is required";
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildTextField(
+                              labelText: field['label'].toString(),
+                              validator: (value) {
+                                if (field['is_required'] == true) {
+                                  if (value?.isEmpty ?? true) {
+                                    return field['label'].toString() +
+                                        " is required";
+                                  }
                                 }
-                              }
-                              return null;
-                            },
-                            myController: new TextEditingController())),
+                                return null;
+                              },
+                              myController: new TextEditingController(),
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please enter text'),
+                        )),
                       }
                     else if (field['type'] == 'dropdown')
                       {
-                        data.add(
-                          _buildDropDown(
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildDropDown(
                               labelText: field['label'].toString(),
                               options: field['options'],
-                              value: field['options'][0]['name']),
-                        ),
+                              value: field['options'][0]['name'],
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please select an option'),
+                        )),
                       }
                     else if (field['type'] == 'radiofield')
                       {
@@ -116,6 +142,42 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               title: field['label'].toString(),
                               options: field['options']),
                         )),
+                      }
+                    else if (field['type'] == 'checkboxfield')
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildCheckbox(
+                              context: context,
+                              title: field['label'].toString(),
+                              options: field['options']),
+                        )),
+                      }
+                    else if (field['type'] == 'datefield')
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildDateField(
+                              hint: field['label'].toString(),
+                              selectedDate: selectedDate,
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please select a date',
+                              type: 'date'),
+                        ))
+                      }
+                    else if (field['type'] == 'timefield')
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildDateField(
+                              hint: field['label'].toString(),
+                              selectedDate: selectedDate,
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ??
+                                  'Please select a date',
+                              type: 'time'),
+                        ))
                       }
                   }),
               if (index == 0)
@@ -151,23 +213,71 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
+  Widget _buildDateField(
+      {required String hint,
+      required DateTime selectedDate,
+      required bool hasHelpLabel,
+      required String helpLabelText,
+      type: String}) {
+    List<Widget> list = [];
+    list.add(Text(hint,
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(DateTimeField(
+        decoration: InputDecoration(
+            hintText: hint,
+            suffixIcon: hasHelpLabel
+                ? IconButton(
+                    icon: Icon(Icons.info_outline),
+                    onPressed: () {
+                      _showDialog(context, helpLabelText);
+                    },
+                  )
+                : null),
+        selectedDate: selectedDate,
+        mode: type == 'time'
+            ? DateTimeFieldPickerMode.time
+            : DateTimeFieldPickerMode.date,
+        onDateSelected: (DateTime value) {
+          selectedDate = value;
+        }));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list,
+    );
+  }
+
   Widget _buildTextField({
     String? labelText,
     FormFieldValidator<String>? validator,
     required TextEditingController myController,
+    required bool hasHelpLabel,
+    required String helpLabelText,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: TextFormField(
-        validator: validator,
-        decoration: InputDecoration(
+    List<Widget> list = [];
+    list.add(Text(labelText!,
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(TextFormField(
+      validator: validator,
+      decoration: InputDecoration(
           labelText: labelText,
-        ),
-        controller: myController,
-        onSaved: (newValue) => {
-          _onUpdate(labelText, newValue),
-        },
-      ),
+          suffixIcon: hasHelpLabel
+              ? IconButton(
+                  icon: Icon(Icons.info_outline),
+                  onPressed: () {
+                    _showDialog(context, helpLabelText);
+                  },
+                )
+              : null),
+      controller: myController,
+      onSaved: (newValue) => {
+        _onUpdate(labelText, newValue),
+      },
+    ));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list,
     );
   }
 
@@ -175,8 +285,25 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required String labelText,
     required List<dynamic> options,
     required String value,
+    required bool hasHelpLabel,
+    required String helpLabelText,
   }) {
-    return DropdownButtonFormField(
+    List<Widget> list = [];
+    list.add(Text(labelText,
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(DropdownButtonFormField(
+      decoration: InputDecoration(
+          labelText: labelText,
+          suffixIcon: hasHelpLabel
+              ? IconButton(
+                  icon: Icon(Icons.info_outline),
+                  onPressed: () {
+                    _showDialog(context, helpLabelText);
+                  },
+                )
+              : null),
+      isExpanded: true,
       hint: Text(labelText),
       value: value,
       onSaved: (String? newValue) => {
@@ -189,9 +316,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       items: options.map((value) {
         return DropdownMenuItem(
           value: value['name'].toString(),
-          child: Text(value['name'].toString()),
+          child: Text(Helper.truncateString(value['name'].toString(), 20)),
         );
       }).toList(),
+    ));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list,
     );
   }
 
@@ -201,13 +332,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required List<dynamic> options}) {
     List<Widget> list = [];
     list.add(Text(title,
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.left,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     options.forEach((each) => {
           list.add(_buildTile(
               title: each['name'], value: 0, selected: options[0]['name']))
         });
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: list,
     );
   }
@@ -225,6 +357,48 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
+  Widget _buildCheckbox(
+      {required BuildContext context,
+      required String title,
+      required List<dynamic> options}) {
+    List<Widget> list = [];
+    list.add(Text(title,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    options.forEach((each) => {
+          list.add(_buildCheckBoxTile(
+              title: each['name'], value: 0, selected: options[0]['name']))
+        });
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list,
+    );
+  }
+
+  Widget _buildCheckBoxTile(
+      {required String title, required int value, String? selected}) {
+    return ListTile(
+      title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
+      leading: Checkbox(
+        value: false,
+        // groupValue: value,
+        activeColor: Color(0xFF6200EE),
+        onChanged: (value) => {selected = value!.toString()},
+      ),
+    );
+  }
+
+  _showDialog(BuildContext context, String message) {
+    BlurryDialog alert = BlurryDialog("Information", message);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   _onUpdate(String? key, String? val) {
     _values[key] = val;
     setState(() {
@@ -239,8 +413,8 @@ sendData(context) {
       animType: AnimType.LEFTSLIDE,
       headerAnimationLoop: false,
       dialogType: DialogType.SUCCES,
-      showCloseIcon: true,
-      title: 'Succes',
+      showCloseIcon: false,
+      title: 'Success',
       desc: 'Submitted!',
       onDissmissCallback: (type) {
         debugPrint('Dialog Dissmiss from callback $type');
