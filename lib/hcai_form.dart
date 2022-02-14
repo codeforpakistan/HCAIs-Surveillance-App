@@ -88,27 +88,31 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       }
                     else if (field['type'] == 'textfield')
                       {
-                        data.add(_buildTextField(
-                            labelText: field['label'].toString(),
-                            validator: (value) {
-                              if (field['is_required'] == true) {
-                                if (value?.isEmpty ?? true) {
-                                  return field['label'].toString() +
-                                      " is required";
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildTextField(
+                              labelText: field['label'].toString(),
+                              validator: (value) {
+                                if (field['is_required'] == true) {
+                                  if (value?.isEmpty ?? true) {
+                                    return field['label'].toString() +
+                                        " is required";
+                                  }
                                 }
-                              }
-                              return null;
-                            },
-                            myController: new TextEditingController())),
+                                return null;
+                              },
+                              myController: new TextEditingController()),
+                        )),
                       }
                     else if (field['type'] == 'dropdown')
                       {
-                        data.add(
-                          _buildDropDown(
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildDropDown(
                               labelText: field['label'].toString(),
                               options: field['options'],
                               value: field['options'][0]['name']),
-                        ),
+                        )),
                       }
                     else if (field['type'] == 'radiofield')
                       {
@@ -132,17 +136,23 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       }
                     else if (field['type'] == 'datefield')
                       {
-                        data.add(_buildDateField(
-                            hint: field['label'].toString(),
-                            selectedDate: selectedDate,
-                            type: 'date'))
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildDateField(
+                              hint: field['label'].toString(),
+                              selectedDate: selectedDate,
+                              type: 'date'),
+                        ))
                       }
                     else if (field['type'] == 'timefield')
                       {
-                        data.add(_buildDateField(
-                            hint: field['label'].toString(),
-                            selectedDate: selectedDate,
-                            type: 'name'))
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildDateField(
+                              hint: field['label'].toString(),
+                              selectedDate: selectedDate,
+                              type: 'name'),
+                        ))
                       }
                   }),
               if (index == 0)
@@ -180,7 +190,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildDateField(
       {required String hint, required DateTime selectedDate, type: String}) {
-    return DateTimeField(
+    List<Widget> list = [];
+    list.add(Text(hint,
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(DateTimeField(
         decoration: InputDecoration(hintText: hint),
         selectedDate: selectedDate,
         mode: type == 'time'
@@ -188,7 +202,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             : DateTimeFieldPickerMode.date,
         onDateSelected: (DateTime value) {
           selectedDate = value;
-        });
+        }));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list,
+    );
   }
 
   Widget _buildTextField({
@@ -196,7 +214,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     FormFieldValidator<String>? validator,
     required TextEditingController myController,
   }) {
-    return Padding(
+    List<Widget> list = [];
+    list.add(Text(labelText!,
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: TextFormField(
         validator: validator,
@@ -208,6 +230,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           _onUpdate(labelText, newValue),
         },
       ),
+    ));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list,
     );
   }
 
@@ -216,7 +242,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required List<dynamic> options,
     required String value,
   }) {
-    return DropdownButtonFormField(
+    List<Widget> list = [];
+    list.add(Text(labelText,
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(DropdownButtonFormField(
       hint: Text(labelText),
       value: value,
       onSaved: (String? newValue) => {
@@ -232,6 +262,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           child: Text(Helper.truncateString(value['name'].toString(), 20)),
         );
       }).toList(),
+    ));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list,
     );
   }
 
@@ -241,13 +275,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required List<dynamic> options}) {
     List<Widget> list = [];
     list.add(Text(title,
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.left,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     options.forEach((each) => {
           list.add(_buildTile(
               title: each['name'], value: 0, selected: options[0]['name']))
         });
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: list,
     );
   }
@@ -278,6 +313,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               title: each['name'], value: 0, selected: options[0]['name']))
         });
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: list,
     );
   }
@@ -310,7 +346,7 @@ sendData(context) {
       headerAnimationLoop: false,
       dialogType: DialogType.SUCCES,
       showCloseIcon: false,
-      title: 'Succes',
+      title: 'Success',
       desc: 'Submitted!',
       onDissmissCallback: (type) {
         debugPrint('Dialog Dissmiss from callback $type');
