@@ -71,6 +71,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     var objToConstruct;
     allSteps.asMap().forEach((index, step) => {
           data = [],
+          if (index == 0)
+            {
+              data.add(Padding(
+                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                child: Text(
+                  hcaiForm['description'].toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+                ),
+              )),
+            },
           if (step['fields'] is List)
             {
               step['fields'].forEach((field) => {
@@ -80,9 +91,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                           child: Text(
                             field['description'].toString(),
-                            textAlign: TextAlign.center,
+                            textAlign: TextAlign.left,
                             style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.normal),
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         )),
                       }
@@ -218,18 +229,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     list.add(Text(labelText!,
         textAlign: TextAlign.left,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
-    list.add(Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: TextFormField(
-        validator: validator,
-        decoration: InputDecoration(
-          labelText: labelText,
-        ),
-        controller: myController,
-        onSaved: (newValue) => {
-          _onUpdate(labelText, newValue),
-        },
+    list.add(TextFormField(
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: labelText,
       ),
+      controller: myController,
+      onSaved: (newValue) => {
+        _onUpdate(labelText, newValue),
+      },
     ));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
