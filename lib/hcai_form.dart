@@ -223,13 +223,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         onChanged: (value) => {selected = value!.toString()},
       ),
     );
-
-    // RadioListTile(
-    //   value: value,
-    //   groupValue: groupValue,
-    //   onChanged: (value) => {print(value)},
-    //   title: Text(title),
-    // );
   }
 
   _onUpdate(String? key, String? val) {
