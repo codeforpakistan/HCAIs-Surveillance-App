@@ -77,7 +77,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                 child: Text(
                   hcaiForm['description'].toString(),
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.justify,
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
                 ),
               )),
