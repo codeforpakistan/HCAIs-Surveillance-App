@@ -120,6 +120,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               options: field['options']),
                         )),
                       }
+                    else if (field['type'] == 'checkboxfield')
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          child: _buildCheckbox(
+                              context: context,
+                              title: field['label'].toString(),
+                              options: field['options']),
+                        )),
+                      }
                     else if (field['type'] == 'datefield')
                       {
                         data.add(_buildDateField(
@@ -219,7 +229,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       items: options.map((value) {
         return DropdownMenuItem(
           value: value['name'].toString(),
-          child: Text(Helper.truncateString(value['name'].toString(), 40)),
+          child: Text(Helper.truncateString(value['name'].toString(), 20)),
         );
       }).toList(),
     );
@@ -249,6 +259,36 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       leading: Radio(
         value: title,
         groupValue: value,
+        activeColor: Color(0xFF6200EE),
+        onChanged: (value) => {selected = value!.toString()},
+      ),
+    );
+  }
+
+  Widget _buildCheckbox(
+      {required BuildContext context,
+      required String title,
+      required List<dynamic> options}) {
+    List<Widget> list = [];
+    list.add(Text(title,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    options.forEach((each) => {
+          list.add(_buildCheckBoxTile(
+              title: each['name'], value: 0, selected: options[0]['name']))
+        });
+    return Column(
+      children: list,
+    );
+  }
+
+  Widget _buildCheckBoxTile(
+      {required String title, required int value, String? selected}) {
+    return ListTile(
+      title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
+      leading: Checkbox(
+        value: false,
+        // groupValue: value,
         activeColor: Color(0xFF6200EE),
         onChanged: (value) => {selected = value!.toString()},
       ),
