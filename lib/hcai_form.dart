@@ -255,6 +255,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         textAlign: TextAlign.left,
         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     list.add(DropdownButtonFormField(
+      isExpanded: true,
       hint: Text(labelText),
       value: value,
       onSaved: (String? newValue) => {
