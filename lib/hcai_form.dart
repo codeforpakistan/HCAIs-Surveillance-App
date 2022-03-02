@@ -86,7 +86,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             },
           if (step['fields'] is List)
             {
-              step['fields'].forEach((field) => {
+              step['fields'].forEach((stepIndex, field) => {
                     if (field['type'] == 'text')
                       {
                         data.add(Padding(
@@ -295,6 +295,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     // list.add(Text(labelText,
     //     textAlign: TextAlign.left,
     //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    // if (options)
+    if (this._values['departmentId'] != null && key == 'unitId') {
+      options = options
+          .where((element) =>
+              element['departmentId'] == this._values['departmentId'])
+          .toList();
+    }
     list.add(DropdownButtonFormField(
       decoration: InputDecoration(
           labelText: labelText,
@@ -408,6 +415,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   _onUpdate(String? key, String? val) {
     _values[key] = val;
     // print(_values);
+  }
+}
+
+filterData(List<dynamic> allSteps, key, value) {
+  if (key == 'departmentId') {
+    allSteps.forEach((each) => {
+          print(each),
+        });
   }
 }
 
