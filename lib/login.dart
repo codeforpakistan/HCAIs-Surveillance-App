@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hcais/components/alertDialog_widget.dart';
 import 'package:hcais/home.dart';
+import 'package:http/http.dart' as http;
+import 'package:hcais/utils/constants.dart';
 
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
@@ -9,6 +13,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final passwordController = new TextEditingController();
+  final emailController = new TextEditingController();
   final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
     onPrimary: Colors.lightGreenAccent,
     //primary: Colors.lightGreenAccent,
@@ -33,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     final email = TextFormField(
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
-      initialValue: 'dr.john.doe@pims.org.pk',
+      controller: emailController,
       decoration: InputDecoration(
         hintText: 'Email',
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -45,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
 
     final password = TextFormField(
       autofocus: false,
-      initialValue: 'some password',
+      controller: passwordController,
       obscureText: true,
       decoration: InputDecoration(
         hintText: 'Password',
@@ -61,7 +67,11 @@ class _LoginPageState extends State<LoginPage> {
       child: ElevatedButton(
         style: raisedButtonStyle,
         onPressed: () {
-          Navigator.of(context).pushNamed(HomePage.tag);
+          if (emailController.text != '' && passwordController.text != '') {
+            this.tryLogin(emailController.text, passwordController.text);
+          } else {
+            _showDialog('Missing fields!', 'Please type in email and password');
+          }
         },
         child: Text(
           "Log In",
@@ -74,7 +84,8 @@ class _LoginPageState extends State<LoginPage> {
 
     final forgotLabel = TextButton(
       onPressed: () {
-        _showDialog(context);
+        _showDialog('Forgot Password?',
+            'PLease contact your hospital administrator to reset your password.');
       },
       child: Text(
         "Forgot password?",
@@ -105,15 +116,30 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _showDialog(BuildContext context) {
-    BlurryDialog alert = BlurryDialog("Forgot Password?",
-        "PLease contact your hospital administrator to reset your password.");
-
+  // ignore: non_constant_identifier_names
+  _showDialog(String alertTitle, String alertMsg) {
+    BlurryDialog alert = BlurryDialog(alertTitle, alertMsg);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return alert;
       },
     );
+  }
+
+  tryLogin(String email, String password) async {
+    final response = await http.post(
+      Uri.parse(Constants.BASE_URL + "/login/"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+    if (response.statusCode == 200) {
+      Navigator.of(context).pushNamed(HomePage.tag);
+    } else {
+      _showDialog('Try Again', 'Wrong Email or password');
+      return false;
+    }
   }
 }

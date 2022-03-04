@@ -24,8 +24,7 @@ class HcaiFormPage extends StatefulWidget {
 class _HcaiFormPageState extends State<HcaiFormPage> {
   final _formKey = GlobalKey<FormState>();
   String? selectedRole = 'Writer';
-  var _values = {};
-  var _result = {};
+  Map _values = {};
 
   @override
   void initState() {
@@ -35,7 +34,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-
+    this._values['hospitalId'] = args.hospitalId;
+    this._values['userId'] = args.userId;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title?.toUpperCase() ?? 'SSI FORM'),
@@ -86,7 +86,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             },
           if (step['fields'] is List)
             {
-              step['fields'].forEach((field) => {
+              step['fields'].forEach((stepIndex, field) => {
                     if (field['type'] == 'text')
                       {
                         data.add(Padding(
@@ -125,9 +125,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                           child: _buildDropDown(
+                              key: field['key'].toString(),
                               labelText: field['label'].toString(),
                               options: field['options'],
-                              value: field['options'][0]['name'],
+                              value: field['options'][0]['_id'] != null
+                                  ? field['options'][0]['_id']
+                                  : field['options'][0]['name'],
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select an option'),
@@ -202,9 +205,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return CoolStepper(
       showErrorSnackbar: false,
       onCompleted: () {
-        sendData(context);
-        print('Steps completed!');
-        print(this._result);
+        sendData(context, this._values);
+        print(this._values);
       },
       steps: steps,
       config: CoolStepperConfig(
@@ -255,9 +257,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required String helpLabelText,
   }) {
     List<Widget> list = [];
-    list.add(Text(labelText!,
-        textAlign: TextAlign.left,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    // list.add(Text(labelText!,
+    //     textAlign: TextAlign.left,
+    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     list.add(TextFormField(
       validator: validator,
       decoration: InputDecoration(
@@ -271,7 +273,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 )
               : null),
       controller: myController,
-      onSaved: (newValue) => {
+      onChanged: (newValue) => {
         _onUpdate(labelText, newValue),
       },
     ));
@@ -282,6 +284,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   Widget _buildDropDown({
+    required String key,
     required String labelText,
     required List<dynamic> options,
     required String value,
@@ -289,9 +292,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required String helpLabelText,
   }) {
     List<Widget> list = [];
-    list.add(Text(labelText,
-        textAlign: TextAlign.left,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    // list.add(Text(labelText,
+    //     textAlign: TextAlign.left,
+    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    // if (options)
+    if (this._values['departmentId'] != null && key == 'unitId') {
+      options = options
+          .where((element) =>
+              element['departmentId'] == this._values['departmentId'])
+          .toList();
+    }
     list.add(DropdownButtonFormField(
       decoration: InputDecoration(
           labelText: labelText,
@@ -310,12 +320,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         setState(() {
           value = newValue!;
         }),
-        _onUpdate(labelText, value)
       },
-      onChanged: (String? newValue) {},
+      onChanged: (String? newValue) {
+        _onUpdate(key, newValue);
+      },
       items: options.map((value) {
         return DropdownMenuItem(
-          value: value['name'].toString(),
+          value: value['_id'] != null
+              ? value['_id'].toString()
+              : value['name'].toString(),
           child: Text(Helper.truncateString(value['name'].toString(), 20)),
         );
       }).toList(),
@@ -331,9 +344,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String title,
       required List<dynamic> options}) {
     List<Widget> list = [];
-    list.add(Text(title,
-        textAlign: TextAlign.left,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    // list.add(Text(title,
+    //     textAlign: TextAlign.left,
+    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     options.forEach((each) => {
           list.add(_buildTile(
               title: each['name'], value: 0, selected: options[0]['name']))
@@ -362,9 +375,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String title,
       required List<dynamic> options}) {
     List<Widget> list = [];
-    list.add(Text(title,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    // list.add(Text(title,
+    //     textAlign: TextAlign.center,
+    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
     options.forEach((each) => {
           list.add(_buildCheckBoxTile(
               title: each['name'], value: 0, selected: options[0]['name']))
@@ -401,25 +414,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   _onUpdate(String? key, String? val) {
     _values[key] = val;
-    setState(() {
-      _result = _values;
-    });
+    // print(_values);
   }
 }
 
-sendData(context) {
-  AwesomeDialog(
-      context: context,
-      animType: AnimType.LEFTSLIDE,
-      headerAnimationLoop: false,
-      dialogType: DialogType.SUCCES,
-      showCloseIcon: false,
-      title: 'Success',
-      desc: 'Submitted!',
-      onDissmissCallback: (type) {
-        debugPrint('Dialog Dissmiss from callback $type');
-      })
-    ..show();
+filterData(List<dynamic> allSteps, key, value) {
+  if (key == 'departmentId') {
+    allSteps.forEach((each) => {
+          print(each),
+        });
+  }
 }
 
 Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
@@ -434,4 +438,43 @@ Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
   );
   data = json.decode(utf8.decode(response.bodyBytes));
   return data.toList();
+}
+
+sendData(context, Map values) async {
+  values['isVerified'] = false;
+  final response = await http.post(
+    Uri.parse(Constants.BASE_URL + "/submissions/"),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(values),
+  );
+  if (response.statusCode == 201) {
+    AwesomeDialog(
+        context: context,
+        animType: AnimType.LEFTSLIDE,
+        headerAnimationLoop: false,
+        dialogType: DialogType.SUCCES,
+        showCloseIcon: false,
+        title: 'Success',
+        desc: 'Submitted!',
+        onDissmissCallback: (type) {
+          debugPrint('Dialog Dissmiss from callback $type');
+        })
+      ..show();
+  } else {
+    print(response);
+    AwesomeDialog(
+        context: context,
+        animType: AnimType.LEFTSLIDE,
+        headerAnimationLoop: false,
+        dialogType: DialogType.ERROR,
+        showCloseIcon: false,
+        title: 'ERROR',
+        desc: jsonDecode(response.body).toString(),
+        onDissmissCallback: (type) {
+          debugPrint('Dialog Dissmiss from callback $type');
+        })
+      ..show();
+  }
 }
