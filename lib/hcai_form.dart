@@ -91,12 +91,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       {
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
-                          child: Text(
-                            field['description'].toString(),
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                field['description'].toString(),
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              )),
                         )),
                       }
                     else if (field['type'] == 'textfield')
@@ -120,7 +122,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   'Please enter text'),
                         )),
                       }
-                    else if (field['type'] == 'dropdown')
+                    else if (field['type'] == 'dropdown' &&
+                        field['options'] is List)
                       {
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
@@ -221,11 +224,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText,
       type: String}) {
-    List<Widget> list = [];
-    list.add(Text(hint,
-        textAlign: TextAlign.left,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
-    list.add(DateTimeField(
+    return DateTimeField(
         decoration: InputDecoration(
             hintText: hint,
             suffixIcon: hasHelpLabel
@@ -236,17 +235,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     },
                   )
                 : null),
-        selectedDate: selectedDate,
+        selectedDate: null,
         mode: type == 'time'
             ? DateTimeFieldPickerMode.time
             : DateTimeFieldPickerMode.date,
         onDateSelected: (DateTime value) {
           selectedDate = value;
-        }));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: list,
-    );
+        });
   }
 
   Widget _buildTextField({
@@ -256,11 +251,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required bool hasHelpLabel,
     required String helpLabelText,
   }) {
-    List<Widget> list = [];
-    // list.add(Text(labelText!,
-    //     textAlign: TextAlign.left,
-    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
-    list.add(TextFormField(
+    return TextFormField(
       validator: validator,
       decoration: InputDecoration(
           labelText: labelText,
@@ -276,10 +267,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       onChanged: (newValue) => {
         _onUpdate(labelText, newValue),
       },
-    ));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: list,
     );
   }
 
@@ -291,18 +278,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required bool hasHelpLabel,
     required String helpLabelText,
   }) {
-    List<Widget> list = [];
-    // list.add(Text(labelText,
-    //     textAlign: TextAlign.left,
-    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
-    // if (options)
-    if (this._values['departmentId'] != null && key == 'unitId') {
+    if (this._values['departmentId'] != null && key == 'wardId') {
       options = options
           .where((element) =>
               element['departmentId'] == this._values['departmentId'])
           .toList();
     }
-    list.add(DropdownButtonFormField(
+    return DropdownButtonFormField(
       decoration: InputDecoration(
           labelText: labelText,
           suffixIcon: hasHelpLabel
@@ -324,18 +306,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       onChanged: (String? newValue) {
         _onUpdate(key, newValue);
       },
-      items: options.map((value) {
+      items: options.map((option) {
         return DropdownMenuItem(
-          value: value['_id'] != null
-              ? value['_id'].toString()
-              : value['name'].toString(),
-          child: Text(Helper.truncateString(value['name'].toString(), 20)),
+          value: option['_id'] != null
+              ? option['_id'].toString()
+              : option['name'].toString(),
+          child: Text(option['name'].toString()),
         );
       }).toList(),
-    ));
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: list,
     );
   }
 
@@ -344,9 +322,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String title,
       required List<dynamic> options}) {
     List<Widget> list = [];
-    // list.add(Text(title,
-    //     textAlign: TextAlign.left,
-    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(Text(title,
+        textAlign: TextAlign.left,
+        style: TextStyle(
+          color: Colors.grey[600],
+          fontSize: 13,
+        )));
     options.forEach((each) => {
           list.add(_buildTile(
               title: each['name'], value: 0, selected: options[0]['name']))
@@ -375,9 +356,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String title,
       required List<dynamic> options}) {
     List<Widget> list = [];
-    // list.add(Text(title,
-    //     textAlign: TextAlign.center,
-    //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)));
+    list.add(Text(title,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.grey[600],
+          fontSize: 13,
+        )));
     options.forEach((each) => {
           list.add(_buildCheckBoxTile(
               title: each['name'], value: 0, selected: options[0]['name']))
@@ -473,7 +457,7 @@ sendData(context, Map values) async {
         title: 'ERROR',
         desc: jsonDecode(response.body).toString(),
         onDissmissCallback: (type) {
-          debugPrint('Dialog Dissmiss from callback $type');
+          debugPrint('Dialog Dismiss from callback $type');
         })
       ..show();
   }
