@@ -71,9 +71,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     final List<CoolStep> steps = [];
     List<Widget> data = [];
     var objToConstruct;
-    allSteps.asMap().forEach((index, step) => {
+    allSteps.asMap().forEach((stepIndex, step) => {
           data = [],
-          if (index == 0)
+          if (stepIndex == 0)
             {
               data.add(Padding(
                 padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
@@ -86,7 +86,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             },
           if (step['fields'] is List)
             {
-              step['fields'].forEach((stepIndex, field) => {
+              step['fields'].asMap().forEach((fieldIndex, field) => {
                     if (field['type'] == 'text')
                       {
                         data.add(Padding(
@@ -183,7 +183,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         ))
                       }
                   }),
-              if (index == 0)
+              if (stepIndex == 0)
                 {
                   objToConstruct =
                       Form(key: _formKey, child: Column(children: data))
