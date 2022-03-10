@@ -40,6 +40,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         title: Text(args.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
             style: TextStyle(fontSize: 20, color: Colors.white)),
         automaticallyImplyLeading: false,
+        actions: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(Icons.cancel_outlined, color: Colors.white),
+              )),
+        ],
       ),
       body: Container(
         child: FutureBuilder(
