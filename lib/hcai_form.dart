@@ -37,7 +37,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     this._values['userId'] = args.userId;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title?.toUpperCase() ?? 'SSI FORM',
+        title: Text(args.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
             style: TextStyle(fontSize: 20, color: Colors.white)),
         automaticallyImplyLeading: false,
       ),

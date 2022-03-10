@@ -116,11 +116,14 @@ class HomePage extends StatelessWidget {
                                 ),
                                 onPressed: () {
                                   Navigator.of(context).pushNamed(
-                                      HcaiFormPage.tag,
-                                      arguments: new Arguments(
-                                          "621ddb0059e8330e432cdb22",
-                                          "62205d48109d1e5a55e215b2",
-                                          snapshot.data?[index]['_id']));
+                                    HcaiFormPage.tag,
+                                    arguments: new Arguments(
+                                      "621ddb0059e8330e432cdb22",
+                                      "62205d48109d1e5a55e215b2",
+                                      snapshot.data?[index]['_id'],
+                                      snapshot.data?[index]['title'],
+                                    ),
+                                  );
                                 }));
                       });
                 default:
