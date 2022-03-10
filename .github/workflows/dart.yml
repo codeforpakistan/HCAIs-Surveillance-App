@@ -8,6 +8,7 @@ name: HCAIS-APK
 on:
   pull_request:
     branches: [ master ]
+    types: [closed]
 
 jobs:
   build:
