@@ -6,8 +6,6 @@
 name: HCAIS-APK
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 

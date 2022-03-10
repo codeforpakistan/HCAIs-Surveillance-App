@@ -1,4 +1,4 @@
-package com.example.hcais
+package com.codeforpakistan.HCAIs
 
 import io.flutter.embedding.android.FlutterActivity
 
