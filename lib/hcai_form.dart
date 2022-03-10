@@ -37,7 +37,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     this._values['userId'] = args.userId;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title?.toUpperCase() ?? 'SSI FORM'),
+        title: Text(widget.title?.toUpperCase() ?? 'SSI FORM',
+            style: TextStyle(fontSize: 20, color: Colors.white)),
+        automaticallyImplyLeading: false,
       ),
       body: Container(
         child: FutureBuilder(
@@ -212,7 +214,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       },
       steps: steps,
       config: CoolStepperConfig(
-        backText: 'PREV',
+        backText: 'PREVIOUS',
       ),
     );
   }
