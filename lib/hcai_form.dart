@@ -75,7 +75,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (stepIndex == 0)
             {
               data.add(Padding(
-                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                 child: Text(
                   hcaiForm['description'].toString(),
                   textAlign: TextAlign.justify,
@@ -103,7 +103,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     else if (field['type'] == 'textfield')
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildTextField(
                               labelText: field['label'].toString(),
                               validator: (value) {
@@ -125,7 +125,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         field['options'] is List)
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildDropDown(
                               key: field['key'].toString(),
                               labelText: field['label'].toString(),
@@ -141,7 +141,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     else if (field['type'] == 'radiofield')
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildRadioButton(
                               context: context,
                               title: field['label'].toString(),
@@ -151,7 +151,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     else if (field['type'] == 'checkboxfield')
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildCheckbox(
                               context: context,
                               title: field['label'].toString(),
@@ -161,7 +161,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     else if (field['type'] == 'datefield')
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildDateField(
                               hint: field['label'].toString(),
                               selectedDate: selectedDate,
@@ -174,7 +174,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     else if (field['type'] == 'timefield')
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildDateField(
                               hint: field['label'].toString(),
                               selectedDate: selectedDate,
@@ -340,6 +340,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Widget _buildTile(
       {required String title, required int value, String? selected}) {
     return ListTile(
+      visualDensity: VisualDensity(
+          horizontal: VisualDensity.minimumDensity,
+          vertical: VisualDensity.minimumDensity),
       title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
       leading: Radio(
         value: title,
@@ -374,6 +377,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Widget _buildCheckBoxTile(
       {required String title, required int value, String? selected}) {
     return ListTile(
+      visualDensity: VisualDensity(
+          horizontal: VisualDensity.minimumDensity,
+          vertical: VisualDensity.minimumDensity),
       title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
       leading: Checkbox(
         value: false,
