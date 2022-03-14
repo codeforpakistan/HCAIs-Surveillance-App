@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
 
 import 'components/alertDialog_widget.dart';
+import 'home.dart';
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
@@ -58,7 +59,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   if (snapshot.hasError) {
-                    print(snapshot.error.toString());
                     return Padding(
                       padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
                       child: Center(child: Text(snapshot.error.toString())),
@@ -78,6 +78,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _formWizard(Map<String, dynamic> hcaiForm, context) {
     List<dynamic> allSteps = hcaiForm["steps"];
+    // ignore: unused_local_variable
     DateTime? selectedDate = DateTime.now();
     final List<CoolStep> steps = [];
     List<Widget> data = [];
@@ -176,7 +177,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildDateField(
                               hint: field['label'].toString(),
-                              selectedDate: selectedDate,
+                              selectedDateKey: field['key'],
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select a date',
@@ -189,7 +190,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildDateField(
                               hint: field['label'].toString(),
-                              selectedDate: selectedDate,
+                              selectedDateKey: field['key'],
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select a date',
@@ -219,8 +220,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return CoolStepper(
       showErrorSnackbar: false,
       onCompleted: () {
-        sendData(context, this._values);
         print(this._values);
+        sendData(context, this._values);
       },
       steps: steps,
       config: CoolStepperConfig(
@@ -231,11 +232,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildDateField(
       {required String hint,
-      required DateTime selectedDate,
+      required String selectedDateKey,
       required bool hasHelpLabel,
       required String helpLabelText,
       type: String}) {
-    return DateTimeField(
+    return DateTimeFormField(
         decoration: InputDecoration(
             hintText: hint,
             suffixIcon: hasHelpLabel
@@ -246,12 +247,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     },
                   )
                 : null),
-        selectedDate: null,
+        initialDate: null,
+        // selectedDate: selectedDateKey,
         mode: type == 'time'
             ? DateTimeFieldPickerMode.time
             : DateTimeFieldPickerMode.date,
         onDateSelected: (DateTime value) {
-          selectedDate = value;
+          _onUpdate(selectedDateKey, value.toIso8601String());
+          // selectedDateKey = value;
         });
   }
 
@@ -333,15 +336,24 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String title,
       required List<dynamic> options}) {
     List<Widget> list = [];
+    int _groupValue = 0;
     list.add(Text(title,
         textAlign: TextAlign.left,
         style: TextStyle(
           color: Colors.grey[600],
           fontSize: 13,
         )));
-    options.forEach((each) => {
-          list.add(_buildTile(
-              title: each['name'], value: 0, selected: options[0]['name']))
+    options.asMap().forEach((index, each) => {
+          list.add(
+            _buildTile(
+              title: each['name'],
+              value: index,
+              groupValue: _groupValue,
+              selected: options[0]['name'],
+              // onChanged: (newValue) =>
+              //     setState(() => _groupValue = int.parse(newValue.toString())),
+            ),
+          )
         });
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,19 +361,23 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  Widget _buildTile(
-      {required String title, required int value, String? selected}) {
+  Widget _buildTile({
+    required String title,
+    required int value,
+    required int groupValue,
+    String? selected,
+    // required void Function(int?)? onChanged
+  }) {
     return ListTile(
       visualDensity: VisualDensity(
           horizontal: VisualDensity.minimumDensity,
           vertical: VisualDensity.minimumDensity),
       title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
-      leading: Radio(
-        value: title,
-        groupValue: value,
-        activeColor: Color(0xFF6200EE),
-        onChanged: (value) => {selected = value!.toString()},
-      ),
+      leading: RadioListTile(
+          value: value,
+          groupValue: groupValue,
+          onChanged: (value) => {print(value)},
+          activeColor: Color(0xFF6200EE)),
     );
   }
 
@@ -387,17 +403,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   Widget _buildCheckBoxTile(
-      {required String title, required int value, String? selected}) {
+      {required String title, required int value, required String selected}) {
     return ListTile(
       visualDensity: VisualDensity(
           horizontal: VisualDensity.minimumDensity,
           vertical: VisualDensity.minimumDensity),
       title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
       leading: Checkbox(
-        value: false,
+        value: title == selected ? true : false,
         // groupValue: value,
         activeColor: Color(0xFF6200EE),
-        onChanged: (value) => {selected = value!.toString()},
+        onChanged: (value) => {print(value)},
       ),
     );
   }
@@ -462,7 +478,7 @@ sendData(context, Map values) async {
         onDissmissCallback: (type) {
           debugPrint('Dialog Dissmiss from callback $type');
         })
-      ..show();
+      ..show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
   } else {
     print(response);
     AwesomeDialog(
