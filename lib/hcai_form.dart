@@ -3,6 +3,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:hcais/utils/constants.dart';
+import 'package:hcais/utils/helper.dart';
 import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
@@ -25,6 +26,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   final _formKey = GlobalKey<FormState>();
   String? selectedRole = 'Writer';
   Map _values = {};
+  List<dynamic> allSteps = [];
+  List<TextEditingController> _controller = [];
 
   @override
   void initState() {
@@ -77,13 +80,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   Widget _formWizard(Map<String, dynamic> hcaiForm, context) {
-    List<dynamic> allSteps = hcaiForm["steps"];
+    this.allSteps = hcaiForm["steps"];
     // ignore: unused_local_variable
     DateTime? selectedDate = DateTime.now();
     final List<CoolStep> steps = [];
     List<Widget> data = [];
     var objToConstruct;
-    allSteps.asMap().forEach((stepIndex, step) => {
+    int currentIndex = 0;
+    this.allSteps.forEach((each) => {
+          each['fields'].forEach((eachField) => {
+                eachField['index'] = currentIndex,
+                currentIndex = currentIndex + 1,
+              }),
+        });
+    _controller = List.generate(currentIndex, (i) => TextEditingController());
+    this.allSteps.asMap().forEach((stepIndex, step) => {
           data = [],
           if (stepIndex == 0)
             {
@@ -102,15 +113,23 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     if (field['type'] == 'text')
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                field['description'].toString(),
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              )),
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          child: _buildTextField(
+                              labelText: field['label'].toString(),
+                              validator: (value) {
+                                if (field['is_required'] == true) {
+                                  if (value?.isEmpty ?? true) {
+                                    return field['label'].toString() +
+                                        " is required";
+                                  }
+                                }
+                                return null;
+                              },
+                              myController: _controller[field['index']],
+                              hasHelpLabel: field['hasHelpLabel'],
+                              helpLabelText: field['helpLabelText'] ?? 'N/A',
+                              index: field['index'],
+                              readOnly: true),
                         )),
                       }
                     else if (field['type'] == 'textfield')
@@ -130,8 +149,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               },
                               myController: new TextEditingController(),
                               hasHelpLabel: field['hasHelpLabel'],
-                              helpLabelText: field['helpLabelText'] ??
-                                  'Please enter text'),
+                              helpLabelText:
+                                  field['helpLabelText'] ?? 'Please enter text',
+                              index: field['index']),
                         )),
                       }
                     else if (field['type'] == 'dropdown' &&
@@ -148,7 +168,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   : field['options'][0]['name'],
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
-                                  'Please select an option'),
+                                  'Please select an option',
+                              index: field['index']),
                         )),
                       }
                     else if (field['type'] == 'radiofield')
@@ -196,7 +217,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   'Please select a date',
                               type: 'time'),
                         ))
-                      }
+                      },
                   }),
               if (stepIndex == 0)
                 {
@@ -236,6 +257,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText,
       type: String}) {
+    var nextValue;
     return DateTimeFormField(
         decoration: InputDecoration(
             hintText: hint,
@@ -254,17 +276,24 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             : DateTimeFieldPickerMode.date,
         onDateSelected: (DateTime value) {
           _onUpdate(selectedDateKey, value.toIso8601String());
+          nextValue =
+              _getCompletedField(selectedDateKey, value.toIso8601String(), []);
+          if (nextValue['controllerIndex'] > -1) {
+            _controller[nextValue['controllerIndex']].text = nextValue['value'];
+          }
           // selectedDateKey = value;
         });
   }
 
-  Widget _buildTextField({
-    String? labelText,
-    FormFieldValidator<String>? validator,
-    required TextEditingController myController,
-    required bool hasHelpLabel,
-    required String helpLabelText,
-  }) {
+  Widget _buildTextField(
+      {String? labelText,
+      FormFieldValidator<String>? validator,
+      required TextEditingController myController,
+      required bool hasHelpLabel,
+      required String helpLabelText,
+      required int index,
+      bool readOnly = false}) {
+    var nextValue;
     return TextFormField(
       validator: validator,
       decoration: InputDecoration(
@@ -278,26 +307,25 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 )
               : null),
       controller: myController,
+      readOnly: readOnly,
       onChanged: (newValue) => {
+        nextValue = _getCompletedField(labelText, newValue, []),
+        if (nextValue['controllerIndex'] > -1)
+          {_controller[nextValue['controllerIndex']].text = nextValue['value']},
         _onUpdate(labelText, newValue),
       },
     );
   }
 
-  Widget _buildDropDown({
-    required String key,
-    required String labelText,
-    required List<dynamic> options,
-    required String value,
-    required bool hasHelpLabel,
-    required String helpLabelText,
-  }) {
-    if (this._values['departmentId'] != null && key == 'wardId') {
-      options = options
-          .where((element) =>
-              element['departmentId'] == this._values['departmentId'])
-          .toList();
-    }
+  Widget _buildDropDown(
+      {required String key,
+      required String labelText,
+      required List<dynamic> options,
+      required String value,
+      required bool hasHelpLabel,
+      required String helpLabelText,
+      required int index}) {
+    var nextValue;
     return DropdownButtonFormField(
       decoration: InputDecoration(
           labelText: labelText,
@@ -317,8 +345,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           value = newValue!;
         }),
       },
-      onChanged: (String? newValue) {
-        _onUpdate(key, newValue);
+      onChanged: (String? newValue) => {
+        nextValue = _getCompletedField(key, newValue, options),
+        if (nextValue['controllerIndex'] > -1)
+          {_controller[nextValue['controllerIndex']].text = nextValue['value']},
+        _onUpdate(key, newValue)
       },
       items: options.map((option) {
         return DropdownMenuItem(
@@ -336,7 +367,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String title,
       required List<dynamic> options}) {
     List<Widget> list = [];
-    int _groupValue = 0;
+    int _groupValue = -1;
     list.add(Text(title,
         textAlign: TextAlign.left,
         style: TextStyle(
@@ -344,16 +375,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           fontSize: 13,
         )));
     options.asMap().forEach((index, each) => {
-          list.add(
-            _buildTile(
+          list.add(_buildTile(
               title: each['name'],
               value: index,
               groupValue: _groupValue,
-              selected: options[0]['name'],
-              // onChanged: (newValue) =>
-              //     setState(() => _groupValue = int.parse(newValue.toString())),
-            ),
-          )
+              selected: options[0]['name']))
         });
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -361,23 +387,22 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  Widget _buildTile({
-    required String title,
-    required int value,
-    required int groupValue,
-    String? selected,
-    // required void Function(int?)? onChanged
-  }) {
+  Widget _buildTile(
+      {required String title,
+      required int value,
+      required int groupValue,
+      String? selected}) {
     return ListTile(
       visualDensity: VisualDensity(
           horizontal: VisualDensity.minimumDensity,
           vertical: VisualDensity.minimumDensity),
       title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
-      leading: RadioListTile(
-          value: value,
-          groupValue: groupValue,
-          onChanged: (value) => {print(value)},
-          activeColor: Color(0xFF6200EE)),
+      leading: Radio(
+        value: value,
+        groupValue: groupValue,
+        activeColor: Color(0xFF6200EE),
+        onChanged: (selected) => {print(selected)},
+      ),
     );
   }
 
@@ -427,6 +452,50 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         return alert;
       },
     );
+  }
+
+  Map _getCompletedField(String? key, String? value, List<dynamic> options) {
+    try {
+      switch (key) {
+        case 'ICD10Id':
+          {
+            return {
+              'controllerIndex': Helper.getNextControllerIndex(
+                  this.allSteps, 'recommendedSurveillancePeriod'),
+              'value': options
+                  .firstWhere(
+                      (each) => each['_id'] == value)['surveillancePeriod']
+                  .toString()
+            };
+          }
+        case 'dateOfEvent':
+        case 'dateOfProcedure':
+          {
+            return {
+              'controllerIndex': Helper.getNextControllerIndex(
+                  this.allSteps, 'infectionSurveyTime'),
+              'value': Helper.daysBetweenDate(_values['dateOfEvent'],
+                      _values['dateOfProcedure'], 'days')
+                  .toString()
+            };
+          }
+        case 'patientDateOfBirth':
+          {
+            return {
+              'controllerIndex':
+                  Helper.getNextControllerIndex(this.allSteps, 'patientAge'),
+              'value': Helper.daysBetweenDate(_values['patientDateOfBirth'],
+                      new DateTime.now().toString(), 'years')
+                  .toString()
+            };
+          }
+        default:
+          return {'controllerIndex': -1, 'value': ''};
+      }
+    } catch (e) {
+      print(e);
+      return {'controllerIndex': -1, 'value': ''};
+    }
   }
 
   _onUpdate(String? key, String? val) {
