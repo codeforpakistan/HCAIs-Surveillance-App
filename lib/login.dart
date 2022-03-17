@@ -62,6 +62,10 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
 
+    // to be removed
+    emailController.text = 'doctor@example.com';
+    passwordController.text = 'testpass';
+
     final loginButton = Padding(
       padding: EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
