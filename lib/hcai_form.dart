@@ -13,19 +13,16 @@ import 'home.dart';
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
-
   final String? title;
-
   static String tag = 'ssi-form-page';
-
   @override
   _HcaiFormPageState createState() => _HcaiFormPageState();
 }
 
 class _HcaiFormPageState extends State<HcaiFormPage> {
   final _formKey = GlobalKey<FormState>();
-  String? selectedRole = 'Writer';
   Map _values = {};
+  Map _selectedRole = {};
   List<dynamic> allSteps = [];
   List<TextEditingController> _controller = [];
 
@@ -89,6 +86,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     int currentIndex = 0;
     this.allSteps.forEach((each) => {
           each['fields'].forEach((eachField) => {
+                if (each['type'] == 'radiofield') {},
                 eachField['index'] = currentIndex,
                 currentIndex = currentIndex + 1,
               }),
@@ -179,6 +177,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           child: _buildRadioButton(
                               context: context,
                               title: field['label'].toString(),
+                              key: field['key'].toString(),
                               options: field['options']),
                         )),
                       }
@@ -365,6 +364,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Widget _buildRadioButton(
       {required BuildContext context,
       required String title,
+      required String key,
       required List<dynamic> options}) {
     List<Widget> list = [];
     int _groupValue = -1;
@@ -377,6 +377,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     options.asMap().forEach((index, each) => {
           list.add(_buildTile(
               title: each['name'],
+              key: key,
               value: index,
               groupValue: _groupValue,
               selected: options[0]['name']))
@@ -389,20 +390,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildTile(
       {required String title,
+      required String key,
       required int value,
       required int groupValue,
       String? selected}) {
-    return ListTile(
-      visualDensity: VisualDensity(
-          horizontal: VisualDensity.minimumDensity,
-          vertical: VisualDensity.minimumDensity),
-      title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
-      leading: Radio(
-        value: value,
-        groupValue: groupValue,
-        activeColor: Color(0xFF6200EE),
-        onChanged: (selected) => {print(selected)},
-      ),
+    return RadioListTile(
+      value: title,
+      activeColor: Color(0xFF6200EE),
+      groupValue: _selectedRole[key],
+      title: Text(title),
+      onChanged: (Object? value) {
+        setState(() {
+          _selectedRole[key] = value;
+        });
+      },
     );
   }
 
