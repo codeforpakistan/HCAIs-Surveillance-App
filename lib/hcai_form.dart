@@ -485,7 +485,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         case 'patientWeight':
         case 'patientHeight':
           {
-            print(_values['patientWeight']);
             return {
               'controllerIndex':
                   Helper.getNextControllerIndex(this.allSteps, 'bodyMassIndex'),
