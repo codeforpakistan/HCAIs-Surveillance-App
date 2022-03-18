@@ -479,6 +479,18 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   .toString()
             };
           }
+        case 'patientWeight':
+        case 'patientHeight':
+          {
+            print(_values['patientWeight']);
+            return {
+              'controllerIndex':
+                  Helper.getNextControllerIndex(this.allSteps, 'bodyMassIndex'),
+              'value': Helper.bodyMassIndex(
+                      _values['patientWeight'], _values['patientHeight'])
+                  .toString()
+            };
+          }
         case 'patientDateOfBirth':
           {
             return {
