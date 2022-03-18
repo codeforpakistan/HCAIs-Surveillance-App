@@ -115,6 +115,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildTextField(
+                              key: field['key'].toString(),
                               labelText: field['label'].toString(),
                               validator: (value) {
                                 if (field['is_required'] == true) {
@@ -137,6 +138,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildTextField(
+                              key: field['key'].toString(),
                               labelText: field['label'].toString(),
                               validator: (value) {
                                 if (field['is_required'] == true) {
@@ -287,6 +289,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildTextField(
       {String? labelText,
+      String? key,
       FormFieldValidator<String>? validator,
       required TextEditingController myController,
       required bool hasHelpLabel,
@@ -309,10 +312,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       controller: myController,
       readOnly: readOnly,
       onChanged: (newValue) => {
-        nextValue = _getCompletedField(labelText, newValue, []),
+        nextValue = _getCompletedField(key, newValue, []),
         if (nextValue['controllerIndex'] > -1)
           {_controller[nextValue['controllerIndex']].text = nextValue['value']},
-        _onUpdate(labelText, newValue),
+        _onUpdate(key, newValue),
       },
     );
   }

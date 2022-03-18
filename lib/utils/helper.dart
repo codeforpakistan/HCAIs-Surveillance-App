@@ -22,11 +22,16 @@ class Helper {
 
   static int bodyMassIndex(weight, height) {
     try {
+      if (weight == '' || height == '') {
+        return 0;
+      }
+      weight = double.parse(weight);
+      height = double.parse(height);
       final bmi = weight / pow(height, 2);
       return bmi.round();
     } catch (e) {
       print(e);
-      return -1;
+      return 0;
     }
   }
 
