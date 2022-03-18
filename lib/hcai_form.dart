@@ -25,20 +25,29 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Map _selectedRole = {};
   List<dynamic> allSteps = [];
   List<TextEditingController> _controller = [];
+  late Future<List>? _listFuture;
 
   @override
   void initState() {
     super.initState();
+    //  find a way to get arguments in init
+    // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
+    _listFuture =
+        getHcaiForm('6229fab94c82eb5c4cb10b3c', '62205d48109d1e5a55e215b2');
+  }
+
+  refresh() async {
+    final args = ModalRoute.of(context)!.settings.arguments as Arguments;
+    this._values['hospitalId'] = args.hospitalId;
+    this._values['userId'] = args.userId;
+    _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    this._values['hospitalId'] = args.hospitalId;
-    this._values['userId'] = args.userId;
     return Scaffold(
       appBar: AppBar(
-        title: Text(args.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
+        title: Text('HCAI FORM',
             style: TextStyle(fontSize: 20, color: Colors.white)),
         automaticallyImplyLeading: false,
         actions: <Widget>[
@@ -54,8 +63,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       ),
       body: Container(
         child: FutureBuilder(
-            future: getHcaiForm(args.hcaiId, args.hospitalId),
-            builder: (context, AsyncSnapshot<List> snapshot) {
+            future: _listFuture,
+            builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   if (snapshot.hasError) {
@@ -64,7 +73,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       child: Center(child: Text(snapshot.error.toString())),
                     );
                   } else if (snapshot.hasData) {
-                    return _formWizard(snapshot.data?.first, context);
+                    return _formWizard(snapshot.data, context);
                   } else {
                     return Center(child: CircularProgressIndicator());
                   }
@@ -76,7 +85,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  Widget _formWizard(Map<String, dynamic> hcaiForm, context) {
+  Widget _formWizard(formData, context) {
+    Map<String, dynamic> hcaiForm = formData?.first;
     this.allSteps = hcaiForm["steps"];
     // ignore: unused_local_variable
     DateTime? selectedDate = DateTime.now();
@@ -201,7 +211,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select a date',
-                              type: 'date'),
+                              type: 'date',
+                              selectedDate: DateTime.now()),
                         ))
                       }
                     else if (field['type'] == 'timefield')
@@ -214,7 +225,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select a date',
-                              type: 'time'),
+                              type: 'time',
+                              selectedDate: DateTime.now()),
                         ))
                       },
                   }),
@@ -255,7 +267,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String selectedDateKey,
       required bool hasHelpLabel,
       required String helpLabelText,
-      type: String}) {
+      type: String,
+      required DateTime selectedDate}) {
     var nextValue;
     return DateTimeFormField(
         decoration: InputDecoration(
@@ -268,12 +281,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     },
                   )
                 : null),
-        initialDate: null,
+        initialDate: selectedDate,
         // selectedDate: selectedDateKey,
         mode: type == 'time'
             ? DateTimeFieldPickerMode.time
             : DateTimeFieldPickerMode.date,
         onDateSelected: (DateTime value) {
+          setState(() {
+            selectedDate = value;
+          });
           _onUpdate(selectedDateKey, value.toIso8601String());
           nextValue =
               _getCompletedField(selectedDateKey, value.toIso8601String(), []);
@@ -550,7 +566,6 @@ sendData(context, Map values) async {
         })
       ..show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
   } else {
-    print(response);
     AwesomeDialog(
         context: context,
         animType: AnimType.LEFTSLIDE,
