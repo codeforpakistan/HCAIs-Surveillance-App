@@ -13,35 +13,41 @@ import 'home.dart';
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
-
   final String? title;
-
   static String tag = 'ssi-form-page';
-
   @override
   _HcaiFormPageState createState() => _HcaiFormPageState();
 }
 
 class _HcaiFormPageState extends State<HcaiFormPage> {
   final _formKey = GlobalKey<FormState>();
-  String? selectedRole = 'Writer';
   Map _values = {};
+  Map _selectedRole = {};
   List<dynamic> allSteps = [];
   List<TextEditingController> _controller = [];
+  late Future<List>? _listFuture;
 
   @override
   void initState() {
     super.initState();
+    //  find a way to get arguments in init
+    // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
+    _listFuture =
+        getHcaiForm('6229fab94c82eb5c4cb10b3c', '62205d48109d1e5a55e215b2');
+  }
+
+  refresh() async {
+    final args = ModalRoute.of(context)!.settings.arguments as Arguments;
+    this._values['hospitalId'] = args.hospitalId;
+    this._values['userId'] = args.userId;
+    _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    this._values['hospitalId'] = args.hospitalId;
-    this._values['userId'] = args.userId;
     return Scaffold(
       appBar: AppBar(
-        title: Text(args.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
+        title: Text('HCAI FORM',
             style: TextStyle(fontSize: 20, color: Colors.white)),
         automaticallyImplyLeading: false,
         actions: <Widget>[
@@ -57,8 +63,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       ),
       body: Container(
         child: FutureBuilder(
-            future: getHcaiForm(args.hcaiId, args.hospitalId),
-            builder: (context, AsyncSnapshot<List> snapshot) {
+            future: _listFuture,
+            builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   if (snapshot.hasError) {
@@ -67,7 +73,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       child: Center(child: Text(snapshot.error.toString())),
                     );
                   } else if (snapshot.hasData) {
-                    return _formWizard(snapshot.data?.first, context);
+                    return _formWizard(snapshot.data, context);
                   } else {
                     return Center(child: CircularProgressIndicator());
                   }
@@ -79,7 +85,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  Widget _formWizard(Map<String, dynamic> hcaiForm, context) {
+  Widget _formWizard(formData, context) {
+    Map<String, dynamic> hcaiForm = formData?.first;
     this.allSteps = hcaiForm["steps"];
     // ignore: unused_local_variable
     DateTime? selectedDate = DateTime.now();
@@ -89,6 +96,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     int currentIndex = 0;
     this.allSteps.forEach((each) => {
           each['fields'].forEach((eachField) => {
+                if (each['type'] == 'radiofield') {},
                 eachField['index'] = currentIndex,
                 currentIndex = currentIndex + 1,
               }),
@@ -181,6 +189,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           child: _buildRadioButton(
                               context: context,
                               title: field['label'].toString(),
+                              key: field['key'].toString(),
                               options: field['options']),
                         )),
                       }
@@ -204,7 +213,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select a date',
-                              type: 'date'),
+                              type: 'date',
+                              selectedDate: DateTime.now()),
                         ))
                       }
                     else if (field['type'] == 'timefield')
@@ -217,7 +227,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select a date',
-                              type: 'time'),
+                              type: 'time',
+                              selectedDate: DateTime.now()),
                         ))
                       },
                   }),
@@ -258,7 +269,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String selectedDateKey,
       required bool hasHelpLabel,
       required String helpLabelText,
-      type: String}) {
+      type: String,
+      required DateTime selectedDate}) {
     var nextValue;
     return DateTimeFormField(
         decoration: InputDecoration(
@@ -271,12 +283,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     },
                   )
                 : null),
-        initialDate: null,
+        initialDate: selectedDate,
         // selectedDate: selectedDateKey,
         mode: type == 'time'
             ? DateTimeFieldPickerMode.time
             : DateTimeFieldPickerMode.date,
         onDateSelected: (DateTime value) {
+          setState(() {
+            selectedDate = value;
+          });
           _onUpdate(selectedDateKey, value.toIso8601String());
           nextValue =
               _getCompletedField(selectedDateKey, value.toIso8601String(), []);
@@ -368,6 +383,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Widget _buildRadioButton(
       {required BuildContext context,
       required String title,
+      required String key,
       required List<dynamic> options}) {
     List<Widget> list = [];
     int _groupValue = -1;
@@ -380,6 +396,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     options.asMap().forEach((index, each) => {
           list.add(_buildTile(
               title: each['name'],
+              key: key,
               value: index,
               groupValue: _groupValue,
               selected: options[0]['name']))
@@ -392,20 +409,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildTile(
       {required String title,
+      required String key,
       required int value,
       required int groupValue,
       String? selected}) {
-    return ListTile(
-      visualDensity: VisualDensity(
-          horizontal: VisualDensity.minimumDensity,
-          vertical: VisualDensity.minimumDensity),
-      title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
-      leading: Radio(
-        value: value,
-        groupValue: groupValue,
-        activeColor: Color(0xFF6200EE),
-        onChanged: (selected) => {print(selected)},
-      ),
+    return RadioListTile(
+      value: title,
+      activeColor: Color(0xFF6200EE),
+      groupValue: _selectedRole[key],
+      title: Text(title),
+      onChanged: (Object? value) {
+        setState(() {
+          _selectedRole[key] = value;
+        });
+      },
     );
   }
 
@@ -563,7 +580,6 @@ sendData(context, Map values) async {
         })
       ..show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
   } else {
-    print(response);
     AwesomeDialog(
         context: context,
         animType: AnimType.LEFTSLIDE,
