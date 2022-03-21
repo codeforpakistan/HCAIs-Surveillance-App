@@ -181,7 +181,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               options: field['options'],
                               value: field['options'][0]['_id'] != null
                                   ? field['options'][0]['_id']
-                                  : field['options'][0]['name'],
+                                  : field['options'][0]['name'] != null
+                                      ? field['options'][0]['name']
+                                      : field['options'][0]['title'],
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select an option',
@@ -389,8 +391,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         return DropdownMenuItem(
           value: option['_id'] != null
               ? option['_id'].toString()
-              : option['name'].toString(),
-          child: Text(option['name'].toString()),
+              : option['name'] != null
+                  ? option['name'].toString()
+                  : option['title'].toString(),
+          child: Text(option['name'] != null
+              ? option['name'].toString()
+              : option['title'].toString()),
         );
       }).toList(),
     );
