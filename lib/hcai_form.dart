@@ -121,6 +121,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               step['fields'].asMap().forEach((fieldIndex, field) => {
                     if (field['type'] == 'text')
                       {
+                        if (field['index'] == 0)
+                          {
+                            _controller[field['index']].text =
+                                field['description'].toString()
+                          },
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildTextField(
@@ -332,6 +337,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         if (nextValue['controllerIndex'] > -1)
           {_controller[nextValue['controllerIndex']].text = nextValue['value']},
         _onUpdate(key, newValue),
+        if (nextValue['controllerIndex2'] > -1)
+          {
+            _controller[nextValue['controllerIndex2']].text =
+                nextValue['value2']
+          },
       },
     );
   }
@@ -486,7 +496,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               'value': options
                   .firstWhere(
                       (each) => each['_id'] == value)['surveillancePeriod']
-                  .toString()
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
             };
           }
         case 'dateOfEvent':
@@ -497,7 +509,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   this.allSteps, 'infectionSurveyTime'),
               'value': Helper.daysBetweenDate(_values['dateOfEvent'],
                       _values['dateOfProcedure'], 'days')
-                  .toString()
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
             };
           }
         case 'patientWeight':
@@ -507,6 +521,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               'controllerIndex':
                   Helper.getNextControllerIndex(this.allSteps, 'bodyMassIndex'),
               'value': Helper.bodyMassIndex(
+                      _values['patientWeight'], _values['patientHeight'])
+                  .toString(),
+              'controllerIndex2': Helper.getNextControllerIndex(
+                  this.allSteps, 'bodyMassIndexScale'),
+              'value2': Helper.bodyMassIndexScale(
                       _values['patientWeight'], _values['patientHeight'])
                   .toString()
             };
@@ -518,11 +537,18 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   Helper.getNextControllerIndex(this.allSteps, 'patientAge'),
               'value': Helper.daysBetweenDate(_values['patientDateOfBirth'],
                       new DateTime.now().toString(), 'years')
-                  .toString()
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
             };
           }
         default:
-          return {'controllerIndex': -1, 'value': ''};
+          return {
+            'controllerIndex': -1,
+            'value': '',
+            'controllerIndex2': -1,
+            'value2': ''
+          };
       }
     } catch (e) {
       print(e);
