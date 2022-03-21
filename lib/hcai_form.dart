@@ -33,7 +33,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     //  find a way to get arguments in init
     // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
     _listFuture =
-        getHcaiForm('6229fab94c82eb5c4cb10b3c', '62205d48109d1e5a55e215b2');
+        getHcaiForm('623826388b1903e2f2d2f3d6', '62205d48109d1e5a55e215b2');
   }
 
   refresh() async {
@@ -378,7 +378,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         nextValue = _getCompletedField(key, newValue, options),
         if (nextValue['controllerIndex'] > -1)
           {_controller[nextValue['controllerIndex']].text = nextValue['value']},
-        _onUpdate(key, newValue)
+        _onUpdate(key, newValue),
+        if (nextValue['controllerIndex2'] > -1)
+          {
+            _controller[nextValue['controllerIndex2']].text =
+                nextValue['value2']
+          },
       },
       items: options.map((option) {
         return DropdownMenuItem(
@@ -497,8 +502,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   .firstWhere(
                       (each) => each['_id'] == value)['surveillancePeriod']
                   .toString(),
-              'controllerIndex2': -1,
-              'value2': ''
+              'controllerIndex2':
+                  Helper.getNextControllerIndex(this.allSteps, 'ICD10Code'),
+              'value2': options
+                  .firstWhere((each) => each['_id'] == value)['ICDCode']
+                  .toString(),
             };
           }
         case 'dateOfProcedure':
@@ -587,6 +595,7 @@ filterData(List<dynamic> allSteps, key, value) {
 Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
   var data = [];
   var url = Constants.BASE_URL + "/hcai/" + hospitalId + "/" + hcaiId;
+  print(url);
   var response = await http.get(
     Uri.parse(url),
     headers: {
