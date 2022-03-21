@@ -33,7 +33,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     //  find a way to get arguments in init
     // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
     _listFuture =
-        getHcaiForm('6229fab94c82eb5c4cb10b3c', '62205d48109d1e5a55e215b2');
+        getHcaiForm('623826388b1903e2f2d2f3d6', '62205d48109d1e5a55e215b2');
   }
 
   refresh() async {
@@ -45,9 +45,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final homeArgs = ModalRoute.of(context)!.settings.arguments as Arguments;
     return Scaffold(
       appBar: AppBar(
-        title: Text('HCAI FORM',
+        title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
             style: TextStyle(fontSize: 20, color: Colors.white)),
         automaticallyImplyLeading: false,
         actions: <Widget>[
@@ -120,9 +121,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               step['fields'].asMap().forEach((fieldIndex, field) => {
                     if (field['type'] == 'text')
                       {
+                        if (field['index'] == 0)
+                          {
+                            _controller[field['index']].text =
+                                field['description'].toString()
+                          },
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildTextField(
+                              key: field['key'].toString(),
                               labelText: field['label'].toString(),
                               validator: (value) {
                                 if (field['is_required'] == true) {
@@ -145,6 +152,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                           child: _buildTextField(
+                              key: field['key'].toString(),
                               labelText: field['label'].toString(),
                               validator: (value) {
                                 if (field['is_required'] == true) {
@@ -173,7 +181,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               options: field['options'],
                               value: field['options'][0]['_id'] != null
                                   ? field['options'][0]['_id']
-                                  : field['options'][0]['name'],
+                                  : field['options'][0]['name'] != null
+                                      ? field['options'][0]['name']
+                                      : field['options'][0]['title'],
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText: field['helpLabelText'] ??
                                   'Please select an option',
@@ -302,6 +312,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildTextField(
       {String? labelText,
+      String? key,
       FormFieldValidator<String>? validator,
       required TextEditingController myController,
       required bool hasHelpLabel,
@@ -324,10 +335,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       controller: myController,
       readOnly: readOnly,
       onChanged: (newValue) => {
-        nextValue = _getCompletedField(labelText, newValue, []),
+        nextValue = _getCompletedField(key, newValue, []),
         if (nextValue['controllerIndex'] > -1)
           {_controller[nextValue['controllerIndex']].text = nextValue['value']},
-        _onUpdate(labelText, newValue),
+        _onUpdate(key, newValue),
+        if (nextValue['controllerIndex2'] > -1)
+          {
+            _controller[nextValue['controllerIndex2']].text =
+                nextValue['value2']
+          },
       },
     );
   }
@@ -364,14 +380,23 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         nextValue = _getCompletedField(key, newValue, options),
         if (nextValue['controllerIndex'] > -1)
           {_controller[nextValue['controllerIndex']].text = nextValue['value']},
-        _onUpdate(key, newValue)
+        _onUpdate(key, newValue),
+        if (nextValue['controllerIndex2'] > -1)
+          {
+            _controller[nextValue['controllerIndex2']].text =
+                nextValue['value2']
+          },
       },
       items: options.map((option) {
         return DropdownMenuItem(
           value: option['_id'] != null
               ? option['_id'].toString()
-              : option['name'].toString(),
-          child: Text(option['name'].toString()),
+              : option['name'] != null
+                  ? option['name'].toString()
+                  : option['title'].toString(),
+          child: Text(option['name'] != null
+              ? option['name'].toString()
+              : option['title'].toString()),
         );
       }).toList(),
     );
@@ -482,32 +507,76 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               'value': options
                   .firstWhere(
                       (each) => each['_id'] == value)['surveillancePeriod']
-                  .toString()
+                  .toString(),
+              'controllerIndex2':
+                  Helper.getNextControllerIndex(this.allSteps, 'ICD10Code'),
+              'value2': options
+                  .firstWhere((each) => each['_id'] == value)['ICDCode']
+                  .toString(),
             };
           }
-        case 'dateOfEvent':
         case 'dateOfProcedure':
+        case 'dateOfEvent':
           {
             return {
               'controllerIndex': Helper.getNextControllerIndex(
                   this.allSteps, 'infectionSurveyTime'),
-              'value': Helper.daysBetweenDate(_values['dateOfEvent'],
-                      _values['dateOfProcedure'], 'days')
-                  .toString()
+              'value': Helper.daysBetweenDate(_values['dateOfProcedure'],
+                      _values['dateOfEvent'], 'days')
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
+            };
+          }
+        case 'dateOfDischarge':
+          {
+            return {
+              'controllerIndex': Helper.getNextControllerIndex(
+                  this.allSteps, 'postOpHospitalStay'),
+              'value': Helper.daysBetweenDate(_values['dateOfProcedure'],
+                      _values['dateOfDischarge'], 'days')
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
             };
           }
         case 'patientDateOfBirth':
           {
+            print(Helper.daysBetweenDate(_values['patientDateOfBirth'],
+                new DateTime.now().toString(), 'years'));
             return {
               'controllerIndex':
                   Helper.getNextControllerIndex(this.allSteps, 'patientAge'),
               'value': Helper.daysBetweenDate(_values['patientDateOfBirth'],
                       new DateTime.now().toString(), 'years')
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
+            };
+          }
+        case 'patientWeight':
+        case 'patientHeight':
+          {
+            return {
+              'controllerIndex':
+                  Helper.getNextControllerIndex(this.allSteps, 'bodyMassIndex'),
+              'value': Helper.bodyMassIndex(
+                      _values['patientWeight'], _values['patientHeight'])
+                  .toString(),
+              'controllerIndex2': Helper.getNextControllerIndex(
+                  this.allSteps, 'bodyMassIndexScale'),
+              'value2': Helper.bodyMassIndexScale(
+                      _values['patientWeight'], _values['patientHeight'])
                   .toString()
             };
           }
         default:
-          return {'controllerIndex': -1, 'value': ''};
+          return {
+            'controllerIndex': -1,
+            'value': '',
+            'controllerIndex2': -1,
+            'value2': ''
+          };
       }
     } catch (e) {
       print(e);
@@ -532,6 +601,7 @@ filterData(List<dynamic> allSteps, key, value) {
 Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
   var data = [];
   var url = Constants.BASE_URL + "/hcai/" + hospitalId + "/" + hcaiId;
+  print(url);
   var response = await http.get(
     Uri.parse(url),
     headers: {
