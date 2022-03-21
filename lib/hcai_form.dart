@@ -46,42 +46,50 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   @override
   Widget build(BuildContext context) {
     final homeArgs = ModalRoute.of(context)!.settings.arguments as Arguments;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
-            style: TextStyle(fontSize: 20, color: Colors.white)),
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.cancel_outlined, color: Colors.white),
-              )),
-        ],
-      ),
-      body: Container(
-        child: FutureBuilder(
-            future: _listFuture,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.done:
-                  if (snapshot.hasError) {
-                    return Padding(
-                      padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-                      child: Center(child: Text(snapshot.error.toString())),
-                    );
-                  } else if (snapshot.hasData) {
-                    return _formWizard(snapshot.data, context);
-                  } else {
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.of(context).userGestureInProgress)
+          return false;
+        else
+          return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
+              style: TextStyle(fontSize: 20, color: Colors.white)),
+          automaticallyImplyLeading: false,
+          actions: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(Icons.cancel_outlined, color: Colors.white),
+                )),
+          ],
+        ),
+        body: Container(
+          child: FutureBuilder(
+              future: _listFuture,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                    if (snapshot.hasError) {
+                      return Padding(
+                        padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                        child: Center(child: Text(snapshot.error.toString())),
+                      );
+                    } else if (snapshot.hasData) {
+                      return _formWizard(snapshot.data, context);
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  default:
                     return Center(child: CircularProgressIndicator());
-                  }
-                default:
-                  return Center(child: CircularProgressIndicator());
-              }
-            }),
+                }
+              }),
+        ),
       ),
     );
   }
