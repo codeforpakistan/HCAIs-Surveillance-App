@@ -5,7 +5,7 @@ class Helper {
     try {
       final startDate = DateTime.parse(date1);
       final endDate = DateTime.parse(date2);
-      final days = startDate.difference(endDate).inDays;
+      final days = endDate.difference(startDate).inDays;
       switch (returnType) {
         case 'days':
           return days;
