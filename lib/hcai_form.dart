@@ -24,11 +24,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Map _values = {};
   Map _selectedRole = {};
   List<dynamic> allSteps = [];
+  List<dynamic> orignalSteps = [];
   List<TextEditingController> _controller = [];
   late Future<List>? _listFuture;
 
   @override
   void initState() {
+    this._values = {};
     super.initState();
     //  find a way to get arguments in init
     // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
@@ -38,14 +40,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   refresh() async {
     final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    this._values['hospitalId'] = args.hospitalId;
-    this._values['userId'] = args.userId;
     _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
   }
 
   @override
   Widget build(BuildContext context) {
     final homeArgs = ModalRoute.of(context)!.settings.arguments as Arguments;
+    this._values['hospitalId'] = homeArgs.hospitalId;
+    this._values['userId'] = homeArgs.userId;
     return Scaffold(
       appBar: AppBar(
         title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
@@ -88,7 +90,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _formWizard(formData, context) {
     Map<String, dynamic> hcaiForm = formData?.first;
-    this.allSteps = hcaiForm["steps"];
+    this.orignalSteps = hcaiForm["steps"].toList();
+    this.allSteps = hcaiForm["steps"].toList();
     // ignore: unused_local_variable
     DateTime? selectedDate = DateTime.now();
     final List<CoolStep> steps = [];
@@ -97,7 +100,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     int currentIndex = 0;
     this.allSteps.forEach((each) => {
           each['fields'].forEach((eachField) => {
-                if (each['type'] == 'radiofield') {},
                 eachField['index'] = currentIndex,
                 currentIndex = currentIndex + 1,
               }),
@@ -171,7 +173,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         )),
                       }
                     else if (field['type'] == 'dropdown' &&
-                        field['options'] is List)
+                        field['options'] is List &&
+                        field['options'].length > 0)
                       {
                         data.add(Padding(
                           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -280,6 +283,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       type: String,
       required DateTime selectedDate}) {
     var nextValue;
+    if (this._values[selectedDateKey] == null) {
+      this._values[selectedDateKey] = '';
+    }
     return DateTimeFormField(
         decoration: InputDecoration(
             hintText: hint,
@@ -291,22 +297,19 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     },
                   )
                 : null),
-        initialDate: selectedDate,
-        // selectedDate: selectedDateKey,
+        initialValue:
+            DateTime.tryParse(this._values[selectedDateKey]), //Add this in your
         mode: type == 'time'
             ? DateTimeFieldPickerMode.time
             : DateTimeFieldPickerMode.date,
         onDateSelected: (DateTime value) {
-          setState(() {
-            selectedDate = value;
-          });
-          _onUpdate(selectedDateKey, value.toIso8601String());
-          nextValue =
-              _getCompletedField(selectedDateKey, value.toIso8601String(), []);
-          if (nextValue['controllerIndex'] > -1) {
-            _controller[nextValue['controllerIndex']].text = nextValue['value'];
+          if (this.mounted) {
+            setState(() {
+              this._values[selectedDateKey] = value.toIso8601String();
+            });
           }
-          // selectedDateKey = value;
+
+          _setCompleteField(selectedDateKey, value.toIso8601String(), []);
         });
   }
 
@@ -320,6 +323,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required int index,
       bool readOnly = false}) {
     var nextValue;
+    if (myController.text == '' && this._values[key] != null) {
+      myController.text = this._values[key];
+    }
     return TextFormField(
       validator: validator,
       decoration: InputDecoration(
@@ -335,15 +341,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       controller: myController,
       readOnly: readOnly,
       onChanged: (newValue) => {
-        nextValue = _getCompletedField(key, newValue, []),
-        if (nextValue['controllerIndex'] > -1)
-          {_controller[nextValue['controllerIndex']].text = nextValue['value']},
         _onUpdate(key, newValue),
-        if (nextValue['controllerIndex2'] > -1)
-          {
-            _controller[nextValue['controllerIndex2']].text =
-                nextValue['value2']
-          },
+        _setCompleteField(key, newValue, []),
       },
     );
   }
@@ -357,6 +356,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String helpLabelText,
       required int index}) {
     var nextValue;
+    if (this._values[key] == null) {
+      this._values[key] = value;
+    }
     return DropdownButtonFormField(
       decoration: InputDecoration(
           labelText: labelText,
@@ -370,22 +372,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               : null),
       isExpanded: true,
       hint: Text(labelText),
-      value: value,
-      onSaved: (String? newValue) => {
-        setState(() {
-          value = newValue!;
-        }),
-      },
+      value: this._values[key].toString(),
       onChanged: (String? newValue) => {
-        nextValue = _getCompletedField(key, newValue, options),
-        if (nextValue['controllerIndex'] > -1)
-          {_controller[nextValue['controllerIndex']].text = nextValue['value']},
-        _onUpdate(key, newValue),
-        if (nextValue['controllerIndex2'] > -1)
-          {
-            _controller[nextValue['controllerIndex2']].text =
-                nextValue['value2']
-          },
+        setState(() => {this._values[key] = newValue}),
+        // filterData(key, newValue),
+        // _onUpdate(key, newValue),
+        _setCompleteField(key, newValue, options),
       },
       items: options.map((option) {
         return DropdownMenuItem(
@@ -496,91 +488,65 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  Map _getCompletedField(String? key, String? value, List<dynamic> options) {
+  void _setCompleteField(String? key, String? value, List<dynamic> options) {
     try {
       switch (key) {
         case 'ICD10Id':
           {
-            return {
-              'controllerIndex': Helper.getNextControllerIndex(
-                  this.allSteps, 'recommendedSurveillancePeriod'),
-              'value': options
-                  .firstWhere(
-                      (each) => each['_id'] == value)['surveillancePeriod']
-                  .toString(),
-              'controllerIndex2':
-                  Helper.getNextControllerIndex(this.allSteps, 'ICD10Code'),
-              'value2': options
-                  .firstWhere((each) => each['_id'] == value)['ICDCode']
-                  .toString(),
-            };
+            this._values['recommendedSurveillancePeriod'] = options
+                .firstWhere(
+                    (each) => each['_id'] == value)['surveillancePeriod']
+                .toString();
+            this._values['ICD10Code'] = options
+                .firstWhere((each) => each['_id'] == value)['ICDCode']
+                .toString();
+            print(this._values['ICD10Code']);
+            break;
           }
         case 'dateOfProcedure':
         case 'dateOfEvent':
           {
-            return {
-              'controllerIndex': Helper.getNextControllerIndex(
-                  this.allSteps, 'infectionSurveyTime'),
-              'value': Helper.daysBetweenDate(_values['dateOfProcedure'],
-                      _values['dateOfEvent'], 'days')
-                  .toString(),
-              'controllerIndex2': -1,
-              'value2': ''
-            };
+            this._values['infectionSurveyTime'] = Helper.daysBetweenDate(
+                    _values['dateOfProcedure'], _values['dateOfEvent'], 'days')
+                .toString();
+            break;
           }
         case 'dateOfDischarge':
           {
-            return {
-              'controllerIndex': Helper.getNextControllerIndex(
-                  this.allSteps, 'postOpHospitalStay'),
-              'value': Helper.daysBetweenDate(_values['dateOfProcedure'],
-                      _values['dateOfDischarge'], 'days')
-                  .toString(),
-              'controllerIndex2': -1,
-              'value2': ''
-            };
+            this._values['postOpHospitalStay'] = Helper.daysBetweenDate(
+                    _values['dateOfProcedure'],
+                    _values['dateOfDischarge'],
+                    'days')
+                .toString();
+            break;
           }
         case 'patientDateOfBirth':
           {
-            print(Helper.daysBetweenDate(_values['patientDateOfBirth'],
-                new DateTime.now().toString(), 'years'));
-            return {
-              'controllerIndex':
-                  Helper.getNextControllerIndex(this.allSteps, 'patientAge'),
-              'value': Helper.daysBetweenDate(_values['patientDateOfBirth'],
-                      new DateTime.now().toString(), 'years')
-                  .toString(),
-              'controllerIndex2': -1,
-              'value2': ''
-            };
+            this._values['patientAge'] = Helper.daysBetweenDate(
+                    this._values['patientDateOfBirth'],
+                    new DateTime.now().toString(),
+                    'years')
+                .toString();
+            break;
           }
         case 'patientWeight':
         case 'patientHeight':
           {
-            return {
-              'controllerIndex':
-                  Helper.getNextControllerIndex(this.allSteps, 'bodyMassIndex'),
-              'value': Helper.bodyMassIndex(
-                      _values['patientWeight'], _values['patientHeight'])
-                  .toString(),
-              'controllerIndex2': Helper.getNextControllerIndex(
-                  this.allSteps, 'bodyMassIndexScale'),
-              'value2': Helper.bodyMassIndexScale(
-                      _values['patientWeight'], _values['patientHeight'])
-                  .toString()
-            };
+            this._values['bodyMassIndex'] = Helper.bodyMassIndex(
+                    this._values['patientWeight'],
+                    this._values['patientHeight'])
+                .toString();
+            this._values['bodyMassIndexScale'] = Helper.bodyMassIndexScale(
+                    _values['patientWeight'], _values['patientHeight'])
+                .toString();
+            print(this._values['bodyMassIndex']);
+            break;
           }
         default:
-          return {
-            'controllerIndex': -1,
-            'value': '',
-            'controllerIndex2': -1,
-            'value2': ''
-          };
+          break;
       }
     } catch (e) {
-      print(e);
-      return {'controllerIndex': -1, 'value': ''};
+      print('error in switch' + e.toString());
     }
   }
 
@@ -588,65 +554,78 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     _values[key] = val;
     // print(_values);
   }
-}
 
-filterData(List<dynamic> allSteps, key, value) {
-  if (key == 'departmentId') {
-    allSteps.forEach((each) => {
-          print(each),
-        });
+  filterData(key, value) {
+    List<dynamic> steps = json.decode(json.encode(orignalSteps));
+    if (key == 'departmentId') {
+      for (var step in allSteps) {
+        if (step["fields"] is List) {
+          for (var eachField in step["fields"]) {
+            if (eachField['key'] == 'wardId') {
+              eachField['options'] = eachField['options']
+                  .where((each) => each['departmentId'] == value)
+                  .toList();
+              break;
+            }
+          }
+        }
+      }
+      setState(() {
+        allSteps = steps;
+      });
+    }
   }
-}
 
-Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
-  var data = [];
-  var url = Constants.BASE_URL + "/hcai/" + hospitalId + "/" + hcaiId;
-  print(url);
-  var response = await http.get(
-    Uri.parse(url),
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  );
-  data = json.decode(utf8.decode(response.bodyBytes));
-  return data.toList();
-}
+  Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
+    var data = [];
+    var url = Constants.BASE_URL + "/hcai/" + hospitalId + "/" + hcaiId;
+    print(url);
+    var response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+    data = json.decode(utf8.decode(response.bodyBytes));
+    return data.toList();
+  }
 
-sendData(context, Map values) async {
-  values['isVerified'] = false;
-  final response = await http.post(
-    Uri.parse(Constants.BASE_URL + "/submissions/"),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(values),
-  );
-  if (response.statusCode == 201) {
-    AwesomeDialog(
-        context: context,
-        animType: AnimType.LEFTSLIDE,
-        headerAnimationLoop: false,
-        dialogType: DialogType.SUCCES,
-        showCloseIcon: false,
-        title: 'Success',
-        desc: 'Submitted!',
-        onDissmissCallback: (type) {
-          debugPrint('Dialog Dissmiss from callback $type');
-        })
-      ..show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
-  } else {
-    AwesomeDialog(
-        context: context,
-        animType: AnimType.LEFTSLIDE,
-        headerAnimationLoop: false,
-        dialogType: DialogType.ERROR,
-        showCloseIcon: false,
-        title: 'ERROR',
-        desc: jsonDecode(response.body).toString(),
-        onDissmissCallback: (type) {
-          debugPrint('Dialog Dismiss from callback $type');
-        })
-      ..show();
+  sendData(context, Map values) async {
+    values['isVerified'] = false;
+    final response = await http.post(
+      Uri.parse(Constants.BASE_URL + "/submissions/"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(values),
+    );
+    if (response.statusCode == 201) {
+      AwesomeDialog(
+          context: context,
+          animType: AnimType.LEFTSLIDE,
+          headerAnimationLoop: false,
+          dialogType: DialogType.SUCCES,
+          showCloseIcon: false,
+          title: 'Success',
+          desc: 'Submitted!',
+          onDissmissCallback: (type) {
+            debugPrint('Dialog Dissmiss from callback $type');
+          })
+        ..show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
+    } else {
+      AwesomeDialog(
+          context: context,
+          animType: AnimType.LEFTSLIDE,
+          headerAnimationLoop: false,
+          dialogType: DialogType.ERROR,
+          showCloseIcon: false,
+          title: 'ERROR',
+          desc: jsonDecode(response.body).toString(),
+          onDissmissCallback: (type) {
+            debugPrint('Dialog Dismiss from callback $type');
+          })
+        ..show();
+    }
   }
 }

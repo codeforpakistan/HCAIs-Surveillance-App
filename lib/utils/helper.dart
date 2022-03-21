@@ -3,8 +3,8 @@ import 'dart:math';
 class Helper {
   static int daysBetweenDate(date1, date2, String returnType) {
     try {
-      final startDate = DateTime.parse(date1);
-      final endDate = DateTime.parse(date2);
+      final startDate = DateTime.parse(date1.toString());
+      final endDate = DateTime.parse(date2.toString());
       final days = endDate.difference(startDate).inDays;
       switch (returnType) {
         case 'days':
@@ -15,7 +15,7 @@ class Helper {
           return days;
       }
     } catch (e) {
-      print(e);
+      print('date range failed' + e.toString());
       return -1;
     }
   }
