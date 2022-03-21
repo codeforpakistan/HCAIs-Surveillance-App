@@ -45,9 +45,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final homeArgs = ModalRoute.of(context)!.settings.arguments as Arguments;
     return Scaffold(
       appBar: AppBar(
-        title: Text('HCAI FORM',
+        title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
             style: TextStyle(fontSize: 20, color: Colors.white)),
         automaticallyImplyLeading: false,
         actions: <Widget>[
