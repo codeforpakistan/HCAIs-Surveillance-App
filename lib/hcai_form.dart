@@ -501,14 +501,40 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               'value2': ''
             };
           }
-        case 'dateOfEvent':
         case 'dateOfProcedure':
+        case 'dateOfEvent':
           {
             return {
               'controllerIndex': Helper.getNextControllerIndex(
                   this.allSteps, 'infectionSurveyTime'),
-              'value': Helper.daysBetweenDate(_values['dateOfEvent'],
-                      _values['dateOfProcedure'], 'days')
+              'value': Helper.daysBetweenDate(_values['dateOfProcedure'],
+                      _values['dateOfEvent'], 'days')
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
+            };
+          }
+        case 'dateOfDischarge':
+          {
+            return {
+              'controllerIndex': Helper.getNextControllerIndex(
+                  this.allSteps, 'postOpHospitalStay'),
+              'value': Helper.daysBetweenDate(_values['dateOfProcedure'],
+                      _values['dateOfDischarge'], 'days')
+                  .toString(),
+              'controllerIndex2': -1,
+              'value2': ''
+            };
+          }
+        case 'patientDateOfBirth':
+          {
+            print(Helper.daysBetweenDate(_values['patientDateOfBirth'],
+                new DateTime.now().toString(), 'years'));
+            return {
+              'controllerIndex':
+                  Helper.getNextControllerIndex(this.allSteps, 'patientAge'),
+              'value': Helper.daysBetweenDate(_values['patientDateOfBirth'],
+                      new DateTime.now().toString(), 'years')
                   .toString(),
               'controllerIndex2': -1,
               'value2': ''
@@ -528,18 +554,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               'value2': Helper.bodyMassIndexScale(
                       _values['patientWeight'], _values['patientHeight'])
                   .toString()
-            };
-          }
-        case 'patientDateOfBirth':
-          {
-            return {
-              'controllerIndex':
-                  Helper.getNextControllerIndex(this.allSteps, 'patientAge'),
-              'value': Helper.daysBetweenDate(_values['patientDateOfBirth'],
-                      new DateTime.now().toString(), 'years')
-                  .toString(),
-              'controllerIndex2': -1,
-              'value2': ''
             };
           }
         default:
