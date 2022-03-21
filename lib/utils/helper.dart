@@ -35,6 +35,30 @@ class Helper {
     }
   }
 
+  static String bodyMassIndexScale(weight, height) {
+    try {
+      // Show Underweight if BMI is less than 18.5, show Normal Weight if BMI is in range of 18.5-22.9, show Over-weight if BMI is in range of 23.0-27.5 and show Obese if BMI is more than 27.5
+      if (weight == '' || height == '') {
+        return "NA";
+      }
+      weight = double.parse(weight);
+      height = double.parse(height);
+      final bmi = weight / pow(height, 2);
+      if (bmi < 18.5) {
+        return "Underweight";
+      } else if (bmi >= 18.5 && bmi <= 22.9) {
+        return "Normal Weight";
+      } else if (bmi >= 23.0 && bmi <= 27.5) {
+        return "Overweight";
+      } else {
+        return "Obese";
+      }
+    } catch (e) {
+      print(e);
+      return "NA";
+    }
+  }
+
   static int getNextControllerIndex(List<dynamic> list, String key) {
     int index = -1;
     bool done = false;
