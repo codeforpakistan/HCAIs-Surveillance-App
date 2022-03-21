@@ -79,11 +79,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     return _formWizard(snapshot.data, context);
                   } else {
                     return Center(child: CircularProgressIndicator());
-                  }
-                default:
-                  return Center(child: CircularProgressIndicator());
-              }
-            }),
+                }
+              }),
+        ),
       ),
     );
   }
