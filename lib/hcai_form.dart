@@ -282,7 +282,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String helpLabelText,
       type: String,
       required DateTime selectedDate}) {
-    var nextValue;
     if (this._values[selectedDateKey] == null) {
       this._values[selectedDateKey] = '';
     }
@@ -308,7 +307,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               this._values[selectedDateKey] = value.toIso8601String();
             });
           }
-
           _setCompleteField(selectedDateKey, value.toIso8601String(), []);
         });
   }
@@ -322,7 +320,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String helpLabelText,
       required int index,
       bool readOnly = false}) {
-    var nextValue;
     if (myController.text == '' && this._values[key] != null) {
       myController.text = this._values[key];
     }
@@ -355,7 +352,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText,
       required int index}) {
-    var nextValue;
     if (this._values[key] == null) {
       this._values[key] = value;
     }
@@ -376,7 +372,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       onChanged: (String? newValue) => {
         setState(() => {this._values[key] = newValue}),
         // filterData(key, newValue),
-        // _onUpdate(key, newValue),
         _setCompleteField(key, newValue, options),
       },
       items: options.map((option) {
