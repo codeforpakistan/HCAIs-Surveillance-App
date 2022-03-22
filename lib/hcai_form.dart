@@ -24,7 +24,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Map _values = {};
   Map _selectedRole = {};
   List<dynamic> allSteps = [];
-  List<dynamic> orignalSteps = [];
+  List<dynamic> originalSteps = [];
   List<TextEditingController> _controller = [];
   late Future<List>? _listFuture;
 
@@ -48,36 +48,48 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     final homeArgs = ModalRoute.of(context)!.settings.arguments as Arguments;
     this._values['hospitalId'] = homeArgs.hospitalId;
     this._values['userId'] = homeArgs.userId;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
-            style: TextStyle(fontSize: 20, color: Colors.white)),
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.cancel_outlined, color: Colors.white),
-              )),
-        ],
-      ),
-      body: Container(
-        child: FutureBuilder(
-            future: _listFuture,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.done:
-                  if (snapshot.hasError) {
-                    return Padding(
-                      padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-                      child: Center(child: Text(snapshot.error.toString())),
-                    );
-                  } else if (snapshot.hasData) {
-                    return _formWizard(snapshot.data, context);
-                  } else {
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.of(context).userGestureInProgress)
+          return false;
+        else
+          return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
+              style: TextStyle(fontSize: 20, color: Colors.white)),
+          automaticallyImplyLeading: false,
+          actions: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(Icons.cancel_outlined, color: Colors.white),
+                )),
+          ],
+        ),
+        body: Container(
+          child: FutureBuilder(
+              future: _listFuture,
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.done:
+                  case ConnectionState.active:
+                    if (snapshot.hasError) {
+                      return Padding(
+                        padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                        child: Center(child: Text(snapshot.error.toString())),
+                      );
+                    } else if (snapshot.hasData) {
+                      return _formWizard(snapshot.data, context);
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
                     return Center(child: CircularProgressIndicator());
                 }
               }),
@@ -88,7 +100,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _formWizard(formData, context) {
     Map<String, dynamic> hcaiForm = formData?.first;
-    this.orignalSteps = hcaiForm["steps"].toList();
+    this.originalSteps = hcaiForm["steps"].toList();
     this.allSteps = hcaiForm["steps"].toList();
     // ignore: unused_local_variable
     DateTime? selectedDate = DateTime.now();
@@ -549,7 +561,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   filterData(key, value) {
-    List<dynamic> steps = json.decode(json.encode(orignalSteps));
+    List<dynamic> steps = json.decode(json.encode(originalSteps));
     if (key == 'departmentId') {
       for (var step in allSteps) {
         if (step["fields"] is List) {
