@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:convert';
 
 class Helper {
   static int daysBetweenDate(date1, date2, String returnType) {
@@ -20,14 +21,14 @@ class Helper {
     }
   }
 
-  static int bodyMassIndex(weight, height) {
+  static int bodyMassIndex(String weight, String height) {
     try {
       if (weight == '' || height == '') {
         return 0;
       }
-      weight = double.parse(weight);
-      height = double.parse(height);
-      final bmi = weight / pow(height, 2);
+      double w = double.parse(json.encode(json.decode(weight)));
+      double h = double.parse(json.encode(json.decode(height)));
+      final bmi = w / pow(h, 2);
       return bmi.round();
     } catch (e) {
       print(e);

@@ -7,7 +7,6 @@ import 'package:hcais/utils/helper.dart';
 import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
-
 import 'components/alertDialog_widget.dart';
 import 'home.dart';
 
@@ -316,8 +315,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             setState(() {
               this._values[selectedDateKey] = value.toIso8601String();
             });
+            _setCompleteField(selectedDateKey, value.toIso8601String(), []);
           }
-          _setCompleteField(selectedDateKey, value.toIso8601String(), []);
         });
   }
 
@@ -334,24 +333,23 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       myController.text = this._values[key];
     }
     return TextFormField(
-      validator: validator,
-      decoration: InputDecoration(
-          labelText: labelText,
-          suffixIcon: hasHelpLabel
-              ? IconButton(
-                  icon: Icon(Icons.info_outline),
-                  onPressed: () {
-                    _showDialog(context, helpLabelText);
-                  },
-                )
-              : null),
-      controller: myController,
-      readOnly: readOnly,
-      onChanged: (newValue) => {
-        _onUpdate(key, newValue),
-        _setCompleteField(key, newValue, []),
-      },
-    );
+        validator: validator,
+        decoration: InputDecoration(
+            labelText: labelText,
+            suffixIcon: hasHelpLabel
+                ? IconButton(
+                    icon: Icon(Icons.info_outline),
+                    onPressed: () {
+                      _showDialog(context, helpLabelText);
+                    },
+                  )
+                : null),
+        controller: myController,
+        readOnly: readOnly,
+        onChanged: (newValue) => {
+              this._values[key] = newValue,
+              _setCompleteField(key, this._values[key], []),
+            });
   }
 
   Widget _buildDropDown(
@@ -380,9 +378,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       hint: Text(labelText),
       value: this._values[key].toString(),
       onChanged: (String? newValue) => {
-        setState(() => {this._values[key] = newValue}),
-        // filterData(key, newValue),
-        _setCompleteField(key, newValue, options),
+        if (this.mounted)
+          {
+            setState(() => {this._values[key] = newValue}),
+            _setCompleteField(key, newValue, options),
+          }
       },
       items: options.map((option) {
         return DropdownMenuItem(
@@ -438,9 +438,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       groupValue: _selectedRole[key],
       title: Text(title),
       onChanged: (Object? value) {
-        setState(() {
-          _selectedRole[key] = value;
-        });
+        if (this.mounted) {
+          setState(() {
+            _selectedRole[key] = value;
+          });
+        }
       },
     );
   }
@@ -537,14 +539,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         case 'patientWeight':
         case 'patientHeight':
           {
-            this._values['bodyMassIndex'] = Helper.bodyMassIndex(
-                    this._values['patientWeight'],
-                    this._values['patientHeight'])
-                .toString();
-            this._values['bodyMassIndexScale'] = Helper.bodyMassIndexScale(
-                    _values['patientWeight'], _values['patientHeight'])
-                .toString();
-            print(this._values['bodyMassIndex']);
+            if (this._values['patientWeight'] != null &&
+                this._values['patientHeight'] != null) {
+              this._values['bodyMassIndex'] = Helper.bodyMassIndex(
+                      this._values['patientWeight'],
+                      this._values['patientHeight'])
+                  .toString();
+              this._values['bodyMassIndexScale'] = Helper.bodyMassIndexScale(
+                  this._values['patientWeight'], this._values['patientHeight']);
+              _controller[
+                      Helper.getNextControllerIndex(allSteps, 'bodyMassIndex')]
+                  .text = this._values['bodyMassIndex'];
+              _controller[Helper.getNextControllerIndex(
+                      allSteps, 'bodyMassIndexScale')]
+                  .text = this._values['bodyMassIndexScale'];
+            }
             break;
           }
         default:
@@ -555,9 +564,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
-  _onUpdate(String? key, String? val) {
-    _values[key] = val;
-    // print(_values);
+  _setState(key, value) {
+    if (mounted) {
+      setState(() => {this._values[key]: value});
+    }
   }
 
   filterData(key, value) {
