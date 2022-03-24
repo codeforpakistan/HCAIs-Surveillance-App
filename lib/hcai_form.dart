@@ -20,6 +20,8 @@ class HcaiFormPage extends StatefulWidget {
 }
 
 class _HcaiFormPageState extends State<HcaiFormPage> {
+  Arguments args = new Arguments(
+      goodToGo: false, hcaiId: '', hcaiTitle: '', hospitalId: '', userId: '');
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
   Map _selectedRole = {};
@@ -31,23 +33,25 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   @override
   void initState() {
     this._values = {};
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        args = ModalRoute.of(context)!.settings.arguments as Arguments;
+      });
+      this._values['hospitalId'] = args.hospitalId;
+      this._values['userId'] = args.userId;
+      _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
+    });
     super.initState();
+
     //  find a way to get arguments in init
     // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    _listFuture =
-        getHcaiForm('623c4127d8512af7bd13735b', '62205d48109d1e5a55e215b2');
-  }
-
-  refresh() async {
-    final args = ModalRoute.of(context)!.settings.arguments as Arguments;
-    _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final homeArgs = ModalRoute.of(context)!.settings.arguments as Arguments;
-    this._values['hospitalId'] = homeArgs.hospitalId;
-    this._values['userId'] = homeArgs.userId;
+    if (!args.goodToGo) {
+      return Container();
+    }
     return WillPopScope(
       onWillPop: () async {
         if (Navigator.of(context).userGestureInProgress)
@@ -57,7 +61,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(homeArgs.hcaiTitle?.toUpperCase() ?? 'HCAI FORM',
+          title: Text(args.hcaiTitle.toUpperCase(),
               style: TextStyle(fontSize: 20, color: Colors.white)),
           automaticallyImplyLeading: false,
           actions: <Widget>[
