@@ -1,7 +1,26 @@
+import 'package:flutter/material.dart';
+
 class Arguments {
-  final userId;
-  final hospitalId;
-  final hcaiId;
-  final hcaiTitle;
-  Arguments(this.userId, this.hospitalId, this.hcaiId, this.hcaiTitle);
+  static const title = 'HCAI Surveillance App';
+  final String userId;
+  final String hospitalId;
+  final String hcaiId;
+  final String hcaiTitle;
+  final bool goodToGo;
+
+  // This Widget accepts the arguments as constructor
+  // parameters. It does not extract the arguments from
+  // the ModalRoute.
+  //
+  // The arguments are extracted by the onGenerateRoute
+  // function provided to the MaterialApp widget.
+  const Arguments({
+    Key? key,
+    title,
+    required this.goodToGo,
+    required this.userId,
+    required this.hospitalId,
+    required this.hcaiId,
+    required this.hcaiTitle,
+  });
 }
