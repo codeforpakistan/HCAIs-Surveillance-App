@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
 import 'components/alertDialog_widget.dart';
 import 'home.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
@@ -34,7 +35,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     //  find a way to get arguments in init
     // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
     _listFuture =
-        getHcaiForm('623826388b1903e2f2d2f3d6', '62205d48109d1e5a55e215b2');
+        getHcaiForm('623c4127d8512af7bd13735b', '62205d48109d1e5a55e215b2');
   }
 
   refresh() async {
@@ -178,6 +179,19 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               hasHelpLabel: field['hasHelpLabel'],
                               helpLabelText:
                                   field['helpLabelText'] ?? 'Please enter text',
+                              index: field['index']),
+                        )),
+                      }
+                    else if (field['type'] == 'dropdown' &&
+                        field['multiple'] == true)
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          child: _buildMultipleSelect(
+                              key: field['key'].toString(),
+                              options: field['options'],
+                              label:
+                                  field['Label'] ?? 'Please select an option',
                               index: field['index']),
                         )),
                       }
@@ -350,6 +364,34 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               this._values[key] = newValue,
               _setCompleteField(key, this._values[key], []),
             });
+  }
+
+  Widget _buildMultipleSelect(
+      {required String key,
+      required List<dynamic> options,
+      required String label,
+      required int index}) {
+    return MultiSelectDialogField(
+      onConfirm: (val) {
+        if (this.mounted) {
+          setState(() => {this._values[key] = val});
+          _setCompleteField(key, val.toString(), options);
+        }
+      },
+      title: Text(label),
+      dialogWidth: MediaQuery.of(context).size.width * 0.7,
+      searchable: true,
+      items: options
+          .map((each) => MultiSelectItem(
+              each,
+              each['name'] != null
+                  ? each['name'].toString()
+                  : each['title'].toString()))
+          .toList(),
+
+      initialValue: this._values[
+          key], // setting the value of this in initState() to pre-select values.
+    );
   }
 
   Widget _buildDropDown(
