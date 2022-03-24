@@ -564,12 +564,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
-  _setState(key, value) {
-    if (mounted) {
-      setState(() => {this._values[key]: value});
-    }
-  }
-
   filterData(key, value) {
     List<dynamic> steps = json.decode(json.encode(originalSteps));
     if (key == 'departmentId') {
