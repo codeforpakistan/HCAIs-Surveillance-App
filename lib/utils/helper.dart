@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:convert';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class Helper {
   static int daysBetweenDate(date1, date2, String returnType) {
@@ -78,5 +79,31 @@ class Helper {
       }
     }
     return index;
+  }
+
+  static String truncateWithEllipsis(int cutoff, String myString) {
+    return (myString.length <= cutoff)
+        ? myString
+        : '${myString.substring(0, cutoff)}...';
+  }
+
+  static isValidData(_values) {
+    return _values['hospitalId'] != '' &&
+        _values['userId'] != '' &&
+        _values['departmentId'] != '' &&
+        _values['wardId'] != '' &&
+        _values['ICD10Id'] != 'Select ICD-10-PCS Code';
+  }
+
+  static showMsg(context, msg, isError) {
+    AwesomeDialog(
+      context: context,
+      animType: AnimType.LEFTSLIDE,
+      headerAnimationLoop: false,
+      dialogType: isError ? DialogType.ERROR : DialogType.SUCCES,
+      showCloseIcon: false,
+      title: isError ? 'ERROR' : 'Success',
+      desc: msg,
+    )..show();
   }
 }
