@@ -29,6 +29,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   List<dynamic> originalSteps = [];
   List<TextEditingController> _controller = [];
   late Future<List>? _listFuture;
+  bool showFullValue = false;
 
   @override
   void initState() {
@@ -194,8 +195,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           child: _buildMultipleSelect(
                               key: field['key'].toString(),
                               options: field['options'],
-                              label:
-                                  field['Label'] ?? 'Please select an option',
+                              label: field['label'] ?? 'Please Select',
                               index: field['index']),
                         )),
                       }
@@ -223,12 +223,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     else if (field['type'] == 'radiofield')
                       {
                         data.add(Padding(
-                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                           child: _buildRadioButton(
                               context: context,
                               title: field['label'].toString(),
                               key: field['key'].toString(),
-                              options: field['options']),
+                              options: field['options'],
+                              truncate: field['truncate'] ?? false),
                         )),
                       }
                     else if (field['type'] == 'checkboxfield')
@@ -382,7 +383,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           _setCompleteField(key, val.toString(), options);
         }
       },
-      title: Text(label),
+      buttonText: Text(label),
+      title: Text('Please Select'),
       dialogWidth: MediaQuery.of(context).size.width * 0.7,
       searchable: true,
       items: options
@@ -449,7 +451,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       {required BuildContext context,
       required String title,
       required String key,
-      required List<dynamic> options}) {
+      required List<dynamic> options,
+      required bool truncate}) {
     List<Widget> list = [];
     int _groupValue = -1;
     list.add(Text(title,
@@ -464,7 +467,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               key: key,
               value: index,
               groupValue: _groupValue,
-              selected: options[0]['name']))
+              selected: options[0]['name'],
+              truncate: truncate))
         });
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,16 +481,31 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String key,
       required int value,
       required int groupValue,
-      String? selected}) {
+      String? selected,
+      required bool truncate}) {
     return RadioListTile(
-      value: title,
+      value: value,
       activeColor: Color(0xFF6200EE),
       groupValue: _selectedRole[key],
-      title: Text(title),
+      title: new GestureDetector(
+        onTap: () {
+          truncate
+              ? setState(() {
+                  showFullValue = !showFullValue;
+                })
+              // ignore: unnecessary_statements
+              : null;
+        },
+        child: new Text((truncate && (!showFullValue || title.length <= 12))
+            ? Helper.truncateWithEllipsis(12, title)
+            : title),
+      ),
       onChanged: (Object? value) {
         if (this.mounted) {
+          print(title);
           setState(() {
             _selectedRole[key] = value;
+            _values[key] = title;
           });
         }
       },
@@ -553,7 +572,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             this._values['ICD10Code'] = options
                 .firstWhere((each) => each['_id'] == value)['ICDCode']
                 .toString();
-            print(this._values['ICD10Code']);
             break;
           }
         case 'dateOfProcedure':
@@ -634,7 +652,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
     var data = [];
     var url = Constants.BASE_URL + "/hcai/" + hospitalId + "/" + hcaiId;
-    print(url);
     var response = await http.get(
       Uri.parse(url),
       headers: {
@@ -648,6 +665,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   sendData(context, Map values) async {
     values['isVerified'] = false;
+    if (!Helper.isValidData(this._values)) {
+      Helper.showMsg(
+          context, 'Please select Department, ICD-10 Code and Ward', true);
+      return null;
+    }
     final response = await http.post(
       Uri.parse(Constants.BASE_URL + "/submissions/"),
       headers: <String, String>{
@@ -669,18 +691,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           })
         ..show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
     } else {
-      AwesomeDialog(
-          context: context,
-          animType: AnimType.LEFTSLIDE,
-          headerAnimationLoop: false,
-          dialogType: DialogType.ERROR,
-          showCloseIcon: false,
-          title: 'ERROR',
-          desc: jsonDecode(response.body).toString(),
-          onDissmissCallback: (type) {
-            debugPrint('Dialog Dismiss from callback $type');
-          })
-        ..show();
+      Helper.showMsg(context, jsonDecode(response.body).toString(), true);
     }
   }
 }
