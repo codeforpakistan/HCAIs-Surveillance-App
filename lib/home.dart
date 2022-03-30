@@ -1,10 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hcais/hcai_form.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:http/http.dart' as http;
-
 import 'args/Arguments.dart';
 
 class HomePage extends StatelessWidget {

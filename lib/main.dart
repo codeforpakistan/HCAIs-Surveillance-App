@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hcais/home.dart';
 import 'package:hcais/login.dart';
 import 'package:hcais/hcai_form.dart';
+import 'package:hcais/tabs.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,6 +11,7 @@ void main() {
 class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
+    TabView.tag: (context) => TabView(),
     HomePage.tag: (context) => HomePage(),
     HcaiFormPage.tag: (context) => HcaiFormPage(),
   };

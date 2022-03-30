@@ -1,8 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hcais/components/alertDialog_widget.dart';
-import 'package:hcais/home.dart';
+import 'package:hcais/tabs.dart';
 import 'package:http/http.dart' as http;
 import 'package:hcais/utils/constants.dart';
 
@@ -140,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
       body: jsonEncode({'email': email, 'password': password}),
     );
     if (response.statusCode == 200) {
-      Navigator.of(context).pushNamed(HomePage.tag);
+      Navigator.of(context).pushNamed(TabView.tag);
     } else {
       _showDialog('Try Again', 'Wrong Email or password');
       return false;
