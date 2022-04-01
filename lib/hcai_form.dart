@@ -21,7 +21,12 @@ class HcaiFormPage extends StatefulWidget {
 
 class _HcaiFormPageState extends State<HcaiFormPage> {
   Arguments args = new Arguments(
-      goodToGo: false, hcaiId: '', hcaiTitle: '', hospitalId: '', userId: '');
+      goodToGo: false,
+      hcaiId: '',
+      hcaiTitle: '',
+      hospitalId: '',
+      userId: '',
+      values: {});
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
   Map _selectedRole = {};
@@ -38,6 +43,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       setState(() {
         args = ModalRoute.of(context)!.settings.arguments as Arguments;
       });
+      print(args.values);
+      this._values = args.values;
       this._values['hospitalId'] = args.hospitalId;
       this._values['userId'] = args.userId;
       _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
@@ -395,8 +402,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   : each['title'].toString()))
           .toList(),
 
-      initialValue: this._values[
-          key], // setting the value of this in initState() to pre-select values.
+      initialValue: [
+        this._values[key]
+      ], // setting the value of this in initState() to pre-select values.
     );
   }
 

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hcais/components/alertDialog_widget.dart';
-import 'package:hcais/tabs.dart';
+import 'package:hcais/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:hcais/utils/constants.dart';
 
@@ -16,8 +16,6 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = new TextEditingController();
   final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
     onPrimary: Colors.lightGreenAccent,
-    //primary: Colors.lightGreenAccent,
-    //minimumSize: Size(88, 36),
     padding: EdgeInsets.all(12),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(24)),
@@ -139,7 +137,17 @@ class _LoginPageState extends State<LoginPage> {
       body: jsonEncode({'email': email, 'password': password}),
     );
     if (response.statusCode == 200) {
-      Navigator.of(context).pushNamed(TabView.tag);
+      print(response.body);
+      var jsonData = json.decode(response.body);
+      if (Constants.prefs != null) {
+        setState(() {
+          Constants.prefs?.setString('access_token', jsonData['access_token']);
+          Constants.prefs?.setBool("loggedIn", true);
+          Constants.prefs?.setString("user", jsonData['user']);
+        });
+      }
+
+      Navigator.of(context).pushNamed(HomePage.tag);
     } else {
       _showDialog('Try Again', 'Wrong Email or password');
       return false;

@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:hcais/home.dart';
 import 'package:hcais/login.dart';
 import 'package:hcais/hcai_form.dart';
-import 'package:hcais/tabs.dart';
+import 'package:hcais/utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Constants.prefs = await SharedPreferences.getInstance();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
-    TabView.tag: (context) => TabView(),
     HomePage.tag: (context) => HomePage(),
     HcaiFormPage.tag: (context) => HcaiFormPage(),
   };
