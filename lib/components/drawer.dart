@@ -1,15 +1,34 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hcais/home.dart';
 import 'package:hcais/login.dart';
 import 'package:hcais/submitted_view.dart';
-import 'package:hcais/utils/constants.dart';
+import 'package:hcais/utils/my_shared_prefs.dart';
 
-class SideDrawer extends StatelessWidget {
-  const SideDrawer({Key? key}) : super(key: key);
+class SideDrawer extends StatefulWidget {
+  SideDrawer({Key? key}) : super(key: key);
+  @override
+  _SideDrawerState createState() => _SideDrawerState();
+}
+
+class _SideDrawerState extends State<SideDrawer> {
+  var user;
+  @override
+  void initState() {
+    MySharedPreferences.readPrefStr("user").then((value) => {
+          this.setState(() {
+            user = json.decode(value);
+          }),
+        });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // var user = Constants.prefs!.getString('user');
+    if (this.user == null) {
+      return Container();
+    }
     return new SizedBox(
       width: MediaQuery.of(context).size.width * 0.85, //20.0,
       child: Drawer(
@@ -18,12 +37,12 @@ class SideDrawer extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text("Abhishek Mishra"),
-              accountEmail: Text("abhishekm977@gmail.com"),
+              accountName: Text(this.user!['name']),
+              accountEmail: Text(this.user!['email']),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.orange,
                 child: Text(
-                  "A",
+                  this.user!['name']!.substring(0, 1)!.toUpperCase(),
                   style: TextStyle(fontSize: 40.0),
                 ),
               ),
@@ -50,6 +69,7 @@ class SideDrawer extends StatelessWidget {
               leading: Icon(Icons.contacts),
               title: Text("Logout"),
               onTap: () => {
+                MySharedPreferences.instance.removeAll(),
                 Navigator.push(
                     context,
                     new MaterialPageRoute(

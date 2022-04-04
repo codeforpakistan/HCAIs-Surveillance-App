@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hcais/home.dart';
 import 'package:hcais/login.dart';
 import 'package:hcais/hcai_form.dart';
-import 'package:hcais/utils/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-Future main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  Constants.prefs = await SharedPreferences.getInstance();
+main() {
   runApp(MyApp());
 }
 
