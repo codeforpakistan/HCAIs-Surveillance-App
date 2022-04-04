@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = new TextEditingController();
   final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
     onPrimary: Colors.lightGreenAccent,
-    padding: EdgeInsets.all(12),
+    padding: EdgeInsets.all(10),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(24)),
     ),
@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
       tag: 'hero',
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
-        radius: 48.0,
+        radius: 90.0,
         child: Image.asset('assets/logo.png'),
       ),
     );
@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
     passwordController.text = 'testpass';
 
     final loginButton = Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.0),
+      padding: EdgeInsets.symmetric(vertical: 20.0),
       child: ElevatedButton(
         style: raisedButtonStyle,
         onPressed: () {
@@ -112,6 +112,31 @@ class _LoginPageState extends State<LoginPage> {
             loginButton,
             forgotLabel,
           ],
+        ),
+      ),
+      extendBody: true,
+      bottomNavigationBar: ClipRRect(
+        clipBehavior: Clip.antiAlias,
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
+        child: BottomAppBar(
+          color: Colors.white,
+          shape: CircularNotchedRectangle(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.asset(
+                "assets/world-bank.png",
+                height: 100,
+                width: 100,
+              ),
+              Image.asset(
+                "assets/MoNHSRC.png",
+                height: 60,
+                width: 60,
+              ),
+            ],
+          ),
         ),
       ),
     );
