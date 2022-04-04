@@ -21,7 +21,12 @@ class HcaiFormPage extends StatefulWidget {
 
 class _HcaiFormPageState extends State<HcaiFormPage> {
   Arguments args = new Arguments(
-      goodToGo: false, hcaiId: '', hcaiTitle: '', hospitalId: '', userId: '');
+      goodToGo: false,
+      hcaiId: '',
+      hcaiTitle: '',
+      hospitalId: '',
+      userId: '',
+      values: {});
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
   Map _selectedRole = {};
@@ -38,6 +43,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       setState(() {
         args = ModalRoute.of(context)!.settings.arguments as Arguments;
       });
+      this._values = args.values;
       this._values['hospitalId'] = args.hospitalId;
       this._values['userId'] = args.userId;
       _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
@@ -62,7 +68,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(args.hcaiTitle.toUpperCase(),
+          title: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
               style: TextStyle(fontSize: 20, color: Colors.white)),
           automaticallyImplyLeading: false,
           actions: <Widget>[
@@ -293,7 +299,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return CoolStepper(
       showErrorSnackbar: false,
       onCompleted: () {
-        print(this._values);
         sendData(context, this._values);
       },
       steps: steps,
@@ -395,8 +400,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   : each['title'].toString()))
           .toList(),
 
-      initialValue: this._values[
-          key], // setting the value of this in initState() to pre-select values.
+      initialValue: [
+        this._values[key]
+      ], // setting the value of this in initState() to pre-select values.
     );
   }
 
@@ -502,7 +508,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       ),
       onChanged: (Object? value) {
         if (this.mounted) {
-          print(title);
           setState(() {
             _selectedRole[key] = value;
             _values[key] = title;

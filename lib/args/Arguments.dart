@@ -7,6 +7,7 @@ class Arguments {
   final String hcaiId;
   final String hcaiTitle;
   final bool goodToGo;
+  final Map values;
 
   // This Widget accepts the arguments as constructor
   // parameters. It does not extract the arguments from
@@ -22,5 +23,6 @@ class Arguments {
     required this.hospitalId,
     required this.hcaiId,
     required this.hcaiTitle,
+    required this.values,
   });
 }

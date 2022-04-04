@@ -3,7 +3,7 @@ import 'package:hcais/home.dart';
 import 'package:hcais/login.dart';
 import 'package:hcais/hcai_form.dart';
 
-void main() {
+main() {
   runApp(MyApp());
 }
 

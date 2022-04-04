@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hcais/components/alertDialog_widget.dart';
 import 'package:hcais/home.dart';
+import 'package:hcais/utils/my_shared_prefs.dart';
 import 'package:http/http.dart' as http;
 import 'package:hcais/utils/constants.dart';
 
@@ -17,9 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = new TextEditingController();
   final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
     onPrimary: Colors.lightGreenAccent,
-    //primary: Colors.lightGreenAccent,
-    //minimumSize: Size(88, 36),
-    padding: EdgeInsets.all(12),
+    padding: EdgeInsets.all(10),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(24)),
     ),
@@ -31,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       tag: 'hero',
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
-        radius: 48.0,
+        radius: 90.0,
         child: Image.asset('assets/logo.png'),
       ),
     );
@@ -67,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
     passwordController.text = 'testpass';
 
     final loginButton = Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.0),
+      padding: EdgeInsets.symmetric(vertical: 20.0),
       child: ElevatedButton(
         style: raisedButtonStyle,
         onPressed: () {
@@ -117,6 +115,31 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       ),
+      extendBody: true,
+      bottomNavigationBar: ClipRRect(
+        clipBehavior: Clip.antiAlias,
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
+        child: BottomAppBar(
+          color: Colors.white,
+          shape: CircularNotchedRectangle(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image.asset(
+                "assets/world-bank.png",
+                height: 100,
+                width: 100,
+              ),
+              Image.asset(
+                "assets/MoNHSRC.png",
+                height: 60,
+                width: 60,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -140,6 +163,16 @@ class _LoginPageState extends State<LoginPage> {
       body: jsonEncode({'email': email, 'password': password}),
     );
     if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body);
+      if (jsonData!['user']!['tokens'] != null) {
+        setState(() {
+          MySharedPreferences.instance.setStringValue(
+              "access_token", jsonData!['user']!['tokens']!.toString());
+          MySharedPreferences.instance.setBool("loggedIn", true);
+          MySharedPreferences.instance
+              .setStringValue("user", json.encode(jsonData!['user']));
+        });
+      }
       Navigator.of(context).pushNamed(HomePage.tag);
     } else {
       _showDialog('Try Again', 'Wrong Email or password');
