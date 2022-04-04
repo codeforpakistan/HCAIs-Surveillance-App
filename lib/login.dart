@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hcais/components/alertDialog_widget.dart';
 import 'package:hcais/home.dart';
+import 'package:hcais/utils/my_shared_prefs.dart';
 import 'package:http/http.dart' as http;
 import 'package:hcais/utils/constants.dart';
 
@@ -165,16 +166,16 @@ class _LoginPageState extends State<LoginPage> {
       body: jsonEncode({'email': email, 'password': password}),
     );
     if (response.statusCode == 200) {
-      print(response.body);
       var jsonData = json.decode(response.body);
-      if (Constants.prefs != null) {
+      if (jsonData!['user']!['tokens'] != null) {
         setState(() {
-          Constants.prefs?.setString('access_token', jsonData['access_token']);
-          Constants.prefs?.setBool("loggedIn", true);
-          Constants.prefs?.setString("user", jsonData['user']);
+          MySharedPreferences.instance.setStringValue(
+              "access_token", jsonData!['user']!['tokens']!.toString());
+          MySharedPreferences.instance.setBool("loggedIn", true);
+          MySharedPreferences.instance
+              .setStringValue("user", json.encode(jsonData!['user']));
         });
       }
-
       Navigator.of(context).pushNamed(HomePage.tag);
     } else {
       _showDialog('Try Again', 'Wrong Email or password');
