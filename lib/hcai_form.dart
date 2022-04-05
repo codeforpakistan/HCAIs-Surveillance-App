@@ -49,9 +49,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
     });
     super.initState();
-
-    //  find a way to get arguments in init
-    // final args = ModalRoute.of(context)!.settings.arguments as Arguments;
   }
 
   @override
@@ -302,9 +299,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         sendData(context, this._values);
       },
       steps: steps,
-      config: CoolStepperConfig(
-        backText: 'PREVIOUS',
-      ),
+      config: CoolStepperConfig(backText: 'PREVIOUS', stepText: 'Step'),
     );
   }
 
