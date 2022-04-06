@@ -10,6 +10,7 @@ import 'package:date_field/date_field.dart';
 import 'components/alertDialog_widget.dart';
 import 'home.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
@@ -200,6 +201,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               options: field['options'],
                               label: field['label'] ?? 'Please Select',
                               index: field['index']),
+                        )),
+                      }
+                    else if (field['type'] == 'searchable')
+                      {
+                        data.add(Padding(
+                          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          child: _buildSearchble(
+                            key: field['key'].toString(),
+                            options: field['options'],
+                            hasHelpLabel: false,
+                            helpLabelText: '',
+                            labelText: field['label'].toString(),
+                            value: '',
+                          ),
                         )),
                       }
                     else if (field['type'] == 'dropdown' &&
@@ -398,6 +413,51 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       initialValue: [
         this._values[key]
       ], // setting the value of this in initState() to pre-select values.
+    );
+  }
+
+  Widget _buildSearchble(
+      {required String key,
+      required String labelText,
+      required List<dynamic> options,
+      required String value,
+      required bool hasHelpLabel,
+      required String helpLabelText}) {
+    if (this._values[key] == null) {
+      this._values[key] = value;
+    }
+    var item = '';
+    if (this._values[key] != null) {
+      var item = options.firstWhere((each) => each['_id'] == this._values[key]);
+      item = item['name'] != null ? item['name'] : item['title'];
+    }
+    List<String> items = [];
+    options.forEach((each) => {
+          if (each['name'] != null)
+            {items.add(each['name'])}
+          else if (each['title'] != null)
+            {items.add(each['title'])}
+        });
+    return DropdownSearch<String>(
+      showSearchBox: true,
+      items: items,
+      showSelectedItems: true,
+      dropdownSearchDecoration: InputDecoration(
+        labelText: "Search " + labelText,
+        contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+        border: OutlineInputBorder(),
+      ),
+      selectedItem: item,
+      onChanged: (v) {
+        if (v != '') {
+          var newValue = options
+              .firstWhere((each) => each['name'] == v || each['title'] == v);
+          if (this.mounted && newValue['_id'] != null) {
+            setState(() => {this._values[key] = newValue['_id']});
+            _setCompleteField(key, newValue['_id'], options);
+          }
+        }
+      },
     );
   }
 
@@ -670,6 +730,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           context, 'Please select Department, ICD-10 Code and Ward', true);
       return null;
     }
+    print(jsonEncode(values));
     final response = await http.post(
       Uri.parse(Constants.BASE_URL + "/submissions/"),
       headers: <String, String>{
@@ -677,7 +738,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       },
       body: jsonEncode(values),
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
       AwesomeDialog(
           context: context,
           animType: AnimType.LEFTSLIDE,
