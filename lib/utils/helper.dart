@@ -92,7 +92,8 @@ class Helper {
         _values['userId'] != '' &&
         _values['departmentId'] != '' &&
         _values['wardId'] != '' &&
-        _values['ICD10Id'] != 'Select ICD-10-PCS Code';
+        _values['ICD10Id'] != 'Select ICD-10-PCS Code' &&
+        _values['ICD10Id'] != '';
   }
 
   static showMsg(context, msg, isError) {
