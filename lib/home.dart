@@ -28,7 +28,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
             title: Text(
-          'PIMS',
+          'HCAIs',
           style: TextStyle(fontSize: 24.0, color: Colors.white),
         )),
         drawer: SideDrawer(),
