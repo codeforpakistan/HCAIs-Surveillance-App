@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
 
 class Helper {
   static int daysBetweenDate(date1, date2, String returnType) {
@@ -111,4 +113,14 @@ class Helper {
   static String getInitials(String name) => name.isNotEmpty
       ? name.trim().split(' ').map((l) => l[0]).take(3).join()
       : '';
+
+  static List<TextInputFormatter> getMask(maskType) {
+    if (maskType == 'phone') {
+      return [MaskedInputFormatter('0000-0000000')];
+    } else if (maskType == 'cnic') {
+      return [MaskedInputFormatter('00000-0000000-0')];
+    } else {
+      return [];
+    }
+  }
 }

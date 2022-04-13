@@ -168,7 +168,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   helpLabelText:
                                       field['helpLabelText'] ?? 'N/A',
                                   index: field['index'],
-                                  readOnly: true),
+                                  readOnly: true,
+                                  maskType: ''),
                             )),
                           }
                         else if (field['type'] == 'textfield')
@@ -191,7 +192,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   hasHelpLabel: field['hasHelpLabel'],
                                   helpLabelText: field['helpLabelText'] ??
                                       'Please enter text',
-                                  index: field['index']),
+                                  index: field['index'],
+                                  maskType: field['maskType'] ?? ''),
                             )),
                           }
                         else if (field['type'] == 'dropdown' &&
@@ -369,12 +371,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText,
       required int index,
-      bool readOnly = false}) {
+      bool readOnly = false,
+      required String maskType}) {
     if (myController.text == '' && this._values[key] != null) {
       myController.text = this._values[key];
     }
     return TextFormField(
         validator: validator,
+        keyboardType:
+            maskType == 'phone' ? TextInputType.phone : TextInputType.text,
+        inputFormatters: Helper.getMask(maskType),
         decoration: InputDecoration(
             labelText: labelText,
             suffixIcon: hasHelpLabel
