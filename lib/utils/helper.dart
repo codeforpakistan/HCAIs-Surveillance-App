@@ -114,11 +114,27 @@ class Helper {
       ? name.trim().split(' ').map((l) => l[0]).take(3).join()
       : '';
 
+  static TextInputType getMaskType(maskType) {
+    if (maskType == 'phone') {
+      return TextInputType.phone;
+    } else if (maskType == 'cnic' ||
+        maskType == 'number' ||
+        maskType == 'float') {
+      return TextInputType.number;
+    } else {
+      return TextInputType.text;
+    }
+  }
+
   static List<TextInputFormatter> getMask(maskType) {
     if (maskType == 'phone') {
       return [MaskedInputFormatter('0000-0000000')];
     } else if (maskType == 'cnic') {
       return [MaskedInputFormatter('00000-0000000-0')];
+    } else if (maskType == 'float') {
+      return [MaskedInputFormatter('0.00')];
+    } else if (maskType == 'number') {
+      return [FilteringTextInputFormatter.digitsOnly];
     } else {
       return [];
     }
