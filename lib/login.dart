@@ -27,13 +27,15 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final logo = Hero(
       tag: 'hero',
-      child: CircleAvatar(
-        backgroundColor: Colors.transparent,
-        radius: 90.0,
-        child: Image.asset('assets/logo.png'),
+      child: ClipOval(
+        child: Image.asset(
+          'assets/logo.png',
+          width: 230,
+          height: 230,
+          fit: BoxFit.cover,
+        ),
       ),
     );
-
     final email = TextFormField(
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
@@ -75,10 +77,11 @@ class _LoginPageState extends State<LoginPage> {
             _showDialog('Missing fields!', 'Please type in email and password');
           }
         },
-        child: Text(
-          "Log In",
-          style: TextStyle(
-            color: Colors.white,
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: Text(
+            'LOGIN',
+            style: TextStyle(color: Colors.white, fontSize: 20),
           ),
         ),
       ),
@@ -102,14 +105,14 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: ListView(
           shrinkWrap: true,
-          padding: EdgeInsets.only(left: 24.0, right: 24.0),
+          padding: EdgeInsets.only(left: 14.0, right: 14.0),
           children: <Widget>[
             logo,
-            SizedBox(height: 48.0),
+            SizedBox(height: 8.0),
             email,
             SizedBox(height: 8.0),
             password,
-            SizedBox(height: 24.0),
+            SizedBox(height: 8.0),
             loginButton,
             forgotLabel,
           ],
@@ -128,8 +131,8 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               Image.asset(
                 "assets/world-bank.png",
-                height: 100,
-                width: 100,
+                height: 105,
+                width: 105,
               ),
               Image.asset(
                 "assets/MoNHSRC.png",
