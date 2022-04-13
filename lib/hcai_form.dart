@@ -378,8 +378,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
     return TextFormField(
         validator: validator,
-        keyboardType:
-            maskType == 'phone' ? TextInputType.phone : TextInputType.text,
+        keyboardType: Helper.getMaskType(maskType),
         inputFormatters: Helper.getMask(maskType),
         decoration: InputDecoration(
             labelText: labelText,
