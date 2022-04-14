@@ -112,37 +112,76 @@ class _LoginPageState extends State<LoginPage> {
             email,
             SizedBox(height: 8.0),
             password,
-            SizedBox(height: 8.0),
             loginButton,
             forgotLabel,
           ],
         ),
       ),
       extendBody: true,
-      bottomNavigationBar: ClipRRect(
-        clipBehavior: Clip.antiAlias,
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
-        child: BottomAppBar(
-          color: Colors.white,
-          shape: CircularNotchedRectangle(),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Image.asset(
-                "assets/world-bank.png",
-                height: 105,
-                width: 105,
-              ),
-              Image.asset(
-                "assets/MoNHSRC.png",
-                height: 60,
-                width: 60,
-              ),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar: Container(
+          alignment: Alignment.bottomCenter,
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ClipRRect(
+                  clipBehavior: Clip.antiAlias,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16.0),
+                      topRight: Radius.circular(16.0)),
+                  child: BottomAppBar(
+                    color: Colors.white,
+                    shape: CircularNotchedRectangle(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset(
+                          "assets/WHO.png",
+                          height: 70,
+                          width: 70,
+                        ),
+                        Image.asset(
+                          "assets/MoNHSRC.png",
+                          height: 70,
+                          width: 70,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: new BoxDecoration(
+                        gradient: new LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color.fromRGBO(240, 240, 240, 1),
+                        Color.fromRGBO(240, 240, 240, 1),
+                      ],
+                    )),
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text('Powered By',
+                              style: TextStyle(
+                                  color: Color.fromRGBO(130, 131, 133, 1),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text('Code For Pakistan',
+                              style: TextStyle(
+                                  color: Color.fromRGBO(141, 199, 63, 1),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold)),
+                        )
+                      ],
+                    )),
+              ])),
     );
   }
 
