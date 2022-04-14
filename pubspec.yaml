@@ -55,7 +55,7 @@ flutter:
   assets:
     - assets/logo.png
     - assets/MoNHSRC.png
-    - assets/world-bank.png
+    - assets/WHO.png
     - assets/hospital-icon.png
     - assets/Nunito.ttf
 

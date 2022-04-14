@@ -21,6 +21,7 @@ class Submitted extends StatelessWidget {
       },
     );
     data = json.decode(utf8.decode(response.bodyBytes));
+    data.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
     return data.toList();
   }
 
