@@ -539,6 +539,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           fontSize: 13,
         )));
     options.asMap().forEach((index, each) => {
+          if (this._values[key] != null && this._values[key] == each['name'])
+            {this._selectedRole[key] = index},
           list.add(_buildTile(
               title: each['name'],
               key: key,
