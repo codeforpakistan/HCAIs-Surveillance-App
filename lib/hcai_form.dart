@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
+import 'package:hcais/utils/WidgetHelper.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:hcais/utils/helper.dart';
 import 'args/Arguments.dart';
@@ -11,6 +12,16 @@ import 'components/alertDialog_widget.dart';
 import 'home.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+
+class MultiSelect {
+  final int id;
+  final String name;
+
+  MultiSelect({
+    required this.id,
+    required this.name,
+  });
+}
 
 class HcaiFormPage extends StatefulWidget {
   HcaiFormPage({Key? key, this.title}) : super(key: key);
@@ -66,6 +77,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(193, 30, 47, 1),
           title: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
               style: TextStyle(fontSize: 20, color: Colors.white)),
           automaticallyImplyLeading: false,
@@ -129,7 +141,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (stepIndex == 0)
             {
               data.add(Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
                 child: Text(
                   hcaiForm['description'].toString(),
                   textAlign: TextAlign.justify,
@@ -140,7 +152,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (step['fields'] is List)
             {
               step['fields'].asMap().forEach((fieldIndex, field) => {
-                    if (field['isHidden'] != true)
+                    if (field['isHidden'] != true ||
+                        (field['key'] != null &&
+                            this._values[field['key']] != null &&
+                            !this
+                                ._values[field['key']]
+                                .toString()
+                                .contains('Select')))
                       {
                         if (field['type'] == 'text')
                           {
@@ -150,7 +168,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     field['description'].toString()
                               },
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildTextField(
                                   key: field['key'].toString(),
                                   labelText: field['label'].toString(),
@@ -175,7 +193,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         else if (field['type'] == 'textfield')
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildTextField(
                                   key: field['key'].toString(),
                                   labelText: field['label'].toString(),
@@ -200,7 +218,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                             field['multiple'] == true)
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildMultipleSelect(
                                   key: field['key'].toString(),
                                   options: field['options'],
@@ -211,7 +229,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         else if (field['type'] == 'searchable')
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildSearchble(
                                 key: field['key'].toString(),
                                 options: field['options'],
@@ -227,7 +245,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                             field['options'].length > 0)
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildDropDown(
                                   key: field['key'].toString(),
                                   labelText: field['label'].toString(),
@@ -246,7 +264,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         else if (field['type'] == 'radiofield')
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildRadioButton(
                                   context: context,
                                   title: field['label'].toString(),
@@ -261,7 +279,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         else if (field['type'] == 'checkboxfield')
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildCheckbox(
                                   context: context,
                                   title: field['label'].toString(),
@@ -271,7 +289,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         else if (field['type'] == 'datefield')
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildDateField(
                                   hint: field['label'].toString(),
                                   selectedDateKey: field['key'],
@@ -285,7 +303,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         else if (field['type'] == 'timefield')
                           {
                             data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                               child: _buildDateField(
                                   hint: field['label'].toString(),
                                   selectedDateKey: field['key'],
@@ -323,7 +341,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         sendData(context, this._values);
       },
       steps: steps,
-      config: CoolStepperConfig(backText: 'PREVIOUS', stepText: 'Step'),
+      config: CoolStepperConfig(
+          backText: 'PREVIOUS', stepText: 'Step', icon: Icon(null)),
     );
   }
 
@@ -337,9 +356,18 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     if (this._values[selectedDateKey] == null) {
       this._values[selectedDateKey] = '';
     }
-    return DateTimeFormField(
+    Column childs = WidgetHelper.buildColumn(hint.toString());
+    childs.children.add(DateTimeFormField(
         decoration: InputDecoration(
-            hintText: hint,
+            filled: true,
+            fillColor: Color.fromRGBO(242, 242, 242, 1),
+            contentPadding: EdgeInsets.fromLTRB(1.0, 1.0, 1.0, 1.0),
+            // labelText: labelText,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              // width: 0.0 produces a thin "hairline" border
+              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+            ),
             suffixIcon: hasHelpLabel
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
@@ -360,7 +388,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             });
             _setCompleteField(selectedDateKey, value.toIso8601String(), [], []);
           }
-        });
+        }));
+    return childs;
   }
 
   Widget _buildTextField(
@@ -376,12 +405,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     if (myController.text == '' && this._values[key] != null) {
       myController.text = this._values[key];
     }
-    return TextFormField(
+    Column childs = WidgetHelper.buildColumn(labelText.toString());
+    childs.children.add(TextFormField(
         validator: validator,
         keyboardType: Helper.getMaskType(maskType),
         inputFormatters: Helper.getMask(maskType),
         decoration: InputDecoration(
-            labelText: labelText,
+            filled: true,
+            fillColor: Color.fromRGBO(242, 242, 242, 1),
+            contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
+            // labelText: labelText,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              // width: 0.0 produces a thin "hairline" border
+              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+            ),
             suffixIcon: hasHelpLabel
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
@@ -395,7 +433,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         onChanged: (newValue) => {
               this._values[key] = newValue,
               _setCompleteField(key, this._values[key], [], []),
-            });
+            }));
+    return childs;
   }
 
   Widget _buildMultipleSelect(
@@ -403,28 +442,40 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required List<dynamic> options,
       required String label,
       required int index}) {
-    return MultiSelectDialogField(
+    final _options = options
+        .map((each) => MultiSelectItem(
+            each,
+            each['name'] != null
+                ? each['name'].toString()
+                : each['title'].toString()))
+        .toList();
+    Column childs = WidgetHelper.buildColumn(label.toString());
+    childs.children.add(MultiSelectDialogField(
       onConfirm: (val) {
         if (this.mounted) {
+          this._values[key] = val;
           setState(() => {this._values[key] = val});
           _setCompleteField(key, val.toString(), options, []);
         }
       },
-      buttonText: Text(label),
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Colors.grey,
+          width: 0.0,
+        ),
+        color: Color.fromRGBO(242, 242, 242, 1),
+      ),
+      buttonText: Text(''),
       title: Text('Please Select'),
-      dialogWidth: MediaQuery.of(context).size.width * 0.7,
+      dialogWidth: MediaQuery.of(context).size.width * 0.9,
       searchable: true,
-      items: options
-          .map((each) => MultiSelectItem(
-              each,
-              each['name'] != null
-                  ? each['name'].toString()
-                  : each['title'].toString()))
-          .toList(),
-
+      items: _options,
       initialValue: this._values[
           key], // setting the value of this in initState() to pre-select values.
-    );
+    ));
+    return childs;
   }
 
   Widget _buildSearchble(
@@ -452,15 +503,29 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           else if (each['title'] != null)
             {items.add(each['title'])}
         });
-    return DropdownSearch<String>(
+    Column childs = WidgetHelper.buildColumn(labelText.toString());
+    childs.children.add(DropdownSearch<String>(
       showSearchBox: true,
       items: items,
       showSelectedItems: true,
       dropdownSearchDecoration: InputDecoration(
-        labelText: "Search " + labelText,
-        contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
-        border: OutlineInputBorder(),
-      ),
+          filled: true,
+          fillColor: Color.fromRGBO(242, 242, 242, 1),
+          contentPadding: EdgeInsets.fromLTRB(1.0, 1.0, 1.0, 1.0),
+          // labelText: labelText,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            // width: 0.0 produces a thin "hairline" border
+            borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+          ),
+          suffixIcon: hasHelpLabel
+              ? IconButton(
+                  icon: Icon(Icons.info_outline),
+                  onPressed: () {
+                    _showDialog(context, helpLabelText);
+                  },
+                )
+              : null),
       selectedItem: item,
       onChanged: (v) {
         if (v != '') {
@@ -472,7 +537,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           }
         }
       },
-    );
+    ));
+    return childs;
   }
 
   Widget _buildDropDown(
@@ -486,40 +552,54 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     if (this._values[key] == null) {
       this._values[key] = value;
     }
-    return DropdownButtonFormField(
-      decoration: InputDecoration(
-          labelText: labelText,
-          suffixIcon: hasHelpLabel
-              ? IconButton(
-                  icon: Icon(Icons.info_outline),
-                  onPressed: () {
-                    _showDialog(context, helpLabelText);
-                  },
-                )
-              : null),
-      isExpanded: true,
-      hint: Text(labelText),
-      value: this._values[key].toString(),
-      onChanged: (String? newValue) => {
-        if (this.mounted)
-          {
-            setState(() => {this._values[key] = newValue}),
-            _setCompleteField(key, newValue, options, []),
-          }
-      },
-      items: options.map((option) {
-        return DropdownMenuItem(
-          value: option['_id'] != null
-              ? option['_id'].toString()
-              : option['name'] != null
-                  ? option['name'].toString()
-                  : option['title'].toString(),
-          child: Text(option['name'] != null
-              ? option['name'].toString()
-              : option['title'].toString()),
-        );
-      }).toList(),
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(
+        labelText.toString(),
+      ),
+      SizedBox(height: 5),
+      DropdownButtonFormField(
+        decoration: InputDecoration(
+            filled: true,
+            fillColor: Color.fromRGBO(242, 242, 242, 1),
+            contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
+            // labelText: labelText,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              // width: 0.0 produces a thin "hairline" border
+              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+            ),
+            suffixIcon: hasHelpLabel
+                ? IconButton(
+                    icon: Icon(Icons.info_outline),
+                    onPressed: () {
+                      _showDialog(context, helpLabelText);
+                    },
+                  )
+                : null),
+        isExpanded: true,
+        hint: Text(labelText),
+        value: this._values[key].toString(),
+        onChanged: (String? newValue) => {
+          if (this.mounted)
+            {
+              setState(() => {this._values[key] = newValue}),
+              _setCompleteField(key, newValue, options, []),
+            }
+        },
+        items: options.map((option) {
+          return DropdownMenuItem(
+            value: option['_id'] != null
+                ? option['_id'].toString()
+                : option['name'] != null
+                    ? option['name'].toString()
+                    : option['title'].toString(),
+            child: Text(option['name'] != null
+                ? option['name'].toString()
+                : option['title'].toString()),
+          );
+        }).toList(),
+      )
+    ]);
   }
 
   Widget _buildRadioButton({
@@ -566,6 +646,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required List<dynamic> hiddenFeilds,
   }) {
     return RadioListTile(
+      contentPadding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
       value: value,
       activeColor: Color(0xFF6200EE),
       groupValue: _selectedRole[key],
@@ -578,9 +659,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               // ignore: unnecessary_statements
               : null;
         },
-        child: new Text((truncate && (!showFullValue || title.length <= 12))
-            ? Helper.truncateWithEllipsis(12, title)
-            : title),
+        child: Align(
+          child: new Text((truncate && (!showFullValue || title.length <= 12))
+              ? Helper.truncateWithEllipsis(12, title)
+              : title),
+          alignment: Alignment(-1.1, 0.0),
+        ),
       ),
       onChanged: (Object? value) {
         if (this.mounted) {

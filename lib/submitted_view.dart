@@ -29,10 +29,11 @@ class Submitted extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+            backgroundColor: Color.fromRGBO(193, 30, 47, 1),
             title: Text(
-          'PIMS',
-          style: TextStyle(fontSize: 24.0, color: Colors.white),
-        )),
+              'PIMS',
+              style: TextStyle(fontSize: 24.0, color: Colors.white),
+            )),
         drawer: SideDrawer(),
         body: SafeArea(
             child: Container(

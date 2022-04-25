@@ -37,10 +37,13 @@ class _SideDrawerState extends State<SideDrawer> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text(this.user!['name']),
-              accountEmail: Text(this.user!['email']),
+              decoration: BoxDecoration(color: Color.fromRGBO(193, 30, 47, 1)),
+              accountName: Text(this.user!['name'],
+                  style: new TextStyle(color: Colors.white)),
+              accountEmail: Text(this.user!['email'],
+                  style: new TextStyle(color: Colors.white)),
               currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.white,
                 child: Text(
                   this.user!['name']!.substring(0, 1)!.toUpperCase(),
                   style: TextStyle(fontSize: 40.0),
@@ -56,7 +59,7 @@ class _SideDrawerState extends State<SideDrawer> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
+              leading: Icon(Icons.drive_file_move_rounded),
               title: Text("Submitted"),
               onTap: () => {
                 Navigator.push(

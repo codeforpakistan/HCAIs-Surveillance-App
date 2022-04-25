@@ -27,10 +27,11 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+            backgroundColor: Color.fromRGBO(193, 30, 47, 1),
             title: Text(
-          'HCAIs',
-          style: TextStyle(fontSize: 24.0, color: Colors.white),
-        )),
+              'HCAIs',
+              style: TextStyle(fontSize: 24.0, color: Colors.white),
+            )),
         drawer: SideDrawer(),
         body: Container(
           width: MediaQuery.of(context).size.width,
@@ -72,6 +73,8 @@ class HomePage extends StatelessWidget {
                                               )),
                                         ),
                                         style: ElevatedButton.styleFrom(
+                                          primary:
+                                              Color.fromRGBO(144, 79, 159, 1),
                                           minimumSize: Size(100, 40),
                                           side: BorderSide(
                                             width: 1.0,

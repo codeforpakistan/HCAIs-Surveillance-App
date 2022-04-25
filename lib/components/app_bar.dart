@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Color backgroundColor = new Color(0xFFA0C5FD);
   final Text title;
   final AppBar appBar;
 
@@ -13,7 +12,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Scaffold(
       appBar: AppBar(
         title: title,
-        backgroundColor: backgroundColor,
+        backgroundColor: Color.fromRGBO(82, 121, 180, 1),
       ),
     );
   }
@@ -21,3 +20,6 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => new Size.fromHeight(appBar.preferredSize.height);
 }
+
+
+          // color: Color.fromRGBO(82, 121, 180, 1),

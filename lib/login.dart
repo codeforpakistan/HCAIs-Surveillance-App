@@ -16,8 +16,9 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = new TextEditingController();
   final emailController = new TextEditingController();
   final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
-    onPrimary: Colors.lightGreenAccent,
-    padding: EdgeInsets.all(10),
+    primary: Color.fromRGBO(140, 198, 62, 1),
+    // padding: EdgeInsets.all(10),
+    minimumSize: Size(20, 40),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(24)),
     ),
@@ -30,72 +31,76 @@ class _LoginPageState extends State<LoginPage> {
       child: ClipOval(
         child: Image.asset(
           'assets/logo.png',
-          width: 230,
-          height: 230,
+          width: 180,
+          height: 180,
           fit: BoxFit.cover,
         ),
       ),
     );
-    final email = TextFormField(
-      keyboardType: TextInputType.emailAddress,
-      autofocus: false,
-      controller: emailController,
-      decoration: InputDecoration(
-        hintText: 'Email',
-        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-      ),
-    );
+    final email =
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Username *'),
+      SizedBox(height: 4),
+      TextFormField(
+          controller: emailController,
+          decoration: InputDecoration(
+              filled: true,
+              fillColor: Color.fromRGBO(242, 242, 242, 1),
+              contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+              )))
+    ]);
 
-    final password = TextFormField(
-      autofocus: false,
-      controller: passwordController,
-      obscureText: true,
-      decoration: InputDecoration(
-        hintText: 'Password',
-        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(32.0),
-        ),
-      ),
-    );
+    final password =
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Password *'),
+      SizedBox(height: 4),
+      TextFormField(
+          controller: passwordController,
+          decoration: InputDecoration(
+              filled: true,
+              fillColor: Color.fromRGBO(242, 242, 242, 1),
+              contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
+              // labelText: labelText,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                // width: 0.0 produces a thin "hairline" border
+                borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+              )))
+    ]);
 
     // to be removed
     emailController.text = 'doctor@example.com';
     passwordController.text = 'testpass';
 
-    final loginButton = Padding(
-      padding: EdgeInsets.symmetric(vertical: 20.0),
-      child: ElevatedButton(
-        style: raisedButtonStyle,
-        onPressed: () {
-          if (emailController.text != '' && passwordController.text != '') {
-            this.tryLogin(emailController.text, passwordController.text);
-          } else {
-            _showDialog('Missing fields!', 'Please type in email and password');
-          }
-        },
-        child: Padding(
-          padding: EdgeInsets.all(5),
-          child: Text(
-            'LOGIN',
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-        ),
+    final loginButton = ElevatedButton(
+      style: raisedButtonStyle,
+      onPressed: () {
+        if (emailController.text != '' && passwordController.text != '') {
+          this.tryLogin(emailController.text, passwordController.text);
+        } else {
+          _showDialog('Missing fields!', 'Please type in email and password');
+        }
+      },
+      child: Text(
+        'Login',
+        style: TextStyle(color: Colors.white, fontSize: 17),
       ),
     );
 
     final forgotLabel = TextButton(
       onPressed: () {
         _showDialog('Forgot Password?',
-            'PLease contact your hospital administrator to reset your password.');
+            'Please contact your hospital administrator to reset your password.');
       },
       child: Text(
         "Forgot password?",
         style: TextStyle(
-          color: Colors.black54,
+          fontSize: 14,
+          color: Color.fromRGBO(82, 121, 180, 1),
+          decoration: TextDecoration.underline,
         ),
       ),
     );
@@ -105,13 +110,15 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: ListView(
           shrinkWrap: true,
-          padding: EdgeInsets.only(left: 14.0, right: 14.0),
+          padding:
+              EdgeInsets.only(left: 14.0, right: 14.0, top: 5.0, bottom: 90.0),
           children: <Widget>[
             logo,
             SizedBox(height: 8.0),
             email,
-            SizedBox(height: 8.0),
+            SizedBox(height: 16.0),
             password,
+            SizedBox(height: 20.0),
             loginButton,
             forgotLabel,
           ],
@@ -152,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Container(
                     padding: EdgeInsets.all(15),
-                    margin: EdgeInsets.only(top: 10.0),
+                    margin: EdgeInsets.only(top: 0),
                     decoration: new BoxDecoration(
                         gradient: new LinearGradient(
                       begin: Alignment.topCenter,
@@ -174,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         Align(
                           alignment: Alignment.center,
-                          child: Text('Code For Pakistan',
+                          child: Text('Code for Pakistan',
                               style: TextStyle(
                                   color: Color.fromRGBO(141, 199, 63, 1),
                                   fontSize: 14,
