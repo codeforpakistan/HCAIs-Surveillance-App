@@ -28,10 +28,10 @@ class Submitted extends StatelessWidget {
     data.forEach((each) => {
           each['difference'] = '',
           each['color'] = '',
-          if (each['surveillancePeriod'] != null)
+          if (each['recommendedSurveillancePeriod'] != null)
             {
               diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
-              diff = (int.parse(each['surveillancePeriod']) - diff),
+              diff = (int.parse(each['recommendedSurveillancePeriod']) - diff),
               if (diff == 0)
                 {each['color'] = Colors.green}
               else if (diff < 0)
