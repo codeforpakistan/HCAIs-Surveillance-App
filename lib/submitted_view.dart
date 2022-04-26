@@ -33,7 +33,7 @@ class Submitted extends StatelessWidget {
               diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
               diff = (int.parse(each['surveillancePeriod']) - diff),
               if (diff == 0)
-                {each['color'] = Colors.blue}
+                {each['color'] = Colors.green}
               else if (diff < 0)
                 {each['color'] = Colors.red},
               each['difference'] = diff.toString()
