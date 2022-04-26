@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hcais/components/drawer.dart';
 import 'package:hcais/hcai_form.dart';
 import 'package:hcais/utils/constants.dart';
+import 'package:hcais/utils/helper.dart';
 import 'package:http/http.dart' as http;
 
 import 'args/Arguments.dart';
@@ -22,6 +23,22 @@ class Submitted extends StatelessWidget {
     );
     data = json.decode(utf8.decode(response.bodyBytes));
     data.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+    final today = DateTime.now();
+    var diff;
+    data.forEach((each) => {
+          each['difference'] = '',
+          each['color'] = '',
+          if (each['surveillancePeriod'] != null)
+            {
+              diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
+              diff = (int.parse(each['surveillancePeriod']) - diff),
+              if (diff == 0)
+                {each['color'] = Colors.blue}
+              else if (diff < 0)
+                {each['color'] = Colors.red},
+              each['difference'] = diff.toString()
+            }
+        });
     return data.toList();
   }
 
@@ -73,7 +90,20 @@ class Submitted extends StatelessWidget {
                                 title: Text((snapshot.data![index]
                                         ['patientName'] ??
                                     'N/A')),
-                                subtitle: Text(snapshot.data![index]
+                                subtitle: Text(
+                                    'Days left : ' +
+                                        (snapshot.data![index]['difference'] !=
+                                                ''
+                                            ? snapshot.data![index]
+                                                ['difference']
+                                            : 'N/A'),
+                                    style: TextStyle(
+                                        color: snapshot
+                                                    .data![index]!['color'] !=
+                                                ''
+                                            ? snapshot.data![index]!['color']
+                                            : Colors.black)),
+                                trailing: Text(snapshot.data![index]
                                         ['createdAt']!
                                     .substring(0, 10)),
                                 onTap: () {

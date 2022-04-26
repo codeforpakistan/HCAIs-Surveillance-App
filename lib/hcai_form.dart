@@ -88,7 +88,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   onTap: () {
                     Navigator.pop(context);
                   },
-                  child: Icon(Icons.cancel_outlined, color: Colors.white),
+                  child: Icon(Icons.cancel_sharp, color: Colors.white),
                 )),
           ],
         ),
@@ -313,7 +313,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   type: 'time',
                                   selectedDate: DateTime.now()),
                             ))
-                          },
+                          }
+                        else if (field['type'] == 'divider')
+                          {
+                            data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+                                child: Divider(
+                                  color: Colors.black,
+                                )))
+                          }
                       }
                   }),
               if (stepIndex == 0)
@@ -451,6 +459,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         .toList();
     Column childs = WidgetHelper.buildColumn(label.toString());
     childs.children.add(MultiSelectDialogField(
+      buttonIcon: Icon(Icons.arrow_drop_down),
       onConfirm: (val) {
         if (this.mounted) {
           this._values[key] = val;
@@ -552,54 +561,50 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     if (this._values[key] == null) {
       this._values[key] = value;
     }
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        labelText.toString(),
-      ),
-      SizedBox(height: 5),
-      DropdownButtonFormField(
-        decoration: InputDecoration(
-            filled: true,
-            fillColor: Color.fromRGBO(242, 242, 242, 1),
-            contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
-            // labelText: labelText,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              // width: 0.0 produces a thin "hairline" border
-              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-            ),
-            suffixIcon: hasHelpLabel
-                ? IconButton(
-                    icon: Icon(Icons.info_outline),
-                    onPressed: () {
-                      _showDialog(context, helpLabelText);
-                    },
-                  )
-                : null),
-        isExpanded: true,
-        hint: Text(labelText),
-        value: this._values[key].toString(),
-        onChanged: (String? newValue) => {
-          if (this.mounted)
-            {
-              setState(() => {this._values[key] = newValue}),
-              _setCompleteField(key, newValue, options, []),
-            }
-        },
-        items: options.map((option) {
-          return DropdownMenuItem(
-            value: option['_id'] != null
-                ? option['_id'].toString()
-                : option['name'] != null
-                    ? option['name'].toString()
-                    : option['title'].toString(),
-            child: Text(option['name'] != null
-                ? option['name'].toString()
-                : option['title'].toString()),
-          );
-        }).toList(),
-      )
-    ]);
+    Column childs = WidgetHelper.buildColumn(labelText.toString());
+    childs.children.add(DropdownButtonFormField(
+      decoration: InputDecoration(
+          filled: true,
+          fillColor: Color.fromRGBO(242, 242, 242, 1),
+          contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
+          // labelText: labelText,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            // width: 0.0 produces a thin "hairline" border
+            borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+          ),
+          suffixIcon: hasHelpLabel
+              ? IconButton(
+                  icon: Icon(Icons.info_outline),
+                  onPressed: () {
+                    _showDialog(context, helpLabelText);
+                  },
+                )
+              : null),
+      isExpanded: true,
+      hint: Text(labelText),
+      value: this._values[key].toString(),
+      onChanged: (String? newValue) => {
+        if (this.mounted)
+          {
+            setState(() => {this._values[key] = newValue}),
+            _setCompleteField(key, newValue, options, []),
+          }
+      },
+      items: options.map((option) {
+        return DropdownMenuItem(
+          value: option['_id'] != null
+              ? option['_id'].toString()
+              : option['name'] != null
+                  ? option['name'].toString()
+                  : option['title'].toString(),
+          child: Text(option['name'] != null
+              ? option['name'].toString()
+              : option['title'].toString()),
+        );
+      }).toList(),
+    ));
+    return childs;
   }
 
   Widget _buildRadioButton({
@@ -618,6 +623,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           color: Colors.grey[600],
           fontSize: 13,
         )));
+
     options.asMap().forEach((index, each) => {
           if (this._values[key] != null && this._values[key] == each['name'])
             {this._selectedRole[key] = index},
@@ -630,10 +636,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               truncate: truncate,
               hiddenFeilds: hiddenFeilds))
         });
-    return Column(
+    return Container(
+        child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: list,
-    );
+    ));
   }
 
   Widget _buildTile({
@@ -646,7 +653,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     required List<dynamic> hiddenFeilds,
   }) {
     return RadioListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
+      contentPadding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
       value: value,
       activeColor: Color(0xFF6200EE),
       groupValue: _selectedRole[key],

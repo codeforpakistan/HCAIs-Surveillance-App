@@ -28,6 +28,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Color.fromRGBO(193, 30, 47, 1),
+            iconTheme: IconThemeData(color: Colors.white),
             title: Text(
               'HCAIs',
               style: TextStyle(fontSize: 24.0, color: Colors.white),
