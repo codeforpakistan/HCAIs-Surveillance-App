@@ -32,9 +32,9 @@ class Submitted extends StatelessWidget {
               diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
               diff = (int.parse(each['recommendedSurveillancePeriod']) - diff),
               if (diff == 0)
-                {each['color'] = Colors.green}
+                {each['color'] = 'green'}
               else if (diff < 0)
-                {each['color'] = Colors.red},
+                {each['color'] = 'red'},
               each['difference'] = diff.toString()
             }
         });
@@ -102,11 +102,15 @@ class Submitted extends StatelessWidget {
                                                 ['difference']
                                             : 'N/A'),
                                     style: TextStyle(
-                                        color: snapshot
-                                                    .data![index]!['color'] !=
-                                                ''
-                                            ? snapshot.data![index]!['color']
-                                            : Colors.black)),
+                                        color:
+                                            snapshot.data![index]!['color'] !=
+                                                    ''
+                                                ? (snapshot.data![index]![
+                                                            'color'] ==
+                                                        'red'
+                                                    ? Colors.red
+                                                    : Colors.green)
+                                                : Colors.black)),
                                 trailing: Text(snapshot.data![index]
                                         ['createdAt']!
                                     .substring(0, 10)),

@@ -892,35 +892,40 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   sendData(context, Map values) async {
-    values['isVerified'] = false;
-    if (!Helper.isValidData(this._values)) {
-      Helper.showMsg(
-          context, 'Please select Department, ICD-10 Code and Ward', true);
-      return null;
-    }
-    print(jsonEncode(values));
-    final response = await http.post(
-      Uri.parse(Constants.BASE_URL + "/submissions/"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(values),
-    );
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      AwesomeDialog(
-          context: context,
-          animType: AnimType.LEFTSLIDE,
-          headerAnimationLoop: false,
-          dialogType: DialogType.SUCCES,
-          showCloseIcon: false,
-          title: 'Success',
-          desc: 'Submitted!',
-          onDissmissCallback: (type) {
-            debugPrint('Dialog Dissmiss from callback $type');
-          })
-        ..show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
-    } else {
-      Helper.showMsg(context, jsonDecode(response.body).toString(), true);
+    try {
+      values['isVerified'] = false;
+      if (!Helper.isValidData(this._values)) {
+        Helper.showMsg(
+            context, 'Please select Department, ICD-10 Code and Ward', true);
+        return null;
+      }
+      print(jsonEncode(values));
+      final response = await http.post(
+        Uri.parse(Constants.BASE_URL + "/submissions/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(values),
+      );
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        AwesomeDialog(
+            context: context,
+            animType: AnimType.LEFTSLIDE,
+            headerAnimationLoop: false,
+            dialogType: DialogType.SUCCES,
+            showCloseIcon: false,
+            title: 'Success',
+            desc: 'Submitted!',
+            onDissmissCallback: (type) {
+              debugPrint('Dialog Dissmiss from callback $type');
+            })
+          ..show()
+              .then((value) => Navigator.of(context).pushNamed(HomePage.tag));
+      } else {
+        Helper.showMsg(context, jsonDecode(response.body).toString(), true);
+      }
+    } catch (err) {
+      Helper.showMsg(context, err.toString(), true);
     }
   }
 }
