@@ -22,24 +22,38 @@ class Submitted extends StatelessWidget {
       },
     );
     data = json.decode(utf8.decode(response.bodyBytes));
-    final today = DateTime.now();
-    var diff;
-    data.forEach((each) => {
-          each['difference'] = '',
-          each['color'] = '',
-          if (each['recommendedSurveillancePeriod'] != null)
-            {
-              diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
-              diff = (int.parse(each['recommendedSurveillancePeriod']) - diff),
-              if (diff == 0)
-                {each['color'] = 'green'}
-              else if (diff < 0)
-                {each['color'] = 'red'},
-              each['difference'] = diff.toString()
-            }
-        });
+    try {
+      final today = DateTime.now();
+      var diff;
+      data.forEach((each) => {
+            each['difference'] = '',
+            each['color'] = '',
+            each['reviewed'] = each['reviewed'] != true ? false : true,
+            if (each['recommendedSurveillancePeriod'] != null)
+              {
+                diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
+                diff =
+                    (int.parse(each['recommendedSurveillancePeriod']) - diff),
+                if (diff == 0 || each['reviewed'] == true)
+                  {each['color'] = 'green', diff = 0}
+                else if (diff < 0)
+                  {each['color'] = 'red'},
+                each['difference'] = diff.toString()
+              }
+          });
 
-    data.sort((a, b) => a['difference'].compareTo(b['difference']));
+      data.sort((a, b) =>
+          int.parse(a['difference']).compareTo(int.parse(b['difference'])));
+      // data.sort((a, b) {
+      //   if (a['reviewd']) {
+      //     return 1;
+      //   }
+      //   return -1;
+      // });
+    } catch (err) {
+      print('error in getSubmissions');
+      print(err);
+    }
     return data.toList();
   }
 
@@ -92,25 +106,34 @@ class Submitted extends StatelessWidget {
                                             ['patientName'] ??
                                         'N/A') +
                                     ' - ' +
-                                    (snapshot.data![index]['pcnOrMrNumber'] ??
-                                        'N/A')),
+                                    ('(' +
+                                        (snapshot.data![index]
+                                                ['pcnOrMrNumber'] ??
+                                            'N/A') +
+                                        ')')),
                                 subtitle: Text(
                                     'Days left : ' +
                                         (snapshot.data![index]['difference'] !=
                                                 ''
                                             ? snapshot.data![index]
                                                 ['difference']
-                                            : 'N/A'),
+                                            : 'N/A') +
+                                        ('\nReviewed: ' +
+                                            (snapshot.data![index]
+                                                        ['reviewed'] ==
+                                                    true
+                                                ? 'Yes'
+                                                : 'No')),
                                     style: TextStyle(
-                                        color:
-                                            snapshot.data![index]!['color'] !=
-                                                    ''
-                                                ? (snapshot.data![index]![
-                                                            'color'] ==
-                                                        'red'
-                                                    ? Colors.red
-                                                    : Colors.green)
-                                                : Colors.black)),
+                                        color: snapshot
+                                                    .data![index]!['color'] !=
+                                                ''
+                                            ? (snapshot.data![index]![
+                                                        'color'] ==
+                                                    'red'
+                                                ? Colors.red
+                                                : Colors.green)
+                                            : Colors.black)),
                                 trailing: Text(snapshot.data![index]
                                         ['createdAt']!
                                     .substring(0, 10)),
@@ -128,7 +151,8 @@ class Submitted extends StatelessWidget {
                                             'HCAI Form',
                                         userId: snapshot.data?[index]['userId'],
                                         goodToGo: true,
-                                        values: snapshot.data?[index]),
+                                        values: snapshot.data?[index],
+                                        reviewed: true),
                                   );
                                 },
                                 // trailing: Icon(Icons.add_a_photo),

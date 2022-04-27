@@ -38,7 +38,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       hcaiTitle: '',
       hospitalId: '',
       userId: '',
-      values: {});
+      values: {},
+      reviewed: false);
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
   Map _selectedRole = {};
@@ -58,6 +59,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       this._values = args.values;
       this._values['hospitalId'] = args.hospitalId;
       this._values['userId'] = args.userId;
+      this._values['reviewed'] = args.reviewed;
       _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
     });
     super.initState();
@@ -900,6 +902,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         return null;
       }
       print(jsonEncode(values));
+      if (values['reviewed'] == true) {
+        values['reviewed'] = values['isSSI'] != null;
+      }
       final response = await http.post(
         Uri.parse(Constants.BASE_URL + "/submissions/"),
         headers: <String, String>{

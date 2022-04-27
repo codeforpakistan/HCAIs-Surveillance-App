@@ -95,7 +95,8 @@ class HomePage extends StatelessWidget {
                                                 userId:
                                                     '621ddb0059e8330e432cdb22',
                                                 goodToGo: true,
-                                                values: {}),
+                                                values: {},
+                                                reviewed: false),
                                           );
                                         }));
                               });
