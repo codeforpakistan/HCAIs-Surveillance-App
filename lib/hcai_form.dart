@@ -450,6 +450,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required List<dynamic> options,
       required String label,
       required int index}) {
+    if (this._values[key] != null && this._values[key].runtimeType == String) {
+      this._values[key] = [this._values[key]];
+    }
     final _options = options
         .map((each) => MultiSelectItem(
             each,
