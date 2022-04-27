@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hcais/components/drawer.dart';
 import 'package:hcais/hcai_form.dart';
 import 'package:hcais/utils/constants.dart';
+import 'package:hcais/utils/helper.dart';
 import 'package:http/http.dart' as http;
 
 import 'args/Arguments.dart';
@@ -21,7 +22,24 @@ class Submitted extends StatelessWidget {
       },
     );
     data = json.decode(utf8.decode(response.bodyBytes));
-    data.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+    final today = DateTime.now();
+    var diff;
+    data.forEach((each) => {
+          each['difference'] = '',
+          each['color'] = '',
+          if (each['recommendedSurveillancePeriod'] != null)
+            {
+              diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
+              diff = (int.parse(each['recommendedSurveillancePeriod']) - diff),
+              if (diff == 0)
+                {each['color'] = 'green'}
+              else if (diff < 0)
+                {each['color'] = 'red'},
+              each['difference'] = diff.toString()
+            }
+        });
+
+    data.sort((a, b) => a['difference'].compareTo(b['difference']));
     return data.toList();
   }
 
@@ -29,10 +47,11 @@ class Submitted extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+            backgroundColor: Color.fromRGBO(193, 30, 47, 1),
             title: Text(
-          'PIMS',
-          style: TextStyle(fontSize: 24.0, color: Colors.white),
-        )),
+              'PIMS',
+              style: TextStyle(fontSize: 24.0, color: Colors.white),
+            )),
         drawer: SideDrawer(),
         body: SafeArea(
             child: Container(
@@ -70,9 +89,29 @@ class Submitted extends StatelessWidget {
                                   backgroundColor: Colors.purple,
                                 ),
                                 title: Text((snapshot.data![index]
-                                        ['patientName'] ??
-                                    'N/A')),
-                                subtitle: Text(snapshot.data![index]
+                                            ['patientName'] ??
+                                        'N/A') +
+                                    ' - ' +
+                                    (snapshot.data![index]['pcnOrMrNumber'] ??
+                                        'N/A')),
+                                subtitle: Text(
+                                    'Days left : ' +
+                                        (snapshot.data![index]['difference'] !=
+                                                ''
+                                            ? snapshot.data![index]
+                                                ['difference']
+                                            : 'N/A'),
+                                    style: TextStyle(
+                                        color:
+                                            snapshot.data![index]!['color'] !=
+                                                    ''
+                                                ? (snapshot.data![index]![
+                                                            'color'] ==
+                                                        'red'
+                                                    ? Colors.red
+                                                    : Colors.green)
+                                                : Colors.black)),
+                                trailing: Text(snapshot.data![index]
                                         ['createdAt']!
                                     .substring(0, 10)),
                                 onTap: () {
