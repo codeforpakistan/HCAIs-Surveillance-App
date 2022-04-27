@@ -20,6 +20,3 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => new Size.fromHeight(appBar.preferredSize.height);
 }
-
-
-          // color: Color.fromRGBO(82, 121, 180, 1),
