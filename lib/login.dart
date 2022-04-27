@@ -159,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Container(
                     padding: EdgeInsets.all(15),
-                    margin: EdgeInsets.only(top: 0),
+                    margin: EdgeInsets.only(top: 10),
                     decoration: new BoxDecoration(
                         gradient: new LinearGradient(
                       begin: Alignment.topCenter,

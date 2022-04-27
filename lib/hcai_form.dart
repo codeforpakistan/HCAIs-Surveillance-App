@@ -498,14 +498,18 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       this._values[key] = value;
     }
     String item = '';
+    List<String> items = [];
     if (this._values[key] != null &&
         this._values[key] != '' &&
         options.length > 0) {
-      var selected = options.firstWhere((each) =>
-          each['_id'] != null && each['_id'].toString() == this._values[key]);
-      item = selected['name'] != null ? selected['name'] : selected['title'];
+      try {
+        var selected = options.firstWhere((each) =>
+            each['_id'] != null && each['_id'].toString() == this._values[key]);
+        item = selected['name'] != null ? selected['name'] : selected['title'];
+      } catch (err) {
+        print(err);
+      }
     }
-    List<String> items = [];
     options.forEach((each) => {
           if (each['name'] != null)
             {items.add(each['name'])}
