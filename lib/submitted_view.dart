@@ -44,12 +44,6 @@ class Submitted extends StatelessWidget {
 
       data.sort((a, b) =>
           int.parse(a['difference']).compareTo(int.parse(b['difference'])));
-      // data.sort((a, b) {
-      //   if (a['reviewd']) {
-      //     return 1;
-      //   }
-      //   return -1;
-      // });
     } catch (err) {
       print('error in getSubmissions');
       print(err);
