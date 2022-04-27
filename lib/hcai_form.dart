@@ -450,44 +450,50 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required List<dynamic> options,
       required String label,
       required int index}) {
-    if (this._values[key] != null && this._values[key].runtimeType == String) {
-      this._values[key] = [this._values[key]];
-    }
-    final _options = options
-        .map((each) => MultiSelectItem(
-            each,
-            each['name'] != null
-                ? each['name'].toString()
-                : each['title'].toString()))
-        .toList();
-    Column childs = WidgetHelper.buildColumn(label.toString());
-    childs.children.add(MultiSelectDialogField(
-      buttonIcon: Icon(Icons.arrow_drop_down),
-      onConfirm: (val) {
-        if (this.mounted) {
-          this._values[key] = val;
-          setState(() => {this._values[key] = val});
-          _setCompleteField(key, val.toString(), options, []);
-        }
-      },
-      decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.grey,
-          width: 0.0,
+    try {
+      if (this._values[key] != null &&
+          this._values[key].runtimeType == String) {
+        this._values[key] = [this._values[key]];
+      }
+      final _options = options
+          .map((each) => MultiSelectItem(
+              each,
+              each['name'] != null
+                  ? each['name'].toString()
+                  : each['title'].toString()))
+          .toList();
+      Column childs = WidgetHelper.buildColumn(label.toString());
+      childs.children.add(MultiSelectDialogField(
+        buttonIcon: Icon(Icons.arrow_drop_down),
+        onConfirm: (val) {
+          if (this.mounted) {
+            this._values[key] = val;
+            setState(() => {this._values[key] = val});
+            _setCompleteField(key, val.toString(), options, []);
+          }
+        },
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: Colors.grey,
+            width: 0.0,
+          ),
+          color: Color.fromRGBO(242, 242, 242, 1),
         ),
-        color: Color.fromRGBO(242, 242, 242, 1),
-      ),
-      buttonText: Text(''),
-      title: Text('Please Select'),
-      dialogWidth: MediaQuery.of(context).size.width * 0.9,
-      searchable: true,
-      items: _options,
-      initialValue: this._values[
-          key], // setting the value of this in initState() to pre-select values.
-    ));
-    return childs;
+        buttonText: Text(''),
+        title: Text('Please Select'),
+        dialogWidth: MediaQuery.of(context).size.width * 0.9,
+        searchable: true,
+        items: _options,
+        initialValue: this._values[
+            key], // setting the value of this in initState() to pre-select values.
+      ));
+      return childs;
+    } catch (err) {
+      print(err);
+      return Container();
+    }
   }
 
   Widget _buildSearchble(
@@ -497,64 +503,71 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String value,
       required bool hasHelpLabel,
       required String helpLabelText}) {
-    if (this._values[key] == null) {
-      this._values[key] = value;
-    }
-    String item = '';
-    List<String> items = [];
-    if (this._values[key] != null &&
-        this._values[key] != '' &&
-        options.length > 0) {
-      try {
-        var selected = options.firstWhere((each) =>
-            each['_id'] != null && each['_id'].toString() == this._values[key]);
-        item = selected['name'] != null ? selected['name'] : selected['title'];
-      } catch (err) {
-        print(err);
+    try {
+      if (this._values[key] == null) {
+        this._values[key] = value;
       }
-    }
-    options.forEach((each) => {
-          if (each['name'] != null)
-            {items.add(each['name'])}
-          else if (each['title'] != null)
-            {items.add(each['title'])}
-        });
-    Column childs = WidgetHelper.buildColumn(labelText.toString());
-    childs.children.add(DropdownSearch<String>(
-      showSearchBox: true,
-      items: items,
-      showSelectedItems: true,
-      dropdownSearchDecoration: InputDecoration(
-          filled: true,
-          fillColor: Color.fromRGBO(242, 242, 242, 1),
-          contentPadding: EdgeInsets.fromLTRB(7.0, 1.0, 1.0, 1.0),
-          // labelText: labelText,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            // width: 0.0 produces a thin "hairline" border
-            borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-          ),
-          suffixIcon: hasHelpLabel
-              ? IconButton(
-                  icon: Icon(Icons.info_outline),
-                  onPressed: () {
-                    _showDialog(context, helpLabelText);
-                  },
-                )
-              : null),
-      selectedItem: item,
-      onChanged: (v) {
-        if (v != '') {
-          var newValue = options
-              .firstWhere((each) => each['name'] == v || each['title'] == v);
-          if (this.mounted && newValue['_id'] != null) {
-            setState(() => {this._values[key] = newValue['_id']});
-            _setCompleteField(key, newValue['_id'], options, []);
-          }
+      String item = '';
+      List<String> items = [];
+      if (this._values[key] != null &&
+          this._values[key] != '' &&
+          options.length > 0) {
+        try {
+          var selected = options.firstWhere((each) =>
+              each['_id'] != null &&
+              each['_id'].toString() == this._values[key]);
+          item =
+              selected['name'] != null ? selected['name'] : selected['title'];
+        } catch (err) {
+          print(err);
         }
-      },
-    ));
-    return childs;
+      }
+      options.forEach((each) => {
+            if (each['name'] != null)
+              {items.add(each['name'])}
+            else if (each['title'] != null)
+              {items.add(each['title'])}
+          });
+      Column childs = WidgetHelper.buildColumn(labelText.toString());
+      childs.children.add(DropdownSearch<String>(
+        showSearchBox: true,
+        items: items,
+        showSelectedItems: true,
+        dropdownSearchDecoration: InputDecoration(
+            filled: true,
+            fillColor: Color.fromRGBO(242, 242, 242, 1),
+            contentPadding: EdgeInsets.fromLTRB(7.0, 1.0, 1.0, 1.0),
+            // labelText: labelText,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              // width: 0.0 produces a thin "hairline" border
+              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+            ),
+            suffixIcon: hasHelpLabel
+                ? IconButton(
+                    icon: Icon(Icons.info_outline),
+                    onPressed: () {
+                      _showDialog(context, helpLabelText);
+                    },
+                  )
+                : null),
+        selectedItem: item,
+        onChanged: (v) {
+          if (v != '') {
+            var newValue = options
+                .firstWhere((each) => each['name'] == v || each['title'] == v);
+            if (this.mounted && newValue['_id'] != null) {
+              setState(() => {this._values[key] = newValue['_id']});
+              _setCompleteField(key, newValue['_id'], options, []);
+            }
+          }
+        },
+      ));
+      return childs;
+    } catch (err) {
+      print(err);
+      return Container();
+    }
   }
 
   Widget _buildDropDown(
@@ -565,53 +578,63 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText,
       required int index}) {
-    if (this._values[key] == null) {
-      this._values[key] = value;
+    try {
+      if (this._values[key] == null) {
+        this._values[key] = value;
+      }
+      if (this._values[key] != null && this._values[key].runtimeType == List) {
+        this._values[key] = this._values[key][0]['title'] != ''
+            ? this._values[key][0]['title']
+            : this._values[key][0]['name'];
+      }
+      Column childs = WidgetHelper.buildColumn(labelText.toString());
+      childs.children.add(DropdownButtonFormField(
+        decoration: InputDecoration(
+            filled: true,
+            fillColor: Color.fromRGBO(242, 242, 242, 1),
+            contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
+            // labelText: labelText,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              // width: 0.0 produces a thin "hairline" border
+              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+            ),
+            suffixIcon: hasHelpLabel
+                ? IconButton(
+                    icon: Icon(Icons.info_outline),
+                    onPressed: () {
+                      _showDialog(context, helpLabelText);
+                    },
+                  )
+                : null),
+        isExpanded: true,
+        hint: Text(labelText),
+        value: this._values[key].toString(),
+        onChanged: (String? newValue) => {
+          if (this.mounted)
+            {
+              setState(() => {this._values[key] = newValue}),
+              _setCompleteField(key, newValue, options, []),
+            }
+        },
+        items: options.map((option) {
+          return DropdownMenuItem(
+            value: option['_id'] != null
+                ? option['_id'].toString()
+                : option['name'] != null
+                    ? option['name'].toString()
+                    : option['title'].toString(),
+            child: Text(option['name'] != null
+                ? option['name'].toString()
+                : option['title'].toString()),
+          );
+        }).toList(),
+      ));
+      return childs;
+    } catch (err) {
+      print(err);
+      return Container();
     }
-    Column childs = WidgetHelper.buildColumn(labelText.toString());
-    childs.children.add(DropdownButtonFormField(
-      decoration: InputDecoration(
-          filled: true,
-          fillColor: Color.fromRGBO(242, 242, 242, 1),
-          contentPadding: EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 10.0),
-          // labelText: labelText,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            // width: 0.0 produces a thin "hairline" border
-            borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-          ),
-          suffixIcon: hasHelpLabel
-              ? IconButton(
-                  icon: Icon(Icons.info_outline),
-                  onPressed: () {
-                    _showDialog(context, helpLabelText);
-                  },
-                )
-              : null),
-      isExpanded: true,
-      hint: Text(labelText),
-      value: this._values[key].toString(),
-      onChanged: (String? newValue) => {
-        if (this.mounted)
-          {
-            setState(() => {this._values[key] = newValue}),
-            _setCompleteField(key, newValue, options, []),
-          }
-      },
-      items: options.map((option) {
-        return DropdownMenuItem(
-          value: option['_id'] != null
-              ? option['_id'].toString()
-              : option['name'] != null
-                  ? option['name'].toString()
-                  : option['title'].toString(),
-          child: Text(option['name'] != null
-              ? option['name'].toString()
-              : option['title'].toString()),
-        );
-      }).toList(),
-    ));
-    return childs;
   }
 
   Widget _buildRadioButton({
