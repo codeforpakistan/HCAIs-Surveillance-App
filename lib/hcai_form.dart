@@ -152,13 +152,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (step['fields'] is List)
             {
               step['fields'].asMap().forEach((fieldIndex, field) => {
-                    if (field['isHidden'] != true ||
-                        (field['key'] != null &&
-                            this._values[field['key']] != null &&
-                            !this
-                                ._values[field['key']]
-                                .toString()
-                                .contains('Select')))
+                    if (field['isHidden'] != true)
                       {
                         if (field['type'] == 'text')
                           {
