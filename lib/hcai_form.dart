@@ -534,7 +534,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         dropdownSearchDecoration: InputDecoration(
             filled: true,
             fillColor: Color.fromRGBO(242, 242, 242, 1),
-            contentPadding: EdgeInsets.fromLTRB(7.0, 1.5, 1.0, 1.5),
+            contentPadding: EdgeInsets.fromLTRB(10.0, 1.7, 2.0, 1.7),
             // labelText: labelText,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
