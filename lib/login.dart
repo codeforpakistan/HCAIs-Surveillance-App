@@ -58,6 +58,8 @@ class _LoginPageState extends State<LoginPage> {
       Text('Password *'),
       SizedBox(height: 4),
       TextFormField(
+          obscureText: true,
+          autocorrect: false,
           controller: passwordController,
           decoration: InputDecoration(
               filled: true,
@@ -106,6 +108,7 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Center(
         child: ListView(

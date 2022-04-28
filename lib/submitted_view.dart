@@ -56,6 +56,7 @@ class Submitted extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Color.fromRGBO(193, 30, 47, 1),
+            iconTheme: IconThemeData(color: Colors.white),
             title: Text(
               'PIMS',
               style: TextStyle(fontSize: 24.0, color: Colors.white),

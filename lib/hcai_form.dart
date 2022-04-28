@@ -526,13 +526,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           });
       Column childs = WidgetHelper.buildColumn(labelText.toString());
       childs.children.add(DropdownSearch<String>(
+        mode: Mode.DIALOG,
         showSearchBox: true,
         items: items,
         showSelectedItems: true,
+        showAsSuffixIcons: true,
         dropdownSearchDecoration: InputDecoration(
             filled: true,
             fillColor: Color.fromRGBO(242, 242, 242, 1),
-            contentPadding: EdgeInsets.fromLTRB(7.0, 1.0, 1.0, 1.0),
+            contentPadding: EdgeInsets.fromLTRB(7.0, 1.5, 1.0, 1.5),
             // labelText: labelText,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
@@ -692,12 +694,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               // ignore: unnecessary_statements
               : null;
         },
-        child: Align(
-          child: new Text((truncate && (!showFullValue || title.length <= 12))
-              ? Helper.truncateWithEllipsis(12, title)
-              : title),
-          alignment: Alignment(-1.1, 0.0),
-        ),
+        child: new Text((truncate && (!showFullValue || title.length <= 12))
+            ? Helper.truncateWithEllipsis(12, title)
+            : title),
       ),
       onChanged: (Object? value) {
         if (this.mounted) {
