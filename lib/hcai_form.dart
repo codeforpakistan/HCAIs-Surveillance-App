@@ -526,13 +526,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           });
       Column childs = WidgetHelper.buildColumn(labelText.toString());
       childs.children.add(DropdownSearch<String>(
+        mode: Mode.DIALOG,
         showSearchBox: true,
         items: items,
         showSelectedItems: true,
+        showAsSuffixIcons: true,
         dropdownSearchDecoration: InputDecoration(
             filled: true,
             fillColor: Color.fromRGBO(242, 242, 242, 1),
-            contentPadding: EdgeInsets.fromLTRB(7.0, 1.0, 1.0, 1.0),
+            contentPadding: EdgeInsets.fromLTRB(10.0, 1.7, 2.0, 1.7),
             // labelText: labelText,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
@@ -570,14 +572,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       {required String key,
       required String labelText,
       required List<dynamic> options,
-      required String value,
+      String? value,
       required bool hasHelpLabel,
       required String helpLabelText,
       required int index}) {
     try {
-      if (this._values[key] == null) {
-        this._values[key] = value;
-      }
       if (this._values[key] != null && this._values[key].runtimeType == List) {
         this._values[key] = this._values[key][0]['title'] != ''
             ? this._values[key][0]['title']
@@ -604,8 +603,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   )
                 : null),
         isExpanded: true,
-        hint: Text(labelText),
-        value: this._values[key].toString(),
+        hint: Text('Select ' + labelText),
+        value: this._values[key] != null ? this._values[key].toString() : null,
         onChanged: (String? newValue) => {
           if (this.mounted)
             {
@@ -692,12 +691,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               // ignore: unnecessary_statements
               : null;
         },
-        child: Align(
-          child: new Text((truncate && (!showFullValue || title.length <= 12))
-              ? Helper.truncateWithEllipsis(12, title)
-              : title),
-          alignment: Alignment(-1.1, 0.0),
-        ),
+        child: new Text((truncate && (!showFullValue || title.length <= 12))
+            ? Helper.truncateWithEllipsis(12, title)
+            : title),
       ),
       onChanged: (Object? value) {
         if (this.mounted) {
