@@ -154,7 +154,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (step['fields'] is List)
             {
               step['fields'].asMap().forEach((fieldIndex, field) => {
-                    if (field['isHidden'] != true)
+                    if (field['isHidden'] != true ||
+                        this._values[field['key']] != null)
                       {
                         if (field['type'] == 'text')
                           {
@@ -761,13 +762,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       switch (key) {
         case 'ICD10Id':
           {
-            this._values['recommendedSurveillancePeriod'] = options
-                .firstWhere(
-                    (each) => each['_id'] == value)['surveillancePeriod']
-                .toString();
-            this._values['ICD10Code'] = options
-                .firstWhere((each) => each['_id'] == value)['ICDCode']
-                .toString();
+            if (options.length > 0) {
+              this._values['recommendedSurveillancePeriod'] = options
+                  .firstWhere(
+                      (each) => each['_id'] == value)['surveillancePeriod']
+                  .toString();
+              this._values['ICD10Code'] = options
+                  .firstWhere((each) => each['_id'] == value)['ICDCode']
+                  .toString();
+            }
+
             break;
           }
         case 'dateOfProcedure':
@@ -847,6 +851,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             orElse: () => null,
           );
           if (found != null) {
+            if (flag == true) {
+              this._values.remove(eachField['key']);
+            }
             eachField['isHidden'] = flag;
           }
         }
