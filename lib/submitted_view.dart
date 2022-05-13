@@ -24,21 +24,26 @@ class Submitted extends StatelessWidget {
     data = json.decode(utf8.decode(response.bodyBytes));
     try {
       final today = DateTime.now();
-      var diff;
+      int diff = -9999;
       data.forEach((each) => {
             each['difference'] = '',
             each['color'] = '',
             each['reviewed'] = each['reviewed'] != true ? false : true,
             if (each['recommendedSurveillancePeriod'] != null)
               {
-                diff = Helper.daysBetweenDate(each['createdAt'], today, 'days'),
-                diff =
-                    (int.parse(each['recommendedSurveillancePeriod']) - diff),
-                if (diff == 0 || each['reviewed'] == true)
-                  {each['color'] = 'green', diff = 0}
-                else if (diff < 0)
-                  {each['color'] = 'red'},
-                each['difference'] = diff.toString()
+                if (each['dateOfProcedure'] != null &&
+                    each['dateOfProcedure'] != "")
+                  {
+                    diff = Helper.daysBetweenDate(
+                        each['dateOfProcedure'], today, 'days'),
+                    diff = (int.parse(each['recommendedSurveillancePeriod']) -
+                        diff),
+                    if (diff == 0 || each['reviewed'] == true)
+                      {each['color'] = 'green', diff = 0}
+                    else if (diff < 0)
+                      {each['color'] = 'red'},
+                  },
+                each['difference'] = (diff == -9999) ? 'N/A' : diff.toString()
               }
           });
 
