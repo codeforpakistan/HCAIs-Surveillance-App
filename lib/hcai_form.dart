@@ -381,6 +381,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     },
                   )
                 : null),
+        lastDate: DateTime.now(),
         initialValue:
             DateTime.tryParse(this._values[selectedDateKey]), //Add this in your
         mode: type == 'time'
@@ -823,7 +824,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         case 'antimicrobialProphylaxisAdministered':
         case 'pathogenCausingSSI':
         case 'secondaryBloodstreamInfection':
+        case 'previousHistoryOfBacterialColonization':
           {
+            print("here");
+            print(this._values[key]);
             if (this._values[key] == 'Yes' ||
                 this._values[key] == 'Positive Growth') {
               this.unHide(hiddenFields, false);
