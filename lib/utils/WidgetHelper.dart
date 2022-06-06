@@ -13,7 +13,6 @@ class WidgetHelper {
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ]),
       ),
-      // Text((isRequired ? ' *' : ''), style: TextStyle(color: Colors.red)),
       SizedBox(height: 4)
     ]);
   }
