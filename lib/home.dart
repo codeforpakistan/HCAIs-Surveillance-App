@@ -96,7 +96,8 @@ class HomePage extends StatelessWidget {
                                                     '621ddb0059e8330e432cdb22',
                                                 goodToGo: true,
                                                 values: {},
-                                                reviewed: false),
+                                                reviewed: false,
+                                                isEditedView: false),
                                           );
                                         }));
                               });

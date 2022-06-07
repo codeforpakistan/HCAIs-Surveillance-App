@@ -74,8 +74,8 @@ class _LoginPageState extends State<LoginPage> {
     ]);
 
     // to be removed
-    emailController.text = 'doctor@example.com';
-    passwordController.text = 'testpass';
+    // emailController.text = 'doctor@example.com';
+    // passwordController.text = 'testpass';
 
     final loginButton = ElevatedButton(
       style: raisedButtonStyle,
@@ -198,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
 
   // ignore: non_constant_identifier_names
   _showDialog(String alertTitle, String alertMsg) {
-    BlurryDialog alert = BlurryDialog(alertTitle, alertMsg);
+    BlurryDialog alert = BlurryDialog(alertTitle, alertMsg, []);
     showDialog(
       context: context,
       builder: (BuildContext context) {

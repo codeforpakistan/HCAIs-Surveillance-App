@@ -213,7 +213,8 @@ class _SubmittedState extends State<Submitted> {
                                                               goodToGo: true,
                                                               values: snapshot
                                                                   .data?[index],
-                                                              reviewed: true),
+                                                              reviewed: true,
+                                                              isEditedView: true),
                                                         );
                                                       },
                                                       // trailing: Icon(Icons.add_a_photo),

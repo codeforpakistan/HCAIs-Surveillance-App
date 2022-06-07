@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 class BlurryDialog extends StatelessWidget {
   String title;
   String content;
+  List<Widget> actions;
 
-  BlurryDialog(this.title, this.content);
+  BlurryDialog(this.title, this.content, this.actions);
   TextStyle textStyle = TextStyle(color: Colors.black);
 
   @override
@@ -22,14 +23,16 @@ class BlurryDialog extends StatelessWidget {
             content,
             style: textStyle,
           ),
-          actions: <Widget>[
-            new MaterialButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop('dialog');
-              },
-            ),
-          ],
+          actions: actions.length > 0
+              ? actions
+              : <Widget>[
+                  new MaterialButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                    },
+                  ),
+                ],
         ));
   }
 }

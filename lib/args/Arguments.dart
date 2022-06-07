@@ -9,7 +9,7 @@ class Arguments {
   final bool goodToGo;
   final Map values;
   final bool reviewed;
-
+  final bool isEditedView;
   // This Widget accepts the arguments as constructor
   // parameters. It does not extract the arguments from
   // the ModalRoute.
@@ -25,5 +25,6 @@ class Arguments {
       required this.hcaiId,
       required this.hcaiTitle,
       required this.values,
-      required this.reviewed});
+      required this.reviewed,
+      required this.isEditedView});
 }
