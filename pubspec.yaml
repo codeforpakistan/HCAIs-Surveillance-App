@@ -37,12 +37,18 @@ dependencies:
   multi_select_flutter: ^4.1.2
   dropdown_search: ^2.0.1
   flutter_multi_formatter: ^2.5.1
+  firebase_crashlytics: ^2.5.2
+  flutter_native_splash: ^1.2.3
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/splash_screen.png
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
