@@ -579,7 +579,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         showSearchBox: true,
         items: items,
         showSelectedItems: true,
-        showAsSuffixIcons: true,
         dropdownSearchDecoration: InputDecoration(
             filled: true,
             fillColor: Color.fromRGBO(242, 242, 242, 1),
