@@ -74,10 +74,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
     return WillPopScope(
       onWillPop: () async {
-        if (Navigator.of(context).userGestureInProgress)
-          return false;
-        else
-          return true;
+        this._showDialog(context, 'Do you want to close?',
+            'Your will loose your progress.', true);
+        return false;
       },
       child: Scaffold(
         appBar: AppBar(
