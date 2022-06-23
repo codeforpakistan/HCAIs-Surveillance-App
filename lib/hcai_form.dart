@@ -157,6 +157,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (step['fields'] is List)
             {
               step['fields'].asMap().forEach((fieldIndex, field) => {
+                    print(this._values[field['key']),
+                    print(field['key']),
                     if (field['isHidden'] != true ||
                         this._values[field['key']] != null)
                       {
@@ -575,28 +577,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       Column childs =
           WidgetHelper.buildColumn(labelText.toString(), isRequired);
       childs.children.add(DropdownSearch<String>(
-        mode: Mode.DIALOG,
-        showSearchBox: true,
         items: items,
-        showSelectedItems: true,
-        dropdownSearchDecoration: InputDecoration(
-            filled: true,
-            fillColor: Color.fromRGBO(242, 242, 242, 1),
-            contentPadding: EdgeInsets.fromLTRB(10.0, 1.7, 2.0, 1.7),
-            // labelText: labelText,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              // width: 0.0 produces a thin "hairline" border
-              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-            ),
-            suffixIcon: hasHelpLabel
-                ? IconButton(
-                    icon: Icon(Icons.info_outline),
-                    onPressed: () {
-                      _showDialog(context, "Information", helpLabelText, false);
-                    },
-                  )
-                : null),
         selectedItem: item,
         onChanged: (v) {
           if (v != '') {
@@ -850,6 +831,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         case 'pathogenCausingSSI':
         case 'secondaryBloodstreamInfection':
         case 'previousHistoryOfBacterialColonization':
+        case 'died':
           {
             print(this._values[key]);
             if (this._values[key] == 'Yes' ||
