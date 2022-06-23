@@ -851,8 +851,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         case 'pathogenCausingSSI':
         case 'secondaryBloodstreamInfection':
         case 'previousHistoryOfBacterialColonization':
+        case 'died':
           {
-            print(this._values[key]);
             if (this._values[key] == 'Yes' ||
                 this._values[key] == 'Positive Growth') {
               this.unHide(hiddenFields, false);
