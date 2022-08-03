@@ -653,7 +653,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   )
                 : null),
         isExpanded: true,
-        hint: Text('Select ' + labelText),
+        // hint: Text('Select ' + labelText),
         value: this._values[key] != null ? this._values[key].toString() : null,
         onChanged: (String? newValue) => {
           if (this.mounted)
