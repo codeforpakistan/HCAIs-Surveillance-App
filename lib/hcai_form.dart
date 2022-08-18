@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:hcais/utils/WidgetHelper.dart';
@@ -574,29 +574,32 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       Column childs =
           WidgetHelper.buildColumn(labelText.toString(), isRequired);
       childs.children.add(DropdownSearch<String>(
-        mode: Mode.DIALOG,
-        showSearchBox: true,
+        popupProps: PopupProps.menu(
+          showSelectedItems: true,
+          disabledItemFn: (String s) => s.startsWith('I'),
+        ),
+        // mode: Mode.DIALOG,
+        // showSearchBox: true,
         items: items,
-        showSelectedItems: true,
-        showAsSuffixIcons: true,
-        dropdownSearchDecoration: InputDecoration(
-            filled: true,
-            fillColor: Color.fromRGBO(242, 242, 242, 1),
-            contentPadding: EdgeInsets.fromLTRB(10.0, 1.7, 2.0, 1.7),
-            // labelText: labelText,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              // width: 0.0 produces a thin "hairline" border
-              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-            ),
-            suffixIcon: hasHelpLabel
-                ? IconButton(
-                    icon: Icon(Icons.info_outline),
-                    onPressed: () {
-                      _showDialog(context, "Information", helpLabelText, false);
-                    },
-                  )
-                : null),
+        // showSelectedItems: true,
+        // dropdownSearchDecoration: InputDecoration(
+        //     filled: true,
+        //     fillColor: Color.fromRGBO(242, 242, 242, 1),
+        //     contentPadding: EdgeInsets.fromLTRB(10.0, 1.7, 2.0, 1.7),
+        //     // labelText: labelText,
+        //     enabledBorder: OutlineInputBorder(
+        //       borderRadius: BorderRadius.circular(15),
+        //       // width: 0.0 produces a thin "hairline" border
+        //       borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+        //     ),
+        //     suffixIcon: hasHelpLabel
+        //         ? IconButton(
+        //             icon: Icon(Icons.info_outline),
+        //             onPressed: () {
+        //               _showDialog(context, "Information", helpLabelText, false);
+        //             },
+        //           )
+        //         : null),
         selectedItem: item,
         onChanged: (v) {
           if (v != '') {
@@ -944,19 +947,22 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         body: jsonEncode(values),
       );
       if (response.statusCode >= 200 && response.statusCode <= 299) {
-        AwesomeDialog(
-            context: context,
-            animType: AnimType.LEFTSLIDE,
-            headerAnimationLoop: false,
-            dialogType: DialogType.SUCCES,
-            showCloseIcon: false,
-            title: 'Success',
-            desc: 'Submitted!',
-            onDissmissCallback: (type) {
-              debugPrint('Dialog Dissmiss from callback $type');
-            })
-          ..show()
-              .then((value) => Navigator.of(context).pushNamed(HomePage.tag));
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "RFLUTTER ALERT",
+          desc: "Flutter is more awesome with RFlutter Alert.",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "COOL",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              width: 120,
+            )
+          ],
+        ).show().then((value) => Navigator.of(context).pushNamed(HomePage.tag));
       } else {
         Helper.showMsg(context, jsonDecode(response.body).toString(), true);
       }

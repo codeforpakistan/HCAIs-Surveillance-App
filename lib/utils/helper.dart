@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'dart:convert';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
 
@@ -99,15 +98,15 @@ class Helper {
   }
 
   static showMsg(context, msg, isError) {
-    AwesomeDialog(
-      context: context,
-      animType: AnimType.LEFTSLIDE,
-      headerAnimationLoop: false,
-      dialogType: isError ? DialogType.ERROR : DialogType.SUCCES,
-      showCloseIcon: false,
-      title: isError ? 'ERROR' : 'Success',
-      desc: msg,
-    )..show();
+    // AwesomeDialog(
+    //   context: context,
+    //   animType: AnimType.LEFTSLIDE,
+    //   headerAnimationLoop: false,
+    //   dialogType: isError ? DialogType.ERROR : DialogType.SUCCES,
+    //   showCloseIcon: false,
+    //   title: isError ? 'ERROR' : 'Success',
+    //   desc: msg,
+    // )..show();
   }
 
   static String getInitials(String name) => name.isNotEmpty

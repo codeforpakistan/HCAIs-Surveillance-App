@@ -28,18 +28,20 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.1
   cool_stepper: ^1.2.1
   shared_preferences: ^2.0.7
   http: ^0.13.3
-  awesome_dialog: ^2.1.1
-  date_field: ^2.1.3
-  multi_select_flutter: ^4.1.2
-  dropdown_search: ^2.0.1
+  date_field: ^3.0.1
+  multi_select_flutter:
+    git:
+      url: https://github.com/kabagouda/multi_select_flutter.git
+      ref: patch-1 # branch name
+  dropdown_search: ^5.0.2
   flutter_multi_formatter: ^2.5.1
   firebase_crashlytics: ^2.5.2
-  flutter_native_splash: ^1.2.3
-
+  flutter_native_splash: ^2.2.7
+  rflutter_alert: ^2.0.4
 
 dev_dependencies:
   flutter_test:
