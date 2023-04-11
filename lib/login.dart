@@ -219,8 +219,8 @@ class _LoginPageState extends State<LoginPage> {
       var jsonData = json.decode(response.body);
       if (jsonData!['user']!['tokens'] != null) {
         setState(() {
-          MySharedPreferences.instance.setStringValue(
-              "access_token", jsonData!['user']!['tokens']!.toString());
+          MySharedPreferences.instance.setStringValue("access_token",
+              jsonData!['user']!['tokens']![0]!['accessToken'].toString());
           MySharedPreferences.instance.setBool("loggedIn", true);
           MySharedPreferences.instance
               .setStringValue("user", json.encode(jsonData!['user']));
