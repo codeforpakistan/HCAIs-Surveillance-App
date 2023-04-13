@@ -33,7 +33,7 @@ class _SubmittedState extends State<Submitted> {
       final today = DateTime.now();
       int diff = -9999;
       data.forEach((each) => {
-            each['difference'] = '',
+            each['difference'] = '0',
             each['color'] = '',
             each['reviewed'] = each['reviewed'] != true ? false : true,
             if (each['recommendedSurveillancePeriod'] != null)
@@ -50,7 +50,7 @@ class _SubmittedState extends State<Submitted> {
                     else if (diff < 0)
                       {each['color'] = 'red'},
                   },
-                each['difference'] = (diff == -9999) ? 'N/A' : diff.toString()
+                each['difference'] = (diff == -9999) ? '0' : diff.toString()
               }
           });
 
@@ -119,14 +119,14 @@ class _SubmittedState extends State<Submitted> {
                                             return ((snapshot.data![index]![
                                                                 'patientName'] !=
                                                             null &&
-                                                        snapshot.data![index]![
-                                                                'pcnOrMrNumber'] !=
-                                                            null) &&
-                                                    (snapshot.data![index]![
+                                                        (snapshot.data![index]![
                                                                 'patientName']!
                                                             .toLowerCase()!
                                                             .contains(
-                                                                searchString) ||
+                                                                searchString)) ||
+                                                    (snapshot.data![index]![
+                                                                'pcnOrMrNumber'] !=
+                                                            null) &&
                                                         snapshot.data![index]![
                                                                 'pcnOrMrNumber']!
                                                             .toLowerCase()!

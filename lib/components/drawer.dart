@@ -18,7 +18,7 @@ class _SideDrawerState extends State<SideDrawer> {
   void initState() {
     MySharedPreferences.readPrefStr("user").then((value) => {
           this.setState(() {
-            user = json.decode(value);
+            user = json.decode(value) ?? '';
           }),
         });
     super.initState();
@@ -38,14 +38,16 @@ class _SideDrawerState extends State<SideDrawer> {
           children: <Widget>[
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: Color.fromRGBO(193, 30, 47, 1)),
-              accountName: Text(this.user!['name'],
+              accountName: Text((this.user!['name'] ?? ''),
                   style: new TextStyle(color: Colors.white)),
               accountEmail: Text(this.user!['email'],
                   style: new TextStyle(color: Colors.white)),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Text(
-                  this.user!['name']!.substring(0, 1)!.toUpperCase(),
+                  this.user!['name'] != null
+                      ? this.user!['name']!.substring(0, 1)!.toUpperCase()
+                      : '',
                   style: TextStyle(fontSize: 40.0),
                 ),
               ),

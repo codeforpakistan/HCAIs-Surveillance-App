@@ -504,6 +504,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   ? each['name'].toString()
                   : each['title'].toString()))
           .toList();
+      var initialValue = (isEditedView
+              ? options.where((i) => i!['selected'] == true).toList()
+              : this._values[key]) ??
+          [];
       Column childs = WidgetHelper.buildColumn(label.toString(), isRequired);
       childs.children.add(MultiSelectDialogField(
           buttonIcon: Icon(Icons.arrow_drop_down),
@@ -528,9 +532,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           dialogWidth: MediaQuery.of(context).size.width * 0.9,
           searchable: true,
           items: _options,
-          initialValue: isEditedView
-              ? options.where((i) => i!['selected'] == true).toList()
-              : this._values[key]));
+          initialValue: initialValue));
       return childs;
     } catch (err) {
       print(err);
