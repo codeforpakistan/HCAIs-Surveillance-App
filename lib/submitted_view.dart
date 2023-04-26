@@ -32,30 +32,30 @@ class _SubmittedState extends State<Submitted> {
     try {
       final today = DateTime.now();
       int diff = -9999;
-      data.forEach((each) => {
-            each['difference'] = '0',
-            each['color'] = '',
-            each['reviewed'] = each['reviewed'] != true ? false : true,
-            if (each['recommendedSurveillancePeriod'] != null)
-              {
-                if (each['dateOfProcedure'] != null &&
-                    each['dateOfProcedure'] != "")
-                  {
-                    diff = Helper.daysBetweenDate(
-                        each['dateOfProcedure'], today, 'days'),
-                    diff = (int.parse(each['recommendedSurveillancePeriod']) -
-                        diff),
-                    if (diff == 0 || each['reviewed'] == true)
-                      {each['color'] = 'green', diff = 0}
-                    else if (diff < 0)
-                      {each['color'] = 'red'},
-                  },
-                each['difference'] = (diff == -9999) ? '0' : diff.toString()
-              }
-          });
+      // data.forEach((each) => {
+      //       each['difference'] = '0',
+      //       each['color'] = '',
+      //       each['reviewed'] = each['reviewed'] != true ? false : true,
+      //       if (each['recommendedSurveillancePeriod'] != null)
+      //         {
+      //           if (each['dateOfProcedure'] != null &&
+      //               each['dateOfProcedure'] != "")
+      //             {
+      //               diff = Helper.daysBetweenDate(
+      //                   each['dateOfProcedure'], today, 'days'),
+      //               diff = (int.parse(each['recommendedSurveillancePeriod']) -
+      //                   diff),
+      //               if (diff == 0 || each['reviewed'] == true)
+      //                 {each['color'] = 'green', diff = 0}
+      //               else if (diff < 0)
+      //                 {each['color'] = 'red'},
+      //             },
+      //           each['difference'] = (diff == -9999) ? '0' : diff.toString()
+      //         }
+      //     });
 
-      data.sort((a, b) =>
-          int.parse(a['difference']).compareTo(int.parse(b['difference'])));
+      // data.sort((a, b) =>
+      //     int.parse(a['difference']).compareTo(int.parse(b['difference'])));
     } catch (err) {
       print('error in getSubmissions');
       print(err);
