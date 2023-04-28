@@ -576,29 +576,28 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       Column childs =
           WidgetHelper.buildColumn(labelText.toString(), isRequired);
       childs.children.add(DropdownSearch<String>(
-        mode: Mode.DIALOG,
-        showSearchBox: true,
         items: items,
-        showSelectedItems: true,
-        showAsSuffixIcons: true,
-        dropdownSearchDecoration: InputDecoration(
-            filled: true,
-            fillColor: Color.fromRGBO(242, 242, 242, 1),
-            contentPadding: EdgeInsets.fromLTRB(10.0, 1.7, 2.0, 1.7),
-            // labelText: labelText,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              // width: 0.0 produces a thin "hairline" border
-              borderSide: const BorderSide(color: Colors.grey, width: 0.0),
-            ),
-            suffixIcon: hasHelpLabel
-                ? IconButton(
-                    icon: Icon(Icons.info_outline),
-                    onPressed: () {
-                      _showDialog(context, "Information", helpLabelText, false);
-                    },
-                  )
-                : null),
+        dropdownDecoratorProps: DropDownDecoratorProps(
+          dropdownSearchDecoration: InputDecoration(
+              filled: true,
+              fillColor: Color.fromRGBO(242, 242, 242, 1),
+              contentPadding: EdgeInsets.fromLTRB(10.0, 1.7, 2.0, 1.7),
+              // labelText: labelText,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                // width: 0.0 produces a thin "hairline" border
+                borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+              ),
+              suffixIcon: hasHelpLabel
+                  ? IconButton(
+                      icon: Icon(Icons.info_outline),
+                      onPressed: () {
+                        _showDialog(
+                            context, "Information", helpLabelText, false);
+                      },
+                    )
+                  : null),
+        ),
         selectedItem: item,
         onChanged: (v) {
           if (v != '') {
@@ -948,13 +947,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       if (response.statusCode >= 200 && response.statusCode <= 299) {
         AwesomeDialog(
             context: context,
-            animType: AnimType.LEFTSLIDE,
+            animType: AnimType.leftSlide,
             headerAnimationLoop: false,
-            dialogType: DialogType.SUCCES,
+            dialogType: DialogType.success,
             showCloseIcon: false,
             title: 'Success',
             desc: 'Submitted!',
-            onDissmissCallback: (type) {
+            onDismissCallback: (type) {
               debugPrint('Dialog Dissmiss from callback $type');
             })
           ..show()
