@@ -43,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       SizedBox(height: 4),
       TextFormField(
           controller: emailController,
+          autofillHints: [AutofillHints.email],
           decoration: InputDecoration(
               filled: true,
               fillColor: Color.fromRGBO(242, 242, 242, 1),
@@ -61,6 +62,7 @@ class _LoginPageState extends State<LoginPage> {
           obscureText: true,
           autocorrect: false,
           controller: passwordController,
+          autofillHints: [AutofillHints.password],
           decoration: InputDecoration(
               filled: true,
               fillColor: Color.fromRGBO(242, 242, 242, 1),
@@ -72,10 +74,6 @@ class _LoginPageState extends State<LoginPage> {
                 borderSide: const BorderSide(color: Colors.grey, width: 0.0),
               )))
     ]);
-
-    // to be removed
-    // emailController.text = 'doctor@example.com';
-    // passwordController.text = 'testpass';
 
     final loginButton = ElevatedButton(
       style: raisedButtonStyle,
@@ -110,7 +108,8 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body: Center(
+      body: AutofillGroup(
+          child: Center(
         child: ListView(
           shrinkWrap: true,
           padding:
@@ -126,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
             forgotLabel,
           ],
         ),
-      ),
+      )),
       extendBody: true,
       bottomNavigationBar: Container(
           alignment: Alignment.bottomCenter,
