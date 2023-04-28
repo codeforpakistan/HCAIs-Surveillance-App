@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = new TextEditingController();
   final emailController = new TextEditingController();
   final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
-    primary: Color.fromRGBO(140, 198, 62, 1),
+    backgroundColor: Color.fromRGBO(140, 198, 62, 1),
     // padding: EdgeInsets.all(10),
     minimumSize: Size(20, 40),
     shape: const RoundedRectangleBorder(

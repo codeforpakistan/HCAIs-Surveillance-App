@@ -41,78 +41,82 @@ class HomePage extends StatelessWidget {
         body: Container(
           width: MediaQuery.of(context).size.width,
           padding: EdgeInsets.all(28.0),
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: <
-              Widget>[
-            // hospitalIcon,
-            FutureBuilder(
-                future: getHcais(),
-                builder: (context, AsyncSnapshot<List> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.done:
-                      if (snapshot.hasError) {
-                        return Center(
-                            child: Text(
-                          snapshot.error.toString(),
-                          style: TextStyle(color: Colors.white),
-                        ));
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                // hospitalIcon,
+                FutureBuilder(
+                    future: getHcais(),
+                    builder: (context, AsyncSnapshot<List> snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.done:
+                          if (snapshot.hasError) {
+                            return Center(
+                                child: Text(
+                              snapshot.error.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ));
+                          }
+                          if (snapshot.hasData) {
+                            if (snapshot
+                                    .data![0]!['user']!['hospitals']?.length >
+                                1) {
+                              return _buildDropDown(
+                                  hasHelpLabel: true,
+                                  helpLabelText: 'Select Hospital',
+                                  index: 0,
+                                  isRequired: true,
+                                  labelText: 'Select Hospital',
+                                  options:
+                                      snapshot.data![0]!['user']!['hospitals'],
+                                  key: 'hospital',
+                                  data: snapshot.data,
+                                  context: context);
+                            }
+                          }
+                          return new ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data?.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 12.0),
+                                    child: ElevatedButton(
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                          child: Text(
+                                              snapshot.data?[index]['title']
+                                                  ?.toUpperCase(),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 17.0,
+                                                height: 1.5,
+                                              )),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              Color.fromRGBO(144, 79, 159, 1),
+                                          minimumSize: Size(100, 40),
+                                          side: BorderSide(
+                                            width: 1.0,
+                                            color: new Color(0x5279B4),
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          return route(
+                                              context,
+                                              snapshot.data,
+                                              index,
+                                              snapshot.data![0]!['user']
+                                                  ['hospitals'][0]['_id']);
+                                        }));
+                              });
+                        default:
+                          return Center(child: CircularProgressIndicator());
                       }
-                      if (snapshot.hasData) {
-                        if (snapshot.data![0]!['user']!['hospitals']?.length >
-                            1) {
-                          return _buildDropDown(
-                              hasHelpLabel: true,
-                              helpLabelText: 'Select Hospital',
-                              index: 0,
-                              isRequired: true,
-                              labelText: 'Select Hospital',
-                              options: snapshot.data![0]!['user']!['hospitals'],
-                              key: 'hospital',
-                              data: snapshot.data,
-                              context: context);
-                        }
-                      }
-                      return new ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data?.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 12.0),
-                                child: ElevatedButton(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(5, 10, 5, 10),
-                                      child: Text(
-                                          snapshot.data?[index]['title']
-                                              ?.toUpperCase(),
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 17.0,
-                                            height: 1.5,
-                                          )),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Color.fromRGBO(144, 79, 159, 1),
-                                      minimumSize: Size(100, 40),
-                                      side: BorderSide(
-                                        width: 1.0,
-                                        color: new Color(0x5279B4),
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      return route(
-                                          context,
-                                          snapshot.data,
-                                          index,
-                                          snapshot.data![0]!['user']
-                                              ['hospitals'][0]['_id']);
-                                    }));
-                          });
-                    default:
-                      return Center(child: CircularProgressIndicator());
-                  }
-                }),
-          ]),
+                    }),
+              ]),
         ));
   }
 

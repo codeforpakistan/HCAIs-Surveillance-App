@@ -101,9 +101,9 @@ class Helper {
   static showMsg(context, msg, isError) {
     AwesomeDialog(
       context: context,
-      animType: AnimType.LEFTSLIDE,
+      animType: AnimType.leftSlide,
       headerAnimationLoop: false,
-      dialogType: isError ? DialogType.ERROR : DialogType.SUCCES,
+      dialogType: isError ? DialogType.error : DialogType.success,
       showCloseIcon: false,
       title: isError ? 'ERROR' : 'Success',
       desc: msg,
