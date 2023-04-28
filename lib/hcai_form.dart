@@ -372,7 +372,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String selectedDateKey,
       required bool hasHelpLabel,
       required String helpLabelText,
-      type: String,
+      String? type,
       required DateTime selectedDate,
       required bool isRequired}) {
     if (this._values[selectedDateKey] == null) {
@@ -781,7 +781,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       visualDensity: VisualDensity(
           horizontal: VisualDensity.minimumDensity,
           vertical: VisualDensity.minimumDensity),
-      title: Text(title, style: Theme.of(context).textTheme.subtitle1!),
+      title: Text(title, style: Theme.of(context).textTheme.titleMedium!),
       leading: Checkbox(
         value: title == selected ? true : false,
         // groupValue: value,
