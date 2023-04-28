@@ -49,20 +49,25 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   List<TextEditingController> _controller = [];
   late Future<List>? _listFuture;
   bool showFullValue = false;
+  bool isSubmitted = false;
 
   @override
   void initState() {
     this._values = {};
     Future.delayed(Duration.zero, () {
-      setState(() {
-        args = ModalRoute.of(context)!.settings.arguments as Arguments;
-      });
-      this._values = args.values;
-      this._values['hospitalId'] = args.hospitalId;
-      this._values['userId'] = args.userId;
-      this._values['reviewed'] = args.reviewed;
-      this._values['isEditedView'] = args.isEditedView;
-      _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
+      if (ModalRoute.of(context)!.settings.arguments != null) {
+        setState(() {
+          args = ModalRoute.of(context)!.settings.arguments as Arguments;
+        });
+        this._values = args.values;
+        this._values['hospitalId'] = args.hospitalId;
+        this._values['userId'] = args.userId;
+        this._values['reviewed'] = args.reviewed;
+        this._values['isEditedView'] = args.isEditedView;
+        _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
+      } else {
+        Navigator.of(context).pushNamed(HomePage.tag);
+      }
     });
     super.initState();
   }
@@ -577,6 +582,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           WidgetHelper.buildColumn(labelText.toString(), isRequired);
       childs.children.add(DropdownSearch<String>(
         items: items,
+        enabled: true,
         dropdownDecoratorProps: DropDownDecoratorProps(
           dropdownSearchDecoration: InputDecoration(
               filled: true,
@@ -598,6 +604,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     )
                   : null),
         ),
+        popupProps: PopupProps.menu(
+            showSearchBox: true, isFilterOnline: true, showSelectedItems: true),
         selectedItem: item,
         onChanged: (v) {
           if (v != '') {
@@ -927,13 +935,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   sendData(context, Map values) async {
     try {
+      if (isSubmitted) {
+        print('stopping duplicate submission');
+        return;
+      }
+      setState(() {
+        isSubmitted = true;
+      });
       values['isVerified'] = false;
       if (!Helper.isValidData(this._values)) {
         Helper.showMsg(
             context, 'Please select Department, ICD-10 Code and Ward', true);
         return null;
       }
-      print(jsonEncode(values));
+      // print(jsonEncode(values));
       if (values['reviewed'] == true) {
         values['reviewed'] = values['isSSI'] != null;
       }
@@ -955,6 +970,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             desc: 'Submitted!',
             onDismissCallback: (type) {
               debugPrint('Dialog Dissmiss from callback $type');
+              Navigator.of(context).pushNamed(HomePage.tag);
             })
           ..show()
               .then((value) => Navigator.of(context).pushNamed(HomePage.tag));
