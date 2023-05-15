@@ -8,8 +8,16 @@ import 'package:hcais/utils/my_shared_prefs.dart';
 import 'package:http/http.dart' as http;
 import 'args/Arguments.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  HomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
   static String tag = 'home-page';
+  @override
+  _HomePagePageState createState() => _HomePagePageState();
+}
+
+class _HomePagePageState extends State<HomePage> {
+  String selectedHospital = '';
   Future<List> getHcais() async {
     var data = [];
     var url = Constants.BASE_URL + "/get-hcai-titles";
@@ -24,6 +32,9 @@ class HomePage extends StatelessWidget {
     final Map user =
         json.decode(await MySharedPreferences.instance.getStringValue('user'));
     data[0]['user'] = user;
+    if (user['hospitals']?.length == 1) {
+      setState(() => {selectedHospital: user['hospitals'][0]['_id']});
+    }
     return data.toList();
   }
 
@@ -58,9 +69,7 @@ class HomePage extends StatelessWidget {
                             ));
                           }
                           if (snapshot.hasData) {
-                            if (snapshot
-                                    .data![0]!['user']!['hospitals']?.length >
-                                1) {
+                            if (this.selectedHospital == '') {
                               return _buildDropDown(
                                   hasHelpLabel: true,
                                   helpLabelText: 'Select Hospital',
@@ -161,9 +170,11 @@ class HomePage extends StatelessWidget {
           ),
         ), // hint: Text('Select ' + labelText),
         onChanged: (String? newValue) => {
+          setState(() {
+            this.selectedHospital = newValue.toString();
+          }),
           MySharedPreferences.instance
-              .setStringValue('hospitalId', newValue!.toString()),
-          this.route(context, data, index, newValue.toString())
+              .setStringValue('hospitalId', newValue!.toString())
         },
         items: options.map((option) {
           return DropdownMenuItem(
