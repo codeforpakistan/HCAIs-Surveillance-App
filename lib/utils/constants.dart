@@ -1,5 +1,5 @@
 class Constants {
-  static const dev = true;
+  static const dev = false;
   static const local = true;
   static const Local_URL = 'http://localhost:3000';
   static const Server_URL =
