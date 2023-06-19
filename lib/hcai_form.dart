@@ -794,6 +794,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       List<dynamic> hiddenFields) {
     try {
       switch (key) {
+        case 'isSSI':
+          {
+            if (this._values['isSSI'] == 'No') {
+              this.updateFlagForAll(this.allSteps, true, 'died');
+            } else if (this._values['isSSI'] == 'Yes') {
+              this.updateFlagForAll(this.allSteps, false, 'died');
+            }
+            break;
+          }
         case 'ICD10Id':
           {
             if (options.length > 0) {
@@ -805,7 +814,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   .firstWhere((each) => each['_id'] == value)['ICDCode']
                   .toString();
             }
-
             break;
           }
         case 'dateOfProcedure':
@@ -897,6 +905,25 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
+  updateFlagForAll(List<dynamic> fields, flag, key) {
+    bool found = false;
+    for (var step in this.allSteps) {
+      if (step["fields"] is List) {
+        for (var eachField in step["fields"]) {
+          if (!found) {
+            found = eachField['key'] == key;
+          }
+          if (found) {
+            if (flag == true) {
+              this._values.remove(eachField['key']);
+            }
+            eachField['isHidden'] = flag;
+          }
+        }
+      }
+    }
+  }
+
   filterData(key, value) {
     List<dynamic> steps = json.decode(json.encode(originalSteps));
     if (key == 'departmentId') {
@@ -938,15 +965,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         print('stopping duplicate submission');
         return;
       }
-      setState(() {
-        isSubmitted = true;
-      });
       values['isVerified'] = false;
       if (!Helper.isValidData(this._values)) {
         Helper.showMsg(
             context, 'Please select Department, ICD-10 Code and Ward', true);
         return null;
       }
+      setState(() {
+        isSubmitted = true;
+      });
       // print(jsonEncode(values));
       if (values['reviewed'] == true) {
         values['reviewed'] = values['isSSI'] != null;

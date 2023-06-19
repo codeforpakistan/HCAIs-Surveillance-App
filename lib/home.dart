@@ -26,6 +26,7 @@ class _HomePagePageState extends State<HomePage> {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'api-key': Constants.API_KEY
       },
     );
     data = json.decode(utf8.decode(response.bodyBytes));
