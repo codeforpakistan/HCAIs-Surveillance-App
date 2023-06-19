@@ -876,6 +876,22 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             break;
           }
+        case 'sSICriteria':
+          {
+            for (var each in this._values[key]) {
+              print(each);
+              if (each['name'] == 'Signs & Symptoms') {
+                this.unHide(['signsAndSymptoms'], false);
+              }
+              if (each['name'] == 'Laboratory') {
+                this.unHide(['laboratory'], false);
+              }
+              if (each['name'] == 'Clinical Diagnosis') {
+                this.unHide(['clinicalDiagnosis'], false);
+              }
+            }
+            break;
+          }
         default:
           break;
       }
