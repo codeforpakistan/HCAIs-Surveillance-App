@@ -55,7 +55,7 @@ class _SubmittedState extends State<Submitted> {
           });
 
       data.sort((a, b) =>
-          int.parse(a['difference']).compareTo(int.parse(b['difference'])));
+          int.parse(a['createdAt']).compareTo(int.parse(b['createdAt'])));
     } catch (err) {
       print('error in getSubmissions');
       print(err);

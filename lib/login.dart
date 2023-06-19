@@ -211,6 +211,7 @@ class _LoginPageState extends State<LoginPage> {
       Uri.parse(Constants.BASE_URL + "/login/"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'api-key': Constants.API_KEY,
       },
       body: jsonEncode({'email': email, 'password': password}),
     );
