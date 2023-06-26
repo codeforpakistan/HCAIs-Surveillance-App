@@ -128,233 +128,240 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   Widget _formWizard(formData, context) {
-    Map<String, dynamic> hcaiForm = formData?.first;
-    this.originalSteps = hcaiForm["steps"].toList();
-    this.allSteps = hcaiForm["steps"].toList();
-    // ignore: unused_local_variable
-    DateTime? selectedDate = DateTime.now();
     final List<CoolStep> steps = [];
-    List<Widget> data = [];
-    var objToConstruct;
-    int currentIndex = 0;
-    this.allSteps.forEach((each) => {
-          each['fields'].forEach((eachField) => {
-                eachField['index'] = currentIndex,
-                currentIndex = currentIndex + 1,
-              }),
-        });
-    _controller = List.generate(currentIndex, (i) => TextEditingController());
-    this.allSteps.asMap().forEach((stepIndex, step) => {
-          data = [],
-          if (stepIndex == 0)
-            {
-              data.add(Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                child: Text(
-                  hcaiForm['description'].toString(),
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
-                ),
-              )),
-            },
-          if (step['fields'] is List)
-            {
-              step['fields'].asMap().forEach((fieldIndex, field) => {
-                    if (field['isHidden'] != true ||
-                        this._values[field['key']] != null)
-                      {
-                        if (field['type'] == 'text')
-                          {
-                            if (field['index'] == 0)
-                              {
-                                _controller[field['index']].text =
-                                    field['description'].toString()
-                              },
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildTextField(
-                                  key: field['key'].toString(),
-                                  isRequired: field!['isRequired'] == true,
-                                  labelText: field['label'].toString(),
-                                  validator: (value) {
-                                    if (field['isRequired'] == true) {
-                                      if (value?.isEmpty ?? true) {
-                                        return field['label'].toString() +
-                                            " is required";
+    try {
+      Map<String, dynamic> hcaiForm = formData?.first;
+      this.originalSteps = hcaiForm["steps"].toList();
+      this.allSteps = hcaiForm["steps"].toList();
+      // ignore: unused_local_variable
+      DateTime? selectedDate = DateTime.now();
+      List<Widget> data = [];
+      var objToConstruct;
+      int currentIndex = 0;
+      this.allSteps.forEach((each) => {
+            each['fields'].forEach((eachField) => {
+                  eachField['index'] = currentIndex,
+                  currentIndex = currentIndex + 1,
+                }),
+          });
+      _controller = List.generate(currentIndex, (i) => TextEditingController());
+      this.allSteps.asMap().forEach((stepIndex, step) => {
+            data = [],
+            if (stepIndex == 0)
+              {
+                data.add(Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                  child: Text(
+                    hcaiForm['description'].toString(),
+                    textAlign: TextAlign.justify,
+                    style:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+                  ),
+                )),
+              },
+            if (step['fields'] is List)
+              {
+                step['fields'].asMap().forEach((fieldIndex, field) => {
+                      if (field['isHidden'] != true ||
+                          this._values[field['key']] != null)
+                        {
+                          if (field['type'] == 'text')
+                            {
+                              if (field['index'] == 0)
+                                {
+                                  _controller[field['index']].text =
+                                      field['description'].toString()
+                                },
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildTextField(
+                                    key: field['key'].toString(),
+                                    isRequired: field!['isRequired'] == true,
+                                    labelText: field['label'].toString(),
+                                    validator: (value) {
+                                      if (field['isRequired'] == true) {
+                                        if (value?.isEmpty ?? true) {
+                                          return field['label'].toString() +
+                                              " is required";
+                                        }
                                       }
-                                    }
-                                    return null;
-                                  },
-                                  myController: _controller[field['index']],
-                                  hasHelpLabel: field['hasHelpLabel'],
-                                  helpLabelText:
-                                      field['helpLabelText'] ?? 'N/A',
-                                  index: field['index'],
-                                  readOnly: true,
-                                  maskType: ''),
-                            )),
-                          }
-                        else if (field['type'] == 'textfield')
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildTextField(
-                                  key: field['key'].toString(),
-                                  labelText: field['label'].toString(),
-                                  isRequired: field!['isRequired'] == true,
-                                  validator: (value) {
-                                    if (field['isRequired'] == true) {
-                                      if (value?.isEmpty ?? true) {
-                                        return field['label'].toString() +
-                                            " is required";
+                                      return null;
+                                    },
+                                    myController: _controller[field['index']],
+                                    hasHelpLabel: field['hasHelpLabel'],
+                                    helpLabelText:
+                                        field['helpLabelText'] ?? 'N/A',
+                                    index: field['index'],
+                                    readOnly: true,
+                                    maskType: ''),
+                              )),
+                            }
+                          else if (field['type'] == 'textfield')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildTextField(
+                                    key: field['key'].toString(),
+                                    labelText: field['label'].toString(),
+                                    isRequired: field!['isRequired'] == true,
+                                    validator: (value) {
+                                      if (field['isRequired'] == true) {
+                                        if (value?.isEmpty ?? true) {
+                                          return field['label'].toString() +
+                                              " is required";
+                                        }
                                       }
-                                    }
-                                    return null;
-                                  },
-                                  myController: new TextEditingController(),
-                                  hasHelpLabel: field['hasHelpLabel'],
-                                  helpLabelText: field['helpLabelText'] ??
-                                      'Please enter text',
-                                  index: field['index'],
-                                  maskType: field['maskType'] ?? ''),
-                            )),
-                          }
-                        else if (field['type'] == 'dropdown' &&
-                            field['multiple'] == true)
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildMultipleSelect(
+                                      return null;
+                                    },
+                                    myController: new TextEditingController(),
+                                    hasHelpLabel: field['hasHelpLabel'],
+                                    helpLabelText: field['helpLabelText'] ??
+                                        'Please enter text',
+                                    index: field['index'],
+                                    maskType: field['maskType'] ?? ''),
+                              )),
+                            }
+                          else if (field['type'] == 'dropdown' &&
+                              field['multiple'] == true)
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildMultipleSelect(
+                                    isRequired: field!['isRequired'] == true,
+                                    key: field['key'].toString(),
+                                    options: field['options'],
+                                    label: field['label'] ?? 'Please Select',
+                                    index: field['index'],
+                                    isEditedView:
+                                        this._values['isEditedView'] == true,
+                                    conditions: field!['conditions'] ?? []),
+                              )),
+                            }
+                          else if (field['type'] == 'searchable')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildSearchble(
                                   isRequired: field!['isRequired'] == true,
                                   key: field['key'].toString(),
                                   options: field['options'],
-                                  label: field['label'] ?? 'Please Select',
-                                  index: field['index'],
-                                  isEditedView:
-                                      this._values['isEditedView'] == true),
-                            )),
-                          }
-                        else if (field['type'] == 'searchable')
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildSearchble(
-                                isRequired: field!['isRequired'] == true,
-                                key: field['key'].toString(),
-                                options: field['options'],
-                                hasHelpLabel: false,
-                                helpLabelText: '',
-                                labelText: field['label'].toString(),
-                                value: '',
-                              ),
-                            )),
-                          }
-                        else if (field['type'] == 'dropdown' &&
-                            field['options'] is List &&
-                            field['options'].length > 0)
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildDropDown(
-                                  isRequired: field!['isRequired'] == true,
-                                  key: field['key'].toString(),
+                                  hasHelpLabel: false,
+                                  helpLabelText: '',
                                   labelText: field['label'].toString(),
-                                  options: field['options'],
-                                  value: field['options'][0]['_id'] != null
-                                      ? field['options'][0]['_id']
-                                      : field['options'][0]['name'] != null
-                                          ? field['options'][0]['name']
-                                          : field['options'][0]['title'],
-                                  hasHelpLabel: field['hasHelpLabel'],
-                                  helpLabelText: field['helpLabelText'] ??
-                                      'Please select an option',
-                                  index: field['index']),
-                            )),
-                          }
-                        else if (field['type'] == 'radiofield')
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildRadioButton(
-                                  context: context,
-                                  title: field['label'].toString(),
-                                  key: field['key'].toString(),
-                                  options: field['options'],
-                                  truncate: field['truncate'] ?? false,
-                                  hiddenFeilds: field['hiddenFeilds'] != null
-                                      ? field['hiddenFeilds']
-                                      : []),
-                            )),
-                          }
-                        else if (field['type'] == 'checkboxfield')
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildCheckbox(
-                                  context: context,
-                                  title: field['label'].toString(),
-                                  options: field['options']),
-                            )),
-                          }
-                        else if (field['type'] == 'datefield')
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildDateField(
-                                  isRequired: field!['isRequired'] == true,
-                                  hint: field['label'].toString(),
-                                  selectedDateKey: field['key'],
-                                  hasHelpLabel: field['hasHelpLabel'],
-                                  helpLabelText: field['helpLabelText'] ??
-                                      'Please select a date',
-                                  type: 'date',
-                                  selectedDate: DateTime.now()),
-                            ))
-                          }
-                        else if (field['type'] == 'timefield')
-                          {
-                            data.add(Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: _buildDateField(
-                                  isRequired: field!['isRequired'] == true,
-                                  hint: field['label'].toString(),
-                                  selectedDateKey: field['key'],
-                                  hasHelpLabel: field['hasHelpLabel'],
-                                  helpLabelText: field['helpLabelText'] ??
-                                      'Please select a date',
-                                  type: 'time',
-                                  selectedDate: DateTime.now()),
-                            ))
-                          }
-                        else if (field['type'] == 'divider')
-                          {
-                            data.add(Padding(
-                                padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
-                                child: Divider(
-                                  color: Colors.black,
-                                )))
-                          }
-                      }
-                  }),
-              if (stepIndex == 0)
-                {
-                  objToConstruct =
-                      Form(key: _formKey, child: Column(children: data))
-                }
-              else
-                {objToConstruct = Form(child: Column(children: data))},
-              if (data.length > 0)
-                {
-                  steps.add(CoolStep(
-                      title: step['stepTitle'].toString(),
-                      subtitle: '',
-                      content: objToConstruct,
-                      validation: () {
-                        return null;
-                      })),
-                }
-            }
-        });
+                                  value: '',
+                                ),
+                              )),
+                            }
+                          else if (field['type'] == 'dropdown' &&
+                              field['options'] is List &&
+                              field['options'].length > 0)
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildDropDown(
+                                    isRequired: field!['isRequired'] == true,
+                                    key: field['key'].toString(),
+                                    labelText: field['label'].toString(),
+                                    options: field['options'],
+                                    value: field['options'][0]['_id'] != null
+                                        ? field['options'][0]['_id']
+                                        : field['options'][0]['name'] != null
+                                            ? field['options'][0]['name']
+                                            : field['options'][0]['title'],
+                                    hasHelpLabel: field['hasHelpLabel'],
+                                    helpLabelText: field['helpLabelText'] ??
+                                        'Please select an option',
+                                    index: field['index']),
+                              )),
+                            }
+                          else if (field['type'] == 'radiofield')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildRadioButton(
+                                    context: context,
+                                    title: field['label'].toString(),
+                                    key: field['key'].toString(),
+                                    options: field['options'],
+                                    truncate: field['truncate'] ?? false,
+                                    hiddenFeilds: field['hiddenFeilds'] != null
+                                        ? field['hiddenFeilds']
+                                        : [],
+                                    conditions: field!['conditions'] ?? []),
+                              )),
+                            }
+                          else if (field['type'] == 'checkboxfield')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildCheckbox(
+                                    context: context,
+                                    title: field['label'].toString(),
+                                    options: field['options']),
+                              )),
+                            }
+                          else if (field['type'] == 'datefield')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildDateField(
+                                    isRequired: field!['isRequired'] == true,
+                                    hint: field['label'].toString(),
+                                    selectedDateKey: field['key'],
+                                    hasHelpLabel: field['hasHelpLabel'],
+                                    helpLabelText: field['helpLabelText'] ??
+                                        'Please select a date',
+                                    type: 'date',
+                                    selectedDate: DateTime.now()),
+                              ))
+                            }
+                          else if (field['type'] == 'timefield')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: _buildDateField(
+                                    isRequired: field!['isRequired'] == true,
+                                    hint: field['label'].toString(),
+                                    selectedDateKey: field['key'],
+                                    hasHelpLabel: field['hasHelpLabel'],
+                                    helpLabelText: field['helpLabelText'] ??
+                                        'Please select a date',
+                                    type: 'time',
+                                    selectedDate: DateTime.now()),
+                              ))
+                            }
+                          else if (field['type'] == 'divider')
+                            {
+                              data.add(Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+                                  child: Divider(
+                                    color: Colors.black,
+                                  )))
+                            }
+                        }
+                    }),
+                if (stepIndex == 0)
+                  {
+                    objToConstruct =
+                        Form(key: _formKey, child: Column(children: data))
+                  }
+                else
+                  {objToConstruct = Form(child: Column(children: data))},
+                if (data.length > 0)
+                  {
+                    steps.add(CoolStep(
+                        title: step['stepTitle'].toString(),
+                        subtitle: '',
+                        content: objToConstruct,
+                        validation: () {
+                          return null;
+                        })),
+                  }
+              }
+          });
+    } on Exception catch (e, s) {
+      print(s);
+    }
     return CoolStepper(
       showErrorSnackbar: false,
       onCompleted: () {
@@ -468,7 +475,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String label,
       required int index,
       required bool isRequired,
-      required bool isEditedView}) {
+      required bool isEditedView,
+      List<dynamic> conditions = const []}) {
     try {
       if (options.length <= 0) {
         return Container();
@@ -518,8 +526,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           onConfirm: (val) {
             if (this.mounted) {
               this._values[key] = val;
-              setState(() => {this._values[key] = val});
-              _setCompleteField(key, val.toString(), options, []);
+              setState(() => this._values[key] = val);
+              _setCompleteField(key, val.toString(), options, [], conditions);
             }
           },
           decoration: BoxDecoration(
@@ -611,7 +619,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             var newValue = options
                 .firstWhere((each) => each['name'] == v || each['title'] == v);
             if (this.mounted && newValue['_id'] != null) {
-              setState(() => {this._values[key] = newValue['_id']});
+              setState(() => this._values[key] = newValue['_id']);
               _setCompleteField(key, newValue['_id'], options, []);
             }
           }
@@ -666,7 +674,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         onChanged: (String? newValue) => {
           if (this.mounted)
             {
-              setState(() => {this._values[key] = newValue}),
+              setState(() => this._values[key] = newValue),
               _setCompleteField(key, newValue, options, []),
             }
         },
@@ -690,14 +698,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
-  Widget _buildRadioButton({
-    required BuildContext context,
-    required String title,
-    required String key,
-    required List<dynamic> options,
-    required bool truncate,
-    required List<dynamic> hiddenFeilds,
-  }) {
+  Widget _buildRadioButton(
+      {required BuildContext context,
+      required String title,
+      required String key,
+      required List<dynamic> options,
+      required bool truncate,
+      required List<dynamic> hiddenFeilds,
+      List<dynamic> conditions = const []}) {
     List<Widget> list = [];
     int _groupValue = -1;
     list.add(Text(title,
@@ -717,7 +725,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               groupValue: _groupValue,
               selected: options[0]['name'],
               truncate: truncate,
-              hiddenFeilds: hiddenFeilds))
+              hiddenFeilds: hiddenFeilds,
+              conditions: conditions))
         });
     return Container(
         child: Column(
@@ -726,15 +735,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     ));
   }
 
-  Widget _buildTile({
-    required String title,
-    required String key,
-    required int value,
-    required int groupValue,
-    String? selected,
-    required bool truncate,
-    required List<dynamic> hiddenFeilds,
-  }) {
+  Widget _buildTile(
+      {required String title,
+      required String key,
+      required int value,
+      required int groupValue,
+      String? selected,
+      required bool truncate,
+      required List<dynamic> hiddenFeilds,
+      List<dynamic> conditions = const []}) {
     return RadioListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
       value: value,
@@ -747,7 +756,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             _selectedRole[key] = value;
             _values[key] = title;
           });
-          _setCompleteField(key, title, [], hiddenFeilds);
+          _setCompleteField(key, title, [], hiddenFeilds, conditions);
         }
       },
     );
@@ -791,8 +800,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   void _setCompleteField(String? key, String? value, List<dynamic> options,
-      List<dynamic> hiddenFields) {
+      List<dynamic> hiddenFields,
+      [List<dynamic> conditions = const []]) {
     try {
+      var matches = [];
       switch (key) {
         case 'isSSI':
           {
@@ -879,7 +890,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         case 'sSICriteria':
           {
             for (var each in this._values[key]) {
-              print(each);
               if (each['name'] == 'Signs & Symptoms') {
                 this.unHide(['signsAndSymptoms'], false);
               }
@@ -893,6 +903,23 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             break;
           }
         default:
+          if (conditions.length > 0) {
+            conditions.forEach(
+              (each) => matches.add({
+                'key': each!['key'],
+                'unHide': each!['unHide'],
+                'shouldHide': this._values[each!['key']] is String
+                    ? this._values[each!['key']] == each[each!['key']]
+                    : this._values[each!['key']]!.indexWhere((eachIndex) =>
+                            eachIndex!['name'] == each[each!['key']]) >
+                        -1
+              }),
+            );
+          }
+          if (matches.length > 0) {
+            matches.forEach(
+                (each) => this.unHide(each!['unHide'], !each!['shouldHide']));
+          }
           break;
       }
     } catch (e) {
@@ -901,20 +928,22 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   }
 
   unHide(List<dynamic> fields, flag) {
-    for (var step in this.allSteps) {
-      if (step["fields"] is List) {
-        for (var eachField in step["fields"]) {
-          var found = fields.firstWhere(
-            (eachHiddenField) =>
-                eachField['key'] != null &&
-                eachHiddenField == eachField['key'].toString(),
-            orElse: () => null,
-          );
-          if (found != null) {
-            if (flag == true) {
-              this._values.remove(eachField['key']);
+    if (fields.length > 0) {
+      for (var step in this.allSteps) {
+        if (step["fields"] is List) {
+          for (var eachField in step["fields"]) {
+            var found = fields.firstWhere(
+              (eachHiddenField) =>
+                  eachField['key'] != null &&
+                  eachHiddenField == eachField['key'].toString(),
+              orElse: () => null,
+            );
+            if (found != null) {
+              if (flag == true) {
+                this._values.remove(eachField['key']);
+              }
+              eachField['isHidden'] = flag;
             }
-            eachField['isHidden'] = flag;
           }
         }
       }

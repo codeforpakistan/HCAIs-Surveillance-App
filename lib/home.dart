@@ -115,11 +115,7 @@ class _HomePagePageState extends State<HomePage> {
                                         ),
                                         onPressed: () async {
                                           return route(
-                                              context,
-                                              snapshot.data,
-                                              index,
-                                              snapshot.data![0]!['user']
-                                                  ['hospitals'][0]['_id']);
+                                              context, snapshot.data, index);
                                         }));
                               });
                         default:
@@ -130,12 +126,12 @@ class _HomePagePageState extends State<HomePage> {
         ));
   }
 
-  route(context, data, index, hospitalId) {
+  route(context, data, index) {
     return Navigator.of(context).pushNamed(
       HcaiFormPage.tag,
       arguments: new Arguments(
           hcaiId: data?[index]['_id'],
-          hospitalId: hospitalId ?? '',
+          hospitalId: this.selectedHospital,
           hcaiTitle: data?[index]['title'],
           userId: data![0]!['user']['_id'] ?? '',
           goodToGo: true,
