@@ -214,7 +214,9 @@ class _SubmittedState extends State<Submitted> {
                                                               values: snapshot
                                                                   .data?[index],
                                                               reviewed: true,
-                                                              isEditedView: true),
+                                                              isEditedView: true, 
+                                                              submissionEndPoint: snapshot
+                                                                  .data?[index].submissionEndPoint),
                                                         );
                                                       },
                                                       // trailing: Icon(Icons.add_a_photo),

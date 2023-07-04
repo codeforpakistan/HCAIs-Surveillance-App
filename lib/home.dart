@@ -19,24 +19,31 @@ class HomePage extends StatefulWidget {
 class _HomePagePageState extends State<HomePage> {
   String selectedHospital = '';
   Future<List> getHcais() async {
-    var data = [];
-    var url = Constants.BASE_URL + "/get-hcai-titles";
-    var response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'api-key': Constants.API_KEY
-      },
-    );
-    data = json.decode(utf8.decode(response.bodyBytes));
-    final Map user =
-        json.decode(await MySharedPreferences.instance.getStringValue('user'));
-    data[0]['user'] = user;
-    if (user['hospitals']?.length == 1) {
-      setState(() => {selectedHospital: user['hospitals'][0]['_id']});
+    try {
+      var data = [];
+      final Map user = json
+          .decode(await MySharedPreferences.instance.getStringValue('user'));
+      var url = Constants.BASE_URL + "/get-hcai-titles";
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'api-key': Constants.API_KEY
+        },
+        body: jsonEncode({'roles': user['roles'] ?? []}),
+      );
+      data = json.decode(utf8.decode(response.bodyBytes));
+      if (user['hospitals']?.length == 1) {
+        setState(() => {selectedHospital: user['hospitals'][0]['_id']});
+      }
+      data[0]['user'] = user;
+      return data.toList();
+    } on Exception catch (e, s) {
+      print(s);
+      print(e);
+      return [];
     }
-    return data.toList();
   }
 
   @override
@@ -68,6 +75,9 @@ class _HomePagePageState extends State<HomePage> {
                               snapshot.error.toString(),
                               style: TextStyle(color: Colors.white),
                             ));
+                          }
+                          if (!snapshot.hasData || snapshot.data!.length == 0) {
+                            return Container();
                           }
                           if (snapshot.hasData) {
                             if (this.selectedHospital == '') {
@@ -135,9 +145,10 @@ class _HomePagePageState extends State<HomePage> {
           hcaiTitle: data?[index]['title'],
           userId: data![0]!['user']['_id'] ?? '',
           goodToGo: true,
-          values: {},
+          values: data![index] ?? {},
           reviewed: false,
-          isEditedView: false),
+          isEditedView: false,
+          submissionEndPoint: data![index]!['submissionEndPoint'] ?? ''),
     );
   }
 

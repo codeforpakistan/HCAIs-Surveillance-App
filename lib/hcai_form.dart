@@ -39,7 +39,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       userId: '',
       values: {},
       reviewed: false,
-      isEditedView: false);
+      isEditedView: false,
+      submissionEndPoint: '');
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
   Map _selectedRole = {};
@@ -60,8 +61,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         });
         this._values = args.values;
         this._values['hospitalId'] = args.hospitalId;
+        this._values['submissionEndPoint'] = args.submissionEndPoint;
+        this._values['hcaiId'] = args.hcaiId;
         this._values['userId'] = args.userId;
         this._values['reviewed'] = args.reviewed;
+        this._values['isSubmitted'] = false;
         this._values['isEditedView'] = args.isEditedView;
         _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
       } else {
@@ -138,12 +142,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       List<Widget> data = [];
       var objToConstruct;
       int currentIndex = 0;
-      this.allSteps.forEach((each) => {
-            each['fields'].forEach((eachField) => {
+      this.allSteps.forEach(
+            (each) => each['fields'].forEach((eachField) => {
                   eachField['index'] = currentIndex,
                   currentIndex = currentIndex + 1,
                 }),
-          });
+          );
       _controller = List.generate(currentIndex, (i) => TextEditingController());
       this.allSteps.asMap().forEach((stepIndex, step) => {
             data = [],
@@ -773,10 +777,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           color: Colors.grey[600],
           fontSize: 13,
         )));
-    options.forEach((each) => {
-          list.add(_buildCheckBoxTile(
-              title: each['name'], value: 0, selected: options[0]['name']))
-        });
+    options.forEach((each) => list.add(_buildCheckBoxTile(
+        title: each['name'], value: 0, selected: options[0]['name'])));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: list,
@@ -990,6 +992,29 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
+  getSubmissionCount(String hcaiId, String hospitalId) async {
+    try {
+      var data = {};
+      var url = Constants.BASE_URL +
+          "/submissions/count/" +
+          hospitalId +
+          "/" +
+          hcaiId;
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+      data = json.decode(utf8.decode(response.bodyBytes));
+      return data['count'] ?? 0;
+    } on Exception catch (e, s) {
+      print(s);
+      print(e);
+    }
+  }
+
   Future<List> getHcaiForm(String hcaiId, String hospitalId) async {
     var data = [];
     var url = Constants.BASE_URL + "/hcai/" + hospitalId + "/" + hcaiId;
@@ -1011,9 +1036,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         return;
       }
       values['isVerified'] = false;
+      values['isSubmitted'] = true;
       if (!Helper.isValidData(this._values)) {
         Helper.showMsg(
-            context, 'Please select Department, ICD-10 Code and Ward', true);
+            context,
+            'Please select ' + Helper.missingFields(this._values)!.join(', '),
+            true);
         return null;
       }
       setState(() {
@@ -1024,7 +1052,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         values['reviewed'] = values['isSSI'] != null;
       }
       final response = await http.post(
-        Uri.parse(Constants.BASE_URL + "/submissions/"),
+        Uri.parse(Constants.BASE_URL + this._values['submissionEndPoint']),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

@@ -90,12 +90,15 @@ class Helper {
   }
 
   static isValidData(_values) {
-    return _values['hospitalId'] != '' &&
-        _values['userId'] != '' &&
-        _values['departmentId'] != '' &&
-        _values['wardId'] != '' &&
-        _values['ICD10Id'] != 'Select ICD-10-PCS Code' &&
-        _values['ICD10Id'] != '';
+    return _values['requiredFields'].indexWhere(
+            (each) => _values![each] == null || _values![each] == '') ==
+        -1;
+  }
+
+  static missingFields(_values) {
+    return _values['requiredFields']
+        .where((each) => _values![each] == null || _values![each] == '')!
+        .toList();
   }
 
   static showMsg(context, msg, isError) {
