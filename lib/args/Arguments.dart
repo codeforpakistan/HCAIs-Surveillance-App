@@ -6,6 +6,7 @@ class Arguments {
   final String hospitalId;
   final String hcaiId;
   final String hcaiTitle;
+  final String submissionEndPoint;
   final bool goodToGo;
   final Map values;
   final bool reviewed;
@@ -19,6 +20,7 @@ class Arguments {
   const Arguments(
       {Key? key,
       title,
+      required this.submissionEndPoint,
       required this.goodToGo,
       required this.userId,
       required this.hospitalId,
