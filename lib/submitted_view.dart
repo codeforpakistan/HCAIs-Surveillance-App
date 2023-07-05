@@ -203,10 +203,9 @@ class _SubmittedState extends State<Submitted> {
                                                               hospitalId: snapshot
                                                                       .data?[index]![
                                                                   'hospitalId'],
-                                                              hcaiTitle: snapshot
-                                                                          .data?[index][
-                                                                      'patientName'] ??
-                                                                  'HCAI Form',
+                                                              hcaiTitle:
+                                                                  snapshot.data?[index]['patientName'] ??
+                                                                      'HCAI Form',
                                                               userId: snapshot
                                                                       .data?[index]
                                                                   ['userId'],
@@ -214,9 +213,11 @@ class _SubmittedState extends State<Submitted> {
                                                               values: snapshot
                                                                   .data?[index],
                                                               reviewed: true,
-                                                              isEditedView: true, 
+                                                              isEditedView:
+                                                                  true,
                                                               submissionEndPoint: snapshot
-                                                                  .data?[index].submissionEndPoint),
+                                                                  .data?[index]
+                                                                  .submissionEndPoint),
                                                         );
                                                       },
                                                       // trailing: Icon(Icons.add_a_photo),
