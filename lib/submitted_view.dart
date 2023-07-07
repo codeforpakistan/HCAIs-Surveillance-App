@@ -4,6 +4,7 @@ import 'package:hcais/components/drawer.dart';
 import 'package:hcais/hcai_form.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:hcais/utils/helper.dart';
+import 'package:hcais/utils/my_shared_prefs.dart';
 import 'package:http/http.dart' as http;
 import 'args/Arguments.dart';
 
@@ -19,14 +20,19 @@ class _SubmittedState extends State<Submitted> {
   String searchString = "";
 
   Future<List> getSubmissions() async {
+    final Map user =
+        json.decode(await MySharedPreferences.instance.getStringValue('user'));
     var data = [];
-    var url = Constants.BASE_URL + "/submissions";
-    var response = await http.get(
+    var hospitals = [];
+    user['hospitals']!.forEach((each) => hospitals.add(each['_id']));
+    var url = Constants.BASE_URL + "/submissions-by-hospitals";
+    var response = await http.post(
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
+      body: jsonEncode({'hospitalIds': hospitals, 'values': true}),
     );
     data = json.decode(utf8.decode(response.bodyBytes));
     try {
@@ -197,8 +203,7 @@ class _SubmittedState extends State<Submitted> {
                                                             .pushNamed(
                                                           HcaiFormPage.tag,
                                                           arguments: new Arguments(
-                                                              hcaiId: snapshot.data?[index][
-                                                                      'hcaiId'] ??
+                                                              hcaiId: snapshot.data?[index]['hcaiId'] ??
                                                                   '623c4127d8512af7bd13735b',
                                                               hospitalId: snapshot
                                                                       .data?[index]![
@@ -207,17 +212,17 @@ class _SubmittedState extends State<Submitted> {
                                                                   snapshot.data?[index]['patientName'] ??
                                                                       'HCAI Form',
                                                               userId: snapshot
-                                                                      .data?[index]
-                                                                  ['userId'],
+                                                                      .data?[index]![
+                                                                  'userId'],
                                                               goodToGo: true,
                                                               values: snapshot
                                                                   .data?[index],
                                                               reviewed: true,
                                                               isEditedView:
                                                                   true,
-                                                              submissionEndPoint: snapshot
-                                                                  .data?[index]
-                                                                  .submissionEndPoint),
+                                                              submissionEndPoint:
+                                                                  snapshot.data?[index]![
+                                                                      'submissionEndPoint']),
                                                         );
                                                       },
                                                       // trailing: Icon(Icons.add_a_photo),

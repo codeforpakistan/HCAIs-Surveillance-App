@@ -137,19 +137,28 @@ class _HomePagePageState extends State<HomePage> {
   }
 
   route(context, data, index) {
-    return Navigator.of(context).pushNamed(
-      HcaiFormPage.tag,
-      arguments: new Arguments(
-          hcaiId: data?[index]['_id'],
-          hospitalId: this.selectedHospital,
-          hcaiTitle: data?[index]['title'],
-          userId: data![0]!['user']['_id'] ?? '',
-          goodToGo: true,
-          values: data![index] ?? {},
-          reviewed: false,
-          isEditedView: false,
-          submissionEndPoint: data![index]!['submissionEndPoint'] ?? ''),
-    );
+    try {
+      var values = new Map.from(data![index] ?? {});
+      if (values['_id'] != null) {
+        values.remove('_id');
+      }
+      return Navigator.of(context).pushNamed(
+        HcaiFormPage.tag,
+        arguments: new Arguments(
+            hcaiId: data?[index]['_id'],
+            hospitalId: this.selectedHospital,
+            hcaiTitle: data?[index]['title'],
+            userId: data![0]!['user']['_id'] ?? '',
+            goodToGo: true,
+            values: values ?? {},
+            reviewed: false,
+            isEditedView: false,
+            submissionEndPoint: data![index]!['submissionEndPoint'] ?? ''),
+      );
+    } on Exception catch (e, s) {
+      print(s);
+      print(e);
+    }
   }
 
   Widget _buildDropDown(

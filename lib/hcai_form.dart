@@ -59,10 +59,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         setState(() {
           args = ModalRoute.of(context)!.settings.arguments as Arguments;
         });
-        if (args.values['_id'] != null) {
-          args.values['_id'] = null;
-          args.values.remove('_id');
-        }
         this._values = args.values;
         this._values['hospitalId'] = args.hospitalId;
         this._values['submissionEndPoint'] = args.submissionEndPoint;
