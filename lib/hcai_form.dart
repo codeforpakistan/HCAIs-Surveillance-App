@@ -880,7 +880,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             break;
           }
         case 'antimicrobialProphylaxisAdministered':
-        case 'pathogenCausingSSI':
         case 'secondaryBloodstreamInfection':
         case 'previousHistoryOfBacterialColonization':
         case 'died':
