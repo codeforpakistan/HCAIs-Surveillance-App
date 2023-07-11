@@ -150,7 +150,7 @@ class _HomePagePageState extends State<HomePage> {
             hcaiTitle: data?[index]['title'],
             userId: data![0]!['user']['_id'] ?? '',
             goodToGo: true,
-            values: values ?? {},
+            values: values,
             reviewed: false,
             isEditedView: false,
             submissionEndPoint: data![index]!['submissionEndPoint'] ?? ''),

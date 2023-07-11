@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
@@ -50,6 +51,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
   late Future<List>? _listFuture;
   bool showFullValue = false;
   bool isSubmitted = false;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -73,6 +75,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       }
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   @override
@@ -467,8 +475,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         controller: myController,
         readOnly: readOnly,
         onChanged: (newValue) => {
-              this._values[key] = newValue,
-              _setCompleteField(key, this._values[key] ?? '', [], []),
+              if (_debounce?.isActive ?? false) _debounce?.cancel(),
+              _debounce = Timer(const Duration(milliseconds: 500), () {
+                // do something with query
+                this._values[key] = newValue;
+                _setCompleteField(key, this._values[key] ?? '', [], []);
+              }),
             }));
     return childs;
   }
@@ -803,7 +815,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   void _setCompleteField(String? key, String? value, List<dynamic> options,
       List<dynamic> hiddenFields,
-      [List<dynamic> conditions = const []]) {
+      [List<dynamic> conditions = const []]) async {
     try {
       var matches = [];
       switch (key) {
