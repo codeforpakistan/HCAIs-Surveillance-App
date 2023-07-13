@@ -81,17 +81,18 @@ class _HomePagePageState extends State<HomePage> {
                           }
                           if (snapshot.hasData) {
                             if (this.selectedHospital == '') {
-                              return _buildDropDown(
-                                  hasHelpLabel: true,
-                                  helpLabelText: 'Select Hospital',
-                                  index: 0,
-                                  isRequired: true,
-                                  labelText: 'Select Hospital',
-                                  options:
-                                      snapshot.data![0]!['user']!['hospitals'],
-                                  key: 'hospital',
-                                  data: snapshot.data,
-                                  context: context);
+                              return Flexible(
+                                  child: _buildDropDown(
+                                      hasHelpLabel: true,
+                                      helpLabelText: 'Select Hospital',
+                                      index: 0,
+                                      isRequired: true,
+                                      labelText: 'Select Hospital',
+                                      options: snapshot
+                                          .data![0]!['user']!['hospitals'],
+                                      key: 'hospital',
+                                      data: snapshot.data,
+                                      context: context));
                             }
                           }
                           return new ListView.builder(
