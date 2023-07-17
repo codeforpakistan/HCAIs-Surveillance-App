@@ -79,6 +79,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   @override
   void dispose() {
+    this.allSteps = [];
+    this.allSteps = [];
     _debounce?.cancel();
     super.dispose();
   }
@@ -237,8 +239,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               field['multiple'] == true)
                             {
                               data.add(Padding(
-                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                child: _buildMultipleSelect(
+                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                  child: _buildMultipleSelect(
                                     isRequired: field!['isRequired'] == true,
                                     key: field['key'].toString(),
                                     options: field['options'],
@@ -246,8 +248,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     index: field['index'],
                                     isEditedView:
                                         this._values['isEditedView'] == true,
-                                    conditions: field!['conditions'] ?? []),
-                              )),
+                                    conditions: field!['conditions'] ?? [],
+                                    hasHelpLabel:
+                                        field['hasHelpLabel'] ?? false,
+                                    helpLabelText: field['helpLabelText'] ??
+                                        'Please select an option',
+                                  ))),
                             }
                           else if (field['type'] == 'searchable')
                             {
@@ -492,7 +498,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required int index,
       required bool isRequired,
       required bool isEditedView,
-      List<dynamic> conditions = const []}) {
+      List<dynamic> conditions = const [],
+      required bool hasHelpLabel,
+      required String helpLabelText}) {
     try {
       if (options.length <= 0) {
         return Container();
@@ -556,7 +564,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             color: Color.fromRGBO(242, 242, 242, 1),
           ),
           buttonText: Text(''),
-          title: Text('Please Select'),
+          title: hasHelpLabel
+              ? Text(helpLabelText != '' ? helpLabelText : 'Please Select')
+              : Text('Please Select'),
           dialogWidth: MediaQuery.of(context).size.width * 0.9,
           searchable: true,
           items: _options,
@@ -822,9 +832,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         case 'isSSI':
           {
             if (this._values['isSSI'] == 'No') {
-              this.updateFlagForAll(this.allSteps, true, 'died');
+              this.updateFlagForAll(this.allSteps, true, 'SSIDetected');
             } else if (this._values['isSSI'] == 'Yes') {
-              this.updateFlagForAll(this.allSteps, false, 'died');
+              // this.allSteps = this.originalSteps;
+              this.updateFlagForAll(this.allSteps, false, 'SSIDetected');
             }
             break;
           }

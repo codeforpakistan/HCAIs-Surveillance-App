@@ -23,16 +23,17 @@ class _SubmittedState extends State<Submitted> {
     final Map user =
         json.decode(await MySharedPreferences.instance.getStringValue('user'));
     var data = [];
-    var hospitals = [];
-    user['hospitals']!.forEach((each) => hospitals.add(each['_id']));
-    var url = Constants.BASE_URL + "/submissions-by-hospitals";
+    // var hospitals = [];
+    // user['hospitals']!.forEach((each) => hospitals.add(each['_id']));
+    var url = Constants.BASE_URL + "/submissions-by-ids";
+    print(user['_id']);
     var response = await http.post(
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: jsonEncode({'hospitalIds': hospitals, 'values': true}),
+      body: jsonEncode({'userId': user['_id'] ?? '', 'values': true}),
     );
     data = json.decode(utf8.decode(response.bodyBytes));
     try {
@@ -59,12 +60,10 @@ class _SubmittedState extends State<Submitted> {
                 each['difference'] = (diff == -9999) ? '0' : diff.toString()
               }
           });
-
-      data.sort((a, b) =>
-          int.parse(a['createdAt']).compareTo(int.parse(b['createdAt'])));
-    } catch (err) {
+    } on Exception catch (e, s) {
       print('error in getSubmissions');
-      print(err);
+      print(s);
+      print(e);
     }
     return data.toList();
   }
