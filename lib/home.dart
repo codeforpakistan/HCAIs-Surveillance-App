@@ -176,6 +176,7 @@ class _HomePagePageState extends State<HomePage> {
       Column childs =
           WidgetHelper.buildColumn(labelText.toString(), isRequired);
       childs.children.add(DropdownButtonFormField(
+        isExpanded: true,
         decoration: InputDecoration(
           filled: true,
           fillColor: Color.fromRGBO(242, 242, 242, 1),
