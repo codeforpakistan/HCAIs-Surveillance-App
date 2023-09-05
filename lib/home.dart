@@ -18,6 +18,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePagePageState extends State<HomePage> {
   String selectedHospital = '';
+
+  void initState() {
+    super.initState();
+  }
+
   Future<List> getHcais() async {
     try {
       var data = [];
@@ -34,9 +39,6 @@ class _HomePagePageState extends State<HomePage> {
         body: jsonEncode({'roles': user['roles'] ?? []}),
       );
       data = json.decode(utf8.decode(response.bodyBytes));
-      if (user['hospitals']?.length == 1) {
-        setState(() => {selectedHospital: user['hospitals'][0]['_id']});
-      }
       data[0]['user'] = user;
       return data.toList();
     } on Exception catch (e, s) {
@@ -80,7 +82,10 @@ class _HomePagePageState extends State<HomePage> {
                             return Container();
                           }
                           if (snapshot.hasData) {
-                            if (this.selectedHospital == '') {
+                            if (snapshot.data![0]!['user']!['hospitals']!
+                                        .length >
+                                    1 &&
+                                this.selectedHospital == '') {
                               return Flexible(
                                   child: _buildDropDown(
                                       hasHelpLabel: true,
@@ -142,6 +147,10 @@ class _HomePagePageState extends State<HomePage> {
       var values = new Map.from(data![index] ?? {});
       if (values['_id'] != null) {
         values.remove('_id');
+      }
+      if (this.selectedHospital == '' &&
+          data![0]!['user']!['hospitals']!.length == 1) {
+        this.selectedHospital = data![0]!['user']!['hospitals'][0]['_id'];
       }
       return Navigator.of(context).pushNamed(
         HcaiFormPage.tag,
