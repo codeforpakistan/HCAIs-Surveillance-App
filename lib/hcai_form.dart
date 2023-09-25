@@ -831,24 +831,25 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       switch (key) {
         case 'isSSI':
           {
-            if (this._values['isSSI'] == 'No') {
-              this.updateFlagForAll(this.allSteps, true, 'SSIDetected');
-            } else if (this._values['isSSI'] == 'Yes') {
-              // this.allSteps = this.originalSteps;
-              this.updateFlagForAll(this.allSteps, false, 'SSIDetected');
-            }
+            this.updateFormFieldsBaseOnIsSS();
             break;
           }
         case 'ICD10Id':
           {
             if (options.length > 0) {
-              this._values['recommendedSurveillancePeriod'] = options
+              var survilancePeriod = options
                   .firstWhere(
                       (each) => each['_id'] == value)['surveillancePeriod']
                   .toString();
+              this._values['recommendedSurveillancePeriod'] = survilancePeriod;
               this._values['ICD10Code'] = options
                   .firstWhere((each) => each['_id'] == value)['ICDCode']
                   .toString();
+              this._values['isSSI'] = Helper.isInfectionLessThanRecomended(
+                      this._values['infectionSurveyTime'], survilancePeriod)
+                  ? 'No'
+                  : 'Yes';
+              this.updateFormFieldsBaseOnIsSS();
             }
             break;
           }
@@ -858,6 +859,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             this._values['infectionSurveyTime'] = Helper.daysBetweenDate(
                     _values['dateOfProcedure'], _values['dateOfEvent'], 'days')
                 .toString();
+            this._values['isSSI'] = Helper.isInfectionLessThanRecomended(
+                    this._values['infectionSurveyTime'],
+                    this._values['recommendedSurveillancePeriod'])
+                ? 'No'
+                : 'Yes';
+            this.updateFormFieldsBaseOnIsSS();
             break;
           }
         case 'dateOfDischarge':
@@ -899,7 +906,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             break;
           }
         case 'antimicrobialProphylaxisAdministered':
-        case 'secondaryBloodstreamInfection':
         case 'previousHistoryOfBacterialColonization':
         case 'died':
           {
@@ -948,6 +954,18 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       }
     } catch (e) {
       print('error in switch' + e.toString());
+    }
+  }
+
+  updateFormFieldsBaseOnIsSS() {
+    setState(() {
+      _selectedRole['isSSI'] = this._values['isSSI'];
+    });
+    if (this._values['isSSI'] == 'No') {
+      this.updateFlagForAll(this.allSteps, true, 'SSIDetected');
+    } else if (this._values['isSSI'] == 'Yes') {
+      // this.allSteps = this.originalSteps;
+      this.updateFlagForAll(this.allSteps, false, 'SSIDetected');
     }
   }
 
