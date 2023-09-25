@@ -7,6 +7,9 @@ import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
 class Helper {
   static int daysBetweenDate(date1, date2, String returnType) {
     try {
+      if (isNullOrEmpty(date1) || isNullOrEmpty(date2)) {
+        return 0;
+      }
       final startDate = DateTime.parse(date1.toString());
       final endDate = DateTime.parse(date2.toString());
       final days = endDate.difference(startDate).inDays;
@@ -21,6 +24,20 @@ class Helper {
     } catch (e) {
       print('date range failed' + e.toString());
       return -1;
+    }
+  }
+
+  static bool isInfectionLessThanRecomended(
+      survilancePeriod, infectionSurveyTime) {
+    try {
+      if (!isNullOrEmpty(survilancePeriod) &&
+          !isNullOrEmpty(infectionSurveyTime)) {
+        return int.parse(infectionSurveyTime) < int.parse(survilancePeriod);
+      }
+      return false;
+    } catch (e) {
+      print(e);
+      return false;
     }
   }
 
@@ -141,5 +158,9 @@ class Helper {
     } else {
       return [];
     }
+  }
+
+  static bool isNullOrEmpty(value) {
+    return value == null || value == '';
   }
 }
