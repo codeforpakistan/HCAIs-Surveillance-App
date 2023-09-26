@@ -101,6 +101,9 @@ class Helper {
   }
 
   static String truncateWithEllipsis(int cutoff, String myString) {
+    if (cutoff == -1) {
+      cutoff = myString.indexOf('...');
+    }
     return (myString.length <= cutoff)
         ? myString
         : '${myString.substring(0, cutoff)}...';

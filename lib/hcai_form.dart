@@ -302,6 +302,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     key: field['key'].toString(),
                                     options: field['options'],
                                     truncate: field['truncate'] ?? false,
+                                    helpLabelText: field['hasHelpLabel']
+                                        ? field['helpLabelText']
+                                        : '',
                                     hiddenFeilds: field['hiddenFeilds'] != null
                                         ? field['hiddenFeilds']
                                         : [],
@@ -730,17 +733,45 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String key,
       required List<dynamic> options,
       required bool truncate,
+      required String helpLabelText,
       required List<dynamic> hiddenFeilds,
       List<dynamic> conditions = const []}) {
     List<Widget> list = [];
     int _groupValue = -1;
-    list.add(Text(title,
-        textAlign: TextAlign.left,
-        style: TextStyle(
-          color: Colors.grey[600],
-          fontSize: 13,
-        )));
 
+    list.add(Row(
+      children: [
+        Text(title,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 13,
+            )),
+        !Helper.isNullOrEmpty(helpLabelText)
+            ? new IconButton(
+                icon: new Icon(Icons.help_outline),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Help'),
+                      content: Text(helpLabelText),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              )
+            : Container(),
+        SizedBox(width: 8), // Add some spacing/ Title
+      ],
+    ));
     options.asMap().forEach((index, each) => {
           if (this._values[key] != null && this._values[key] == each['name'])
             {this._selectedRole[key] = index},
@@ -751,6 +782,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               groupValue: _groupValue,
               selected: options[0]['name'],
               truncate: truncate,
+              helpLabelText: helpLabelText,
               hiddenFeilds: hiddenFeilds,
               conditions: conditions))
         });
@@ -768,6 +800,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required int groupValue,
       String? selected,
       required bool truncate,
+      required String helpLabelText,
       required List<dynamic> hiddenFeilds,
       List<dynamic> conditions = const []}) {
     return RadioListTile(
@@ -775,7 +808,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       value: value,
       activeColor: Color(0xFF6200EE),
       groupValue: _selectedRole[key],
-      title: new Text(title),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () {
+              truncate = !truncate;
+            },
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
       onChanged: (Object? value) {
         if (this.mounted) {
           setState(() {
@@ -938,6 +985,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               (each) => matches.add({
                 'key': each!['key'],
                 'unHide': each!['unHide'],
+                'childHiddenFields': each['childHiddenFields'] ?? [],
                 'shouldHide': this._values[each!['key']] is String
                     ? this._values[each!['key']] == each[each!['key']]
                     : this._values[each!['key']]!.indexWhere((eachIndex) =>
@@ -947,8 +995,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             );
           }
           if (matches.length > 0) {
-            matches.forEach(
-                (each) => this.unHide(each!['unHide'], !each!['shouldHide']));
+            matches.forEach((each) => {
+                  if (each!['unHide']!.length > 0)
+                    {
+                      // if parent elements are going to hide, hide the child even if they are dependent on subchild
+                      if (each!['shouldHide'] == false &&
+                          each!['childHiddenFields']!.length > 0)
+                        {each!['unHide']!.addAll(each!['childHiddenFields'])},
+                      this.unHide(each!['unHide'], !each!['shouldHide']),
+                    }
+                });
           }
           break;
       }
@@ -1008,27 +1064,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           }
         }
       }
-    }
-  }
-
-  filterData(key, value) {
-    List<dynamic> steps = json.decode(json.encode(originalSteps));
-    if (key == 'departmentId') {
-      for (var step in allSteps) {
-        if (step["fields"] is List) {
-          for (var eachField in step["fields"]) {
-            if (eachField['key'] == 'wardId') {
-              eachField['options'] = eachField['options']
-                  .where((each) => each['departmentId'] == value)
-                  .toList();
-              break;
-            }
-          }
-        }
-      }
-      setState(() {
-        allSteps = steps;
-      });
     }
   }
 
