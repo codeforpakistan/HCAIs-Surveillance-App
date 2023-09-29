@@ -749,12 +749,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             )),
         !Helper.isNullOrEmpty(helpLabelText)
             ? new IconButton(
-                icon: new Icon(Icons.help_outline),
+                icon: new Icon(Icons.info_outline),
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Help'),
+                      title: Text('Info'),
                       content: Text(helpLabelText),
                       actions: [
                         TextButton(
