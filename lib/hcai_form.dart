@@ -267,6 +267,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   helpLabelText: '',
                                   labelText: field['label'].toString(),
                                   value: '',
+                                  onChange: field['onChange'] ?? '',
+                                  type: field['type'] ?? '',
                                 ),
                               )),
                             }
@@ -588,7 +590,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String value,
       required bool hasHelpLabel,
       required String helpLabelText,
-      required bool isRequired}) {
+      required bool isRequired,
+      required String onChange,
+      required String type}) {
     try {
       if (this._values[key] == null) {
         this._values[key] = value;
@@ -643,10 +647,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         popupProps: PopupProps.menu(
             showSearchBox: true, isFilterOnline: true, showSelectedItems: true),
         selectedItem: item,
-        onChanged: (v) {
+        onChanged: (v) async {
           if (v != '') {
             var newValue = options
                 .firstWhere((each) => each['name'] == v || each['title'] == v);
+            if (onChange != '' && type != '') {
+              final response = await this
+                  .dynamicOnChangeRequest(onChange, newValue['name'], key);
+              _setAddressValues(response);
+            }
             if (this.mounted && newValue['_id'] != null) {
               setState(() => this._values[key] = newValue['_id']);
               _setCompleteField(key, newValue['_id'], options, []);
@@ -817,8 +826,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             },
             child: Text(
               title,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+              softWrap: true,
             ),
           ),
         ],
@@ -833,6 +841,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         }
       },
     );
+  }
+
+  _setAddressValues(data) {
+    if (data['district'] != null) {
+      this._values['patientDistrict'] = data['district']['title'];
+      this._values['patientProvince'] = data['province']['title'];
+    }
   }
 
   Widget _buildCheckbox(
@@ -1010,6 +1025,25 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       }
     } catch (e) {
       print('error in switch' + e.toString());
+    }
+  }
+
+  Future<dynamic> dynamicOnChangeRequest(url, newValue, key) async {
+    try {
+      final response = await http.post(
+        Uri.parse(Constants.BASE_URL + '/' + url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({key: newValue}),
+      );
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        return json.decode(utf8.decode(response.bodyBytes));
+      }
+      return {};
+    } catch (err) {
+      print('error fetching adddress');
+      return {};
     }
   }
 
