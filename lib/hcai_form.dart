@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hcais/utils/WidgetHelper.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:hcais/utils/helper.dart';
+import 'package:hcais/services/data_service.dart';
 import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
@@ -41,9 +42,12 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       values: {},
       reviewed: false,
       isEditedView: false,
-      submissionEndPoint: '');
+      submissionEndPoint: '',
+      draftId: '');
+  final dataService = new Service();
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
+  String draftId = '';
   Map _selectedRole = {};
   List<dynamic> allSteps = [];
   List<dynamic> originalSteps = [];
@@ -69,6 +73,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         this._values['reviewed'] = args.reviewed;
         this._values['isSubmitted'] = false;
         this._values['isEditedView'] = args.isEditedView;
+        this._values['draftId'] = args.draftId ?? '';
+        if (args.draftId != '') {
+          setState(() => this.draftId = args.draftId);
+        }
         _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
       } else {
         Navigator.of(context).pushNamed(HomePage.tag);
@@ -93,7 +101,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return WillPopScope(
       onWillPop: () async {
         this._showDialog(context, 'Do you want to close?',
-            'Your will loose your progress.', true);
+            'Your Progress will be saved as Draft.', true);
         return false;
       },
       child: Scaffold(
@@ -108,7 +116,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 child: GestureDetector(
                   onTap: () {
                     this._showDialog(context, 'Do you want to close?',
-                        'Your will loose your progress.', true);
+                        'Your progress will be Saved as Draft.', true);
                   },
                   child: Icon(Icons.cancel_sharp, color: Colors.white),
                 )),
@@ -376,7 +384,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         title: step['stepTitle'].toString(),
                         subtitle: '',
                         content: objToConstruct,
+                        // validation: () {
+                        //   if (!(_formKey.currentState != null &&
+                        //       _formKey.currentState!.validate())) {
+                        //     return 'Please Fill All required * fields';
+                        //   }
+                        //   return null;
+                        // })),
                         validation: () {
+                          handleDraft();
                           return null;
                         })),
                   }
@@ -386,7 +402,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       print(s);
     }
     return CoolStepper(
-      showErrorSnackbar: false,
+      showErrorSnackbar: true,
       onCompleted: () {
         sendData(context, this._values);
       },
@@ -394,6 +410,26 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       config: CoolStepperConfig(
           backText: 'PREVIOUS', stepText: 'Step', icon: Icon(null)),
     );
+  }
+
+  handleDraft() async {
+    try {
+      this._values['draftName'] =
+          this._values['pcnOrMrNumber'] ?? '' + DateTime.now().toString();
+      if (this.draftId == '') {
+        this.dataService.createDraft(this._values).then((value) => {
+              if (value != '')
+                {
+                  print(value),
+                  setState(() => this.draftId = value),
+                }
+            });
+      } else {
+        this.dataService.updateDraft(this._values, this.draftId);
+      }
+    } catch (err) {
+      print(err);
+    }
   }
 
   Widget _buildDateField(
@@ -1168,6 +1204,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         body: jsonEncode(values),
       );
       if (response.statusCode >= 200 && response.statusCode <= 299) {
+        this.dataService.deleteDraft(this.draftId);
         AwesomeDialog(
             context: context,
             animType: AnimType.leftSlide,
@@ -1202,6 +1239,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       buttons.add(new MaterialButton(
         child: Text("Close Anyway"),
         onPressed: () {
+          handleDraft();
           Navigator.of(context, rootNavigator: true).pop('dialog');
           Navigator.pop(context);
         },

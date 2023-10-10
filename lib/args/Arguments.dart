@@ -11,13 +11,14 @@ class Arguments {
   final Map values;
   final bool reviewed;
   final bool isEditedView;
+  String draftId;
   // This Widget accepts the arguments as constructor
   // parameters. It does not extract the arguments from
   // the ModalRoute.
   //
   // The arguments are extracted by the onGenerateRoute
   // function provided to the MaterialApp widget.
-  const Arguments(
+  Arguments(
       {Key? key,
       title,
       required this.submissionEndPoint,
@@ -28,5 +29,6 @@ class Arguments {
       required this.hcaiTitle,
       required this.values,
       required this.reviewed,
-      required this.isEditedView});
+      required this.isEditedView,
+      this.draftId = ''});
 }

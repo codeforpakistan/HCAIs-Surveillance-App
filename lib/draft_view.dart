@@ -2,69 +2,36 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hcais/components/drawer.dart';
 import 'package:hcais/hcai_form.dart';
+import 'package:hcais/services/data_service.dart';
 import 'package:hcais/utils/constants.dart';
-import 'package:hcais/utils/helper.dart';
 import 'package:hcais/utils/my_shared_prefs.dart';
 import 'package:http/http.dart' as http;
 import 'args/Arguments.dart';
 
-class Submitted extends StatefulWidget {
-  Submitted({Key? key, this.title}) : super(key: key);
+class DraftView extends StatefulWidget {
+  DraftView({Key? key, this.title}) : super(key: key);
   final String? title;
-  static String tag = 'Submitted-page';
+  static String tag = 'draft-page';
   @override
-  _SubmittedState createState() => _SubmittedState();
+  _DraftState createState() => _DraftState();
 }
 
-class _SubmittedState extends State<Submitted> {
+class _DraftState extends State<DraftView> {
   String searchString = "";
-
-  Future<List> getSubmissions() async {
+  final dataService = new Service();
+  Future<List> getDrafts() async {
     final Map user =
         json.decode(await MySharedPreferences.instance.getStringValue('user'));
     var data = [];
-    // var hospitals = [];
-    // user['hospitals']!.forEach((each) => hospitals.add(each['_id']));
-    var url = Constants.BASE_URL + "/submissions-by-ids";
-    print(user['_id']);
-    var response = await http.post(
+    var url = Constants.BASE_URL + "/draft-by-userId/" + user['_id'];
+    var response = await http.get(
       Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: jsonEncode({'userId': user['_id'] ?? '', 'values': true}),
     );
     data = json.decode(utf8.decode(response.bodyBytes));
-    try {
-      final today = DateTime.now();
-      int diff = -9999;
-      data.forEach((each) => {
-            each['difference'] = '0',
-            each['color'] = '',
-            each['reviewed'] = each['reviewed'] != true ? false : true,
-            if (each['recommendedSurveillancePeriod'] != null)
-              {
-                if (each['dateOfProcedure'] != null &&
-                    each['dateOfProcedure'] != "")
-                  {
-                    diff = Helper.daysBetweenDate(
-                        each['dateOfProcedure'], today, 'days'),
-                    diff = (int.parse(each['recommendedSurveillancePeriod']) -
-                        diff),
-                    if (diff == 0 || each['reviewed'] == true)
-                      {each['color'] = 'green', diff = 0}
-                    else if (diff < 0)
-                      {each['color'] = 'red'},
-                  },
-                each['difference'] = (diff == -9999) ? '0' : diff.toString()
-              }
-          });
-    } on Exception catch (e, s) {
-      print('error in getSubmissions');
-      print(s);
-      print(e);
-    }
     return data.toList();
   }
 
@@ -75,7 +42,7 @@ class _SubmittedState extends State<Submitted> {
             backgroundColor: Color.fromRGBO(193, 30, 47, 1),
             iconTheme: IconThemeData(color: Colors.white),
             title: Text(
-              'Submitted Records',
+              'Drafts',
               style: TextStyle(fontSize: 24.0, color: Colors.white),
             )),
         drawer: SideDrawer(),
@@ -97,7 +64,7 @@ class _SubmittedState extends State<Submitted> {
                             });
                           },
                           decoration: InputDecoration(
-                            labelText: 'Search By Patient Name/PCN',
+                            labelText: 'Search By Draft Name',
                             suffixIcon: Icon(Icons.search),
                           ),
                         ),
@@ -105,7 +72,7 @@ class _SubmittedState extends State<Submitted> {
                       SizedBox(height: 10),
                       Expanded(
                           child: FutureBuilder(
-                              future: getSubmissions(),
+                              future: getDrafts(),
                               builder: (context, AsyncSnapshot<List> snapshot) {
                                 switch (snapshot.connectionState) {
                                   case ConnectionState.done:
@@ -121,22 +88,10 @@ class _SubmittedState extends State<Submitted> {
                                           shrinkWrap: true,
                                           itemCount: snapshot.data?.length,
                                           itemBuilder: (context, index) {
-                                            return ((snapshot.data![index]![
-                                                                'patientName'] !=
-                                                            null &&
-                                                        (snapshot.data![index]![
-                                                                'patientName']!
-                                                            .toLowerCase()!
-                                                            .contains(
-                                                                searchString)) ||
-                                                    (snapshot.data![index]![
-                                                                'pcnOrMrNumber'] !=
-                                                            null) &&
-                                                        snapshot.data![index]![
-                                                                'pcnOrMrNumber']!
-                                                            .toLowerCase()!
-                                                            .contains(
-                                                                searchString)))
+                                            return ((snapshot
+                                                    .data![index]!['draftName']!
+                                                    .toLowerCase()!
+                                                    .contains(searchString)))
                                                 ? Card(
                                                     elevation: 3,
                                                     margin: EdgeInsets.all(2),
@@ -144,12 +99,12 @@ class _SubmittedState extends State<Submitted> {
                                                       leading: CircleAvatar(
                                                         child: Text(((snapshot.data![
                                                                             index]![
-                                                                        'patientName'] !=
+                                                                        'draftName'] !=
                                                                     null
                                                                 ? snapshot
                                                                     .data![
                                                                         index][
-                                                                        'patientName']
+                                                                        'draftName']
                                                                     .substring(
                                                                         0, 1)
                                                                     .toUpperCase()
@@ -159,44 +114,28 @@ class _SubmittedState extends State<Submitted> {
                                                             Colors.purple,
                                                       ),
                                                       title: Text((snapshot
-                                                                          .data![
-                                                                      index]![
-                                                                  'patientName'] ??
-                                                              'N/A') +
-                                                          ' - ' +
-                                                          ('(' +
-                                                              (snapshot.data![
-                                                                          index]
-                                                                      [
-                                                                      'pcnOrMrNumber'] ??
-                                                                  'N/A') +
-                                                              ')')),
-                                                      subtitle: Text(
-                                                          'Days left : ' +
-                                                              (snapshot.data![index]['difference'] != ''
-                                                                  ? snapshot.data![index][
-                                                                      'difference']
-                                                                  : 'N/A') +
-                                                              ('\nReviewed: ' +
-                                                                  (snapshot.data![index]['reviewed'] ==
-                                                                          true
-                                                                      ? 'Yes'
-                                                                      : 'No')),
-                                                          style: TextStyle(
-                                                              color: snapshot.data![index]!['color'] !=
-                                                                      ''
-                                                                  ? (snapshot.data![index]!['color'] ==
-                                                                          'red'
-                                                                      ? Colors
-                                                                          .red
-                                                                      : Colors
-                                                                          .green)
-                                                                  : Colors
-                                                                      .black)),
-                                                      trailing: Text(snapshot
+                                                                      .data![
+                                                                  index]![
+                                                              'draftName'] ??
+                                                          'N/A')),
+                                                      subtitle: Text(snapshot
                                                           .data![index]
                                                               ?['createdAt']!
                                                           .substring(0, 10)),
+                                                      trailing: new IconButton(
+                                                        icon: new Icon(
+                                                            Icons.delete),
+                                                        onPressed: () async {
+                                                          this
+                                                              .dataService
+                                                              .deleteDraft(
+                                                                  snapshot.data![
+                                                                          index]
+                                                                      ['_id']);
+                                                          await this
+                                                              .getDrafts();
+                                                        },
+                                                      ),
                                                       onTap: () {
                                                         Navigator.of(context)
                                                             .pushNamed(
@@ -221,7 +160,8 @@ class _SubmittedState extends State<Submitted> {
                                                                   true,
                                                               submissionEndPoint:
                                                                   snapshot.data?[index]![
-                                                                      'submissionEndPoint']),
+                                                                      'submissionEndPoint'],
+                                                              draftId: snapshot.data![index]['_id'] ?? ''),
                                                         );
                                                       },
                                                       // trailing: Icon(Icons.add_a_photo),
