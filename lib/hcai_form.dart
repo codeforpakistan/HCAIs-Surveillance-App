@@ -799,7 +799,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text('Info'),
+                      title: Text('Information'),
                       content: Text(helpLabelText),
                       actions: [
                         TextButton(
