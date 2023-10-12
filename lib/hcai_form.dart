@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
+import 'package:hcais/components/FormElements.dart';
 import 'package:hcais/utils/WidgetHelper.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:hcais/utils/helper.dart';
@@ -45,6 +46,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       submissionEndPoint: '',
       draftId: '');
   final dataService = new Service();
+  final formElements = new FormElements();
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
   String draftId = '';
@@ -287,19 +289,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               data.add(Padding(
                                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                 child: _buildDropDown(
-                                    isRequired: field!['isRequired'] == true,
-                                    key: field['key'].toString(),
-                                    labelText: field['label'].toString(),
-                                    options: field['options'],
-                                    value: field['options'][0]['_id'] != null
-                                        ? field['options'][0]['_id']
-                                        : field['options'][0]['name'] != null
-                                            ? field['options'][0]['name']
-                                            : field['options'][0]['title'],
-                                    hasHelpLabel: field['hasHelpLabel'],
-                                    helpLabelText: field['helpLabelText'] ??
-                                        'Please select an option',
-                                    index: field['index']),
+                                  isRequired: field!['isRequired'] == true,
+                                  key: field['key'].toString(),
+                                  labelText: field['label'].toString(),
+                                  options: field['options'],
+                                  value: field['options'][0]['_id'] != null
+                                      ? field['options'][0]['_id']
+                                      : field['options'][0]['name'] != null
+                                          ? field['options'][0]['name']
+                                          : field['options'][0]['title'],
+                                  hasHelpLabel: field['hasHelpLabel'],
+                                  helpLabelText: field['helpLabelText'] ??
+                                      'Please select an option',
+                                  index: field['index'],
+                                  conditions: field!['conditions'] ?? [],
+                                ),
                               )),
                             }
                           else if (field['type'] == 'radiofield')
@@ -714,7 +718,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText,
       required int index,
-      required bool isRequired}) {
+      required bool isRequired,
+      List<dynamic> conditions = const []}) {
     try {
       if (this._values[key] != null && this._values[key].runtimeType == List) {
         this._values[key] = this._values[key][0]['title'] != ''
@@ -749,7 +754,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (this.mounted)
             {
               setState(() => this._values[key] = newValue),
-              _setCompleteField(key, newValue, options, []),
+              _setCompleteField(key, newValue, options, [], conditions),
             }
         },
         items: options.map((option) {
@@ -881,8 +886,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   _setAddressValues(data) {
     if (data['district'] != null) {
-      this._values['patientDistrict'] = data['district']['title'];
-      this._values['patientProvince'] = data['province']['title'];
+      this._values['patientDistrict'] =
+          data['district']['title'] + '-' + data['district']['code'];
+      this._values['patientProvince'] =
+          data['province']['title'] + '-' + data['province']['code'];
+      ;
     }
   }
 
@@ -1032,18 +1040,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           }
         default:
           if (conditions.length > 0) {
-            conditions.forEach(
-              (each) => matches.add({
-                'key': each!['key'],
-                'unHide': each!['unHide'],
-                'childHiddenFields': each['childHiddenFields'] ?? [],
-                'shouldHide': this._values[each!['key']] is String
-                    ? this._values[each!['key']] == each[each!['key']]
-                    : this._values[each!['key']]!.indexWhere((eachIndex) =>
-                            eachIndex!['name'] == each[each!['key']]) >
-                        -1
-              }),
-            );
+            // ignore: unnecessary_set_literal
+            conditions.forEach((each) => {
+                  print(this._values[each!['key']]),
+                  matches.add({
+                    'key': each!['key'],
+                    'unHide': each!['unHide'],
+                    'childHiddenFields': each['childHiddenFields'] ?? [],
+                    'shouldHide': this._values[each!['key']] is String
+                        ? this._values[each!['key']] == each[each!['key']]
+                        : this._values[each!['key']]!.indexWhere((eachIndex) =>
+                                eachIndex!['name'] == each[each!['key']]) >
+                            -1
+                  })
+                });
           }
           if (matches.length > 0) {
             matches.forEach((each) => {
