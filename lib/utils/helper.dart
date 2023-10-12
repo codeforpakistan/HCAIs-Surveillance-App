@@ -104,9 +104,13 @@ class Helper {
     if (cutoff == -1) {
       cutoff = myString.indexOf('...');
     }
-    return (myString.length <= cutoff)
-        ? myString
-        : '${myString.substring(0, cutoff)}...';
+    if (cutoff > -1) {
+      return (myString.length <= cutoff)
+          ? myString
+          : '${myString.substring(0, cutoff)}...';
+    } else {
+      return myString;
+    }
   }
 
   static isValidData(_values) {

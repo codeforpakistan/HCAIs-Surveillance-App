@@ -109,8 +109,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(193, 30, 47, 1),
-          title: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
-              style: TextStyle(fontSize: 20, color: Colors.white)),
+          title: Flexible(
+              child: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
+                  style: TextStyle(fontSize: 20, color: Colors.white))),
           automaticallyImplyLeading: false,
           actions: <Widget>[
             Padding(
@@ -788,15 +789,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       List<dynamic> conditions = const []}) {
     List<Widget> list = [];
     int _groupValue = -1;
-
     list.add(Row(
       children: [
-        Text(title,
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 13,
-            )),
+        Flexible(
+            child: Text(title,
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 13,
+                ))),
         !Helper.isNullOrEmpty(helpLabelText)
             ? new IconButton(
                 icon: new Icon(Icons.info_outline),
@@ -866,8 +867,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               truncate = !truncate;
             },
             child: Text(
-              title,
-              softWrap: true,
+              truncate ? Helper.truncateWithEllipsis(-1, title) : title,
+              softWrap: false,
             ),
           ),
         ],
