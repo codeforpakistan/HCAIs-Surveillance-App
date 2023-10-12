@@ -75,7 +75,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         this._values['reviewed'] = args.reviewed;
         this._values['isSubmitted'] = false;
         this._values['isEditedView'] = args.isEditedView;
-        this._values['draftId'] = args.draftId ?? '';
+        this._values['draftId'] = args.draftId;
         if (args.draftId != '') {
           setState(() => this.draftId = args.draftId);
         }
@@ -891,7 +891,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           data['district']['title'] + '-' + data['district']['code'];
       this._values['patientProvince'] =
           data['province']['title'] + '-' + data['province']['code'];
-      ;
     }
   }
 
@@ -1042,19 +1041,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         default:
           if (conditions.length > 0) {
             // ignore: unnecessary_set_literal
-            conditions.forEach((each) => {
-                  print(this._values[each!['key']]),
-                  matches.add({
-                    'key': each!['key'],
-                    'unHide': each!['unHide'],
-                    'childHiddenFields': each['childHiddenFields'] ?? [],
-                    'shouldHide': this._values[each!['key']] is String
-                        ? this._values[each!['key']] == each[each!['key']]
-                        : this._values[each!['key']]!.indexWhere((eachIndex) =>
-                                eachIndex!['name'] == each[each!['key']]) >
-                            -1
-                  })
-                });
+            conditions.forEach((each) => matches.add({
+                  'key': each!['key'],
+                  'unHide': each!['unHide'],
+                  'childHiddenFields': each['childHiddenFields'] ?? [],
+                  'shouldHide': this._values[each!['key']] is String
+                      ? this._values[each!['key']] == each[each!['key']]
+                      : this._values[each!['key']]!.indexWhere((eachIndex) =>
+                              eachIndex!['name'] == each[each!['key']]) >
+                          -1
+                }));
           }
           if (matches.length > 0) {
             matches.forEach((each) => {
