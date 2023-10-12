@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
+import 'package:hcais/components/FormElements.dart';
 import 'package:hcais/utils/WidgetHelper.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:hcais/utils/helper.dart';
+import 'package:hcais/services/data_service.dart';
 import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
@@ -41,9 +43,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       values: {},
       reviewed: false,
       isEditedView: false,
-      submissionEndPoint: '');
+      submissionEndPoint: '',
+      draftId: '');
+  final dataService = new Service();
+  final formElements = new FormElements();
   final _formKey = GlobalKey<FormState>();
   Map _values = {};
+  String draftId = '';
   Map _selectedRole = {};
   List<dynamic> allSteps = [];
   List<dynamic> originalSteps = [];
@@ -69,6 +75,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         this._values['reviewed'] = args.reviewed;
         this._values['isSubmitted'] = false;
         this._values['isEditedView'] = args.isEditedView;
+        this._values['draftId'] = args.draftId;
+        if (args.draftId != '') {
+          setState(() => this.draftId = args.draftId);
+        }
         _listFuture = getHcaiForm(args.hcaiId, args.hospitalId);
       } else {
         Navigator.of(context).pushNamed(HomePage.tag);
@@ -93,14 +103,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return WillPopScope(
       onWillPop: () async {
         this._showDialog(context, 'Do you want to close?',
-            'Your will loose your progress.', true);
+            'Your Progress will be saved as Draft.', true);
         return false;
       },
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(193, 30, 47, 1),
-          title: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
-              style: TextStyle(fontSize: 20, color: Colors.white)),
+          title: Flexible(
+              child: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
+                  style: TextStyle(fontSize: 20, color: Colors.white))),
           automaticallyImplyLeading: false,
           actions: <Widget>[
             Padding(
@@ -108,7 +119,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 child: GestureDetector(
                   onTap: () {
                     this._showDialog(context, 'Do you want to close?',
-                        'Your will loose your progress.', true);
+                        'Your progress will be Saved as Draft.', true);
                   },
                   child: Icon(Icons.cancel_sharp, color: Colors.white),
                 )),
@@ -279,19 +290,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               data.add(Padding(
                                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                 child: _buildDropDown(
-                                    isRequired: field!['isRequired'] == true,
-                                    key: field['key'].toString(),
-                                    labelText: field['label'].toString(),
-                                    options: field['options'],
-                                    value: field['options'][0]['_id'] != null
-                                        ? field['options'][0]['_id']
-                                        : field['options'][0]['name'] != null
-                                            ? field['options'][0]['name']
-                                            : field['options'][0]['title'],
-                                    hasHelpLabel: field['hasHelpLabel'],
-                                    helpLabelText: field['helpLabelText'] ??
-                                        'Please select an option',
-                                    index: field['index']),
+                                  isRequired: field!['isRequired'] == true,
+                                  key: field['key'].toString(),
+                                  labelText: field['label'].toString(),
+                                  options: field['options'],
+                                  value: field['options'][0]['_id'] != null
+                                      ? field['options'][0]['_id']
+                                      : field['options'][0]['name'] != null
+                                          ? field['options'][0]['name']
+                                          : field['options'][0]['title'],
+                                  hasHelpLabel: field['hasHelpLabel'],
+                                  helpLabelText: field['helpLabelText'] ??
+                                      'Please select an option',
+                                  index: field['index'],
+                                  conditions: field!['conditions'] ?? [],
+                                ),
                               )),
                             }
                           else if (field['type'] == 'radiofield')
@@ -376,7 +389,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         title: step['stepTitle'].toString(),
                         subtitle: '',
                         content: objToConstruct,
+                        // validation: () {
+                        //   if (!(_formKey.currentState != null &&
+                        //       _formKey.currentState!.validate())) {
+                        //     return 'Please Fill All required * fields';
+                        //   }
+                        //   return null;
+                        // })),
                         validation: () {
+                          handleDraft();
                           return null;
                         })),
                   }
@@ -386,7 +407,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       print(s);
     }
     return CoolStepper(
-      showErrorSnackbar: false,
+      showErrorSnackbar: true,
       onCompleted: () {
         sendData(context, this._values);
       },
@@ -394,6 +415,26 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       config: CoolStepperConfig(
           backText: 'PREVIOUS', stepText: 'Step', icon: Icon(null)),
     );
+  }
+
+  handleDraft() async {
+    try {
+      this._values['draftName'] =
+          this._values['pcnOrMrNumber'] ?? '' + DateTime.now().toString();
+      if (this.draftId == '') {
+        this.dataService.createDraft(this._values).then((value) => {
+              if (value != '')
+                {
+                  print(value),
+                  setState(() => this.draftId = value),
+                }
+            });
+      } else {
+        this.dataService.updateDraft(this._values, this.draftId);
+      }
+    } catch (err) {
+      print(err);
+    }
   }
 
   Widget _buildDateField(
@@ -678,7 +719,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText,
       required int index,
-      required bool isRequired}) {
+      required bool isRequired,
+      List<dynamic> conditions = const []}) {
     try {
       if (this._values[key] != null && this._values[key].runtimeType == List) {
         this._values[key] = this._values[key][0]['title'] != ''
@@ -713,7 +755,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (this.mounted)
             {
               setState(() => this._values[key] = newValue),
-              _setCompleteField(key, newValue, options, []),
+              _setCompleteField(key, newValue, options, [], conditions),
             }
         },
         items: options.map((option) {
@@ -747,15 +789,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       List<dynamic> conditions = const []}) {
     List<Widget> list = [];
     int _groupValue = -1;
-
     list.add(Row(
       children: [
-        Text(title,
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 13,
-            )),
+        Flexible(
+            child: Text(title,
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 13,
+                ))),
         !Helper.isNullOrEmpty(helpLabelText)
             ? new IconButton(
                 icon: new Icon(Icons.info_outline),
@@ -825,8 +867,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               truncate = !truncate;
             },
             child: Text(
-              title,
-              softWrap: true,
+              truncate ? Helper.truncateWithEllipsis(-1, title) : title,
+              softWrap: false,
             ),
           ),
         ],
@@ -845,8 +887,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   _setAddressValues(data) {
     if (data['district'] != null) {
-      this._values['patientDistrict'] = data['district']['title'];
-      this._values['patientProvince'] = data['province']['title'];
+      this._values['patientDistrict'] =
+          data['district']['title'] + '-' + data['district']['code'];
+      this._values['patientProvince'] =
+          data['province']['title'] + '-' + data['province']['code'];
     }
   }
 
@@ -996,18 +1040,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           }
         default:
           if (conditions.length > 0) {
-            conditions.forEach(
-              (each) => matches.add({
-                'key': each!['key'],
-                'unHide': each!['unHide'],
-                'childHiddenFields': each['childHiddenFields'] ?? [],
-                'shouldHide': this._values[each!['key']] is String
-                    ? this._values[each!['key']] == each[each!['key']]
-                    : this._values[each!['key']]!.indexWhere((eachIndex) =>
-                            eachIndex!['name'] == each[each!['key']]) >
-                        -1
-              }),
-            );
+            // ignore: unnecessary_set_literal
+            conditions.forEach((each) => matches.add({
+                  'key': each!['key'],
+                  'unHide': each!['unHide'],
+                  'childHiddenFields': each['childHiddenFields'] ?? [],
+                  'shouldHide': this._values[each!['key']] is String
+                      ? this._values[each!['key']] == each[each!['key']]
+                      : this._values[each!['key']]!.indexWhere((eachIndex) =>
+                              eachIndex!['name'] == each[each!['key']]) >
+                          -1
+                }));
           }
           if (matches.length > 0) {
             matches.forEach((each) => {
@@ -1168,6 +1211,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         body: jsonEncode(values),
       );
       if (response.statusCode >= 200 && response.statusCode <= 299) {
+        this.dataService.deleteDraft(this.draftId);
         AwesomeDialog(
             context: context,
             animType: AnimType.leftSlide,
@@ -1202,6 +1246,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       buttons.add(new MaterialButton(
         child: Text("Close Anyway"),
         onPressed: () {
+          handleDraft();
           Navigator.of(context, rootNavigator: true).pop('dialog');
           Navigator.pop(context);
         },

@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'dart:convert';
+import 'dart:math';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
@@ -104,9 +104,13 @@ class Helper {
     if (cutoff == -1) {
       cutoff = myString.indexOf('...');
     }
-    return (myString.length <= cutoff)
-        ? myString
-        : '${myString.substring(0, cutoff)}...';
+    if (cutoff > -1) {
+      return (myString.length <= cutoff)
+          ? myString
+          : '${myString.substring(0, cutoff)}...';
+    } else {
+      return myString;
+    }
   }
 
   static isValidData(_values) {

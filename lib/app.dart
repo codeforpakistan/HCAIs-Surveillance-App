@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hcais/draft_view.dart';
 import 'package:hcais/hcai_form.dart';
 import 'package:hcais/home.dart';
 import 'package:hcais/login.dart';
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
     LoginPage.tag: (context) => LoginPage(),
     HomePage.tag: (context) => HomePage(),
     HcaiFormPage.tag: (context) => HcaiFormPage(),
+    DraftView.tag: (context) => DraftView(),
   };
 
   @override

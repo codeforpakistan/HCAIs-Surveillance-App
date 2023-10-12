@@ -5,6 +5,7 @@ import 'package:hcais/home.dart';
 import 'package:hcais/login.dart';
 import 'package:hcais/submitted_view.dart';
 import 'package:hcais/utils/my_shared_prefs.dart';
+import 'package:hcais/draft_view.dart';
 
 class SideDrawer extends StatefulWidget {
   SideDrawer({Key? key}) : super(key: key);
@@ -68,6 +69,16 @@ class _SideDrawerState extends State<SideDrawer> {
                     context,
                     new MaterialPageRoute(
                         builder: (context) => new Submitted()))
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.drive_file_move_rounded),
+              title: Text("Drafts"),
+              onTap: () => {
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                        builder: (context) => new DraftView()))
               },
             ),
             ListTile(
