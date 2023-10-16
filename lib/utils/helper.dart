@@ -100,7 +100,8 @@ class Helper {
     return index;
   }
 
-  static String truncateWithEllipsis(int cutoff, String myString) {
+  static String truncateWithEllipsis(
+      int cutoff, String myString, bool trucate) {
     if (cutoff == -1) {
       cutoff = myString.indexOf('...');
     }

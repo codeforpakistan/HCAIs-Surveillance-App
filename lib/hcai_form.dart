@@ -109,9 +109,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(193, 30, 47, 1),
-          title: Flexible(
-              child: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
-                  style: TextStyle(fontSize: 20, color: Colors.white))),
+          title: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
+              style: TextStyle(fontSize: 20, color: Colors.white)),
           automaticallyImplyLeading: false,
           actions: <Widget>[
             Padding(
@@ -864,11 +863,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         children: [
           GestureDetector(
             onTap: () {
-              truncate = !truncate;
+              // print('on tap');
+              // setState(() {
+              //   _trucate[key] = !_trucate[key];
+              // });
             },
             child: Text(
-              truncate ? Helper.truncateWithEllipsis(-1, title) : title,
-              softWrap: false,
+              title,
+              maxLines: 10,
+              softWrap: true,
             ),
           ),
         ],
