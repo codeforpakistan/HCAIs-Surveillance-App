@@ -220,6 +220,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     maskType: ''),
                               )),
                             }
+                          else if (field['type'] == 'label')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                                child: Text(field['label'].toString(),
+                                    style: TextStyle(
+                                        fontSize: field['fontSize'] ?? 13)),
+                              ))
+                            }
                           else if (field['type'] == 'textfield')
                             {
                               data.add(Padding(
@@ -858,23 +867,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       value: value,
       activeColor: Color(0xFF6200EE),
       groupValue: _selectedRole[key],
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            onTap: () {
-              // print('on tap');
-              // setState(() {
-              //   _trucate[key] = !_trucate[key];
-              // });
-            },
-            child: Text(
-              title,
-              maxLines: 10,
-              softWrap: true,
-            ),
-          ),
-        ],
+      title: Text(
+        title,
+        maxLines: 10,
+        softWrap: true,
       ),
       onChanged: (Object? value) {
         if (this.mounted) {
