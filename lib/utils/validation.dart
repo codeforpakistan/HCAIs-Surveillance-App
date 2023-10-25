@@ -89,16 +89,3 @@ class Validation {
     }
   }
 }
-
-
-
-      // "hasSSIbeenDetected_Conditions": [
-      //                      { "key" : "recomendSur", "recomendSur": "recomendSur", "type": "mutual", "criterail": ">"},
-      //                     { "key" : "deepSurgicalSiteInfection", "deepSurgicalSiteInfectionIndex": 0, "type": "=="},
-      //                       { "key" : "deepSurgicalSiteInfection", "deepSurgicalSiteInfectionIndex": 0, "type": "=="},
-                  
-      //                               { "key" : "deepSurgicalSiteInfection", "deepSurgicalSiteInfectionIndex": 1,  "type": "=="},
-                              
-      //                                 { "key" : "deepSurgicalSiteInfection", "deepSurgicalSiteInfectionIndex": [2,3],  "type": "in"},
-      //                                     { "key" : "deepSurgicalSiteInfection", "deepSurgicalSiteInfectionIndex": [4,5,6,7],  "type": "in"}
-      //                                     ]
