@@ -66,22 +66,26 @@ class Validation {
   static handleAndConditions(_currentValue, conditions, String returnType) {
     try {
       bool isValid = false;
-      conditions?.forEach((eachOR) => {
-            isValid = handleCriteria(
-                _currentValue[eachOR?['key']],
-                (eachOR?['type'] == 'mutual'
-                    ? _currentValue[eachOR?[eachOR?['key']]]
-                    : eachOR?['selecteds'] ?? -1),
-                eachOR?['comparisionType'] ?? '',
-                eachOR?['criteria'] ?? ''),
-            print(isValid),
-            print(eachOR?['type']),
-            print(eachOR?['selecteds']),
-          });
+      for (var eachOR in conditions) {
+        isValid = handleCriteria(
+            _currentValue[eachOR?['key']],
+            (eachOR?['type'] == 'mutual'
+                ? _currentValue[eachOR?[eachOR?['key']]]
+                : eachOR?['selecteds'] ?? -1),
+            eachOR?['comparisionType'] ?? '',
+            eachOR?['criteria'] ?? '');
+        if (!isValid) {
+          break;
+        }
+        print(isValid);
+        print(eachOR?['type']);
+        print(eachOR?['selecteds']);
+      }
+      ;
       return returnType == 'bool' ? isValid : (isValid ? 'Yes' : 'No');
     } catch (err) {
       print(err);
-      return returnType == 'bool' ? false : 'No';
+      return returnType == 'bool' ? false : '';
     }
   }
 }
