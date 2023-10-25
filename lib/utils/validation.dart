@@ -71,12 +71,12 @@ class Validation {
                 _currentValue[eachOR?['key']],
                 (eachOR?['type'] == 'mutual'
                     ? _currentValue[eachOR?[eachOR?['key']]]
-                    : eachOR?['deepSurgicalSiteInfectionIndex'] ?? -1),
+                    : eachOR?['selecteds'] ?? -1),
                 eachOR?['comparisionType'] ?? '',
                 eachOR?['criteria'] ?? ''),
             print(isValid),
             print(eachOR?['type']),
-            print(eachOR?['deepSurgicalSiteInfectionIndex']),
+            print(eachOR?['selecteds']),
           });
       return returnType == 'bool' ? isValid : (isValid ? 'Yes' : 'No');
     } catch (err) {
