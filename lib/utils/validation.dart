@@ -77,11 +77,7 @@ class Validation {
         if (!isValid) {
           break;
         }
-        print(isValid);
-        print(eachOR?['type']);
-        print(eachOR?['selecteds']);
       }
-      ;
       return returnType == 'bool' ? isValid : (isValid ? 'Yes' : 'No');
     } catch (err) {
       print(err);

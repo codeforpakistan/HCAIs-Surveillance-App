@@ -132,7 +132,7 @@ class Helper {
       animType: AnimType.leftSlide,
       headerAnimationLoop: false,
       dialogType: isError ? DialogType.error : DialogType.success,
-      showCloseIcon: false,
+      showCloseIcon: true,
       title: isError ? 'ERROR' : 'Success',
       desc: msg,
     )..show();

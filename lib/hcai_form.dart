@@ -104,7 +104,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return WillPopScope(
       onWillPop: () async {
         this._showDialog(context, 'Do you want to close?',
-            'Your Progress will be saved as Draft.', true);
+            'Your Progress will be saved as Draft.', true, false);
         return false;
       },
       child: Scaffold(
@@ -119,7 +119,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 child: GestureDetector(
                   onTap: () {
                     this._showDialog(context, 'Do you want to close?',
-                        'Your progress will be Saved as Draft.', true);
+                        'Your progress will be Saved as Draft.', true, false);
                   },
                   child: Icon(Icons.cancel_sharp, color: Colors.white),
                 )),
@@ -420,7 +420,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return CoolStepper(
       showErrorSnackbar: true,
       onCompleted: () {
-        sendData(context, this._values);
+        sendData(context, this._values, false);
       },
       steps: steps,
       config: CoolStepperConfig(
@@ -475,7 +475,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
-                      _showDialog(context, "Information", helpLabelText, false);
+                      _showDialog(
+                          context, "Information", helpLabelText, false, false);
                     },
                   )
                 : null),
@@ -531,7 +532,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
-                      _showDialog(context, "Information", helpLabelText, false);
+                      _showDialog(
+                          context, "Information", helpLabelText, false, false);
                     },
                   )
                 : null),
@@ -692,8 +694,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   ? IconButton(
                       icon: Icon(Icons.info_outline),
                       onPressed: () {
-                        _showDialog(
-                            context, "Information", helpLabelText, false);
+                        _showDialog(context, "Information", helpLabelText,
+                            false, false);
                       },
                     )
                   : null),
@@ -757,7 +759,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
-                      _showDialog(context, "Information", helpLabelText, false);
+                      _showDialog(
+                          context, "Information", helpLabelText, false, false);
                     },
                   )
                 : null),
@@ -1111,6 +1114,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       _selectedRole['isSSI'] = this._values['isSSI'];
     });
     // show simple alert
+    if (this._values['isSSI'] == 'No') {
+      this._showDialog(
+          context,
+          'If SSI Event Criteria is No, you dont need to fill the other data',
+          'Your Progress will be saved.',
+          true,
+          true);
+    }
     // if (this._values['isSSI'] == 'No') {
     //   this.updateFlagForAll(this.allSteps, true, 'SSIDetected');
     // } else if (this._values['isSSI'] == 'Yes') {
@@ -1198,7 +1209,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return data.toList();
   }
 
-  sendData(context, Map values) async {
+  sendData(context, Map values, bool forcedSubmit) async {
     try {
       if (isSubmitted) {
         print('stopping duplicate submission');
@@ -1206,7 +1217,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       }
       values['isVerified'] = false;
       values['isSubmitted'] = true;
-      if (!Helper.isValidData(this._values)) {
+      if (!Helper.isValidData(this._values) && !forcedSubmit) {
         Helper.showMsg(
             context,
             'Please select ' + Helper.missingFields(this._values)!.join(', '),
@@ -1241,8 +1252,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               debugPrint('Dialog Dissmiss from callback $type');
               Navigator.of(context).pushNamed(HomePage.tag);
             })
-          ..show()
-              .then((value) => Navigator.of(context).pushNamed(HomePage.tag));
+          ..show();
       } else {
         Helper.showMsg(context, jsonDecode(response.body).toString(), true);
       }
@@ -1251,7 +1261,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
-  _showDialog(context, String alertTitle, String alertMsg, bool showCancel) {
+  _showDialog(context, String alertTitle, String alertMsg, bool showCancel,
+      bool shouldSave) {
     List<Widget> buttons = [];
     if (showCancel) {
       buttons.add(new MaterialButton(
@@ -1263,7 +1274,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       buttons.add(new MaterialButton(
         child: Text("Close Anyway"),
         onPressed: () {
-          handleDraft();
+          if (shouldSave) {
+            sendData(context, this._values, true);
+          } else {
+            handleDraft();
+          }
           Navigator.of(context, rootNavigator: true).pop('dialog');
           Navigator.pop(context);
         },
