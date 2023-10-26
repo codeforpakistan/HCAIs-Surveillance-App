@@ -7,6 +7,7 @@ import 'package:hcais/components/FormElements.dart';
 import 'package:hcais/utils/WidgetHelper.dart';
 import 'package:hcais/utils/constants.dart';
 import 'package:hcais/utils/helper.dart';
+import 'package:hcais/utils/validation.dart';
 import 'package:hcais/services/data_service.dart';
 import 'args/Arguments.dart';
 import 'package:http/http.dart' as http;
@@ -220,6 +221,15 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     maskType: ''),
                               )),
                             }
+                          else if (field['type'] == 'label')
+                            {
+                              data.add(Padding(
+                                padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                                child: Text(field['label'].toString(),
+                                    style: TextStyle(
+                                        fontSize: field['fontSize'] ?? 13)),
+                              ))
+                            }
                           else if (field['type'] == 'textfield')
                             {
                               data.add(Padding(
@@ -259,6 +269,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     isEditedView:
                                         this._values['isEditedView'] == true,
                                     conditions: field!['conditions'] ?? [],
+                                    andConditions: field!['andConditions'] ??
+                                        {'conditions': []},
                                     hasHelpLabel:
                                         field['hasHelpLabel'] ?? false,
                                     helpLabelText: field['helpLabelText'] ??
@@ -544,6 +556,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool isRequired,
       required bool isEditedView,
       List<dynamic> conditions = const [],
+      andConditions = const {},
       required bool hasHelpLabel,
       required String helpLabelText}) {
     try {
@@ -596,7 +609,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             if (this.mounted) {
               this._values[key] = val;
               setState(() => this._values[key] = val);
-              _setCompleteField(key, val.toString(), options, [], conditions);
+              _setCompleteField(
+                  key, val.toString(), options, [], conditions, andConditions);
             }
           },
           decoration: BoxDecoration(
@@ -858,23 +872,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       value: value,
       activeColor: Color(0xFF6200EE),
       groupValue: _selectedRole[key],
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            onTap: () {
-              // print('on tap');
-              // setState(() {
-              //   _trucate[key] = !_trucate[key];
-              // });
-            },
-            child: Text(
-              title,
-              maxLines: 10,
-              softWrap: true,
-            ),
-          ),
-        ],
+      title: Text(
+        title,
+        maxLines: 10,
+        softWrap: true,
       ),
       onChanged: (Object? value) {
         if (this.mounted) {
@@ -934,7 +935,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   void _setCompleteField(String? key, String? value, List<dynamic> options,
       List<dynamic> hiddenFields,
-      [List<dynamic> conditions = const []]) async {
+      [List<dynamic> conditions = const [],
+      andConditons = const {'conditions': []}]) async {
     try {
       var matches = [];
       switch (key) {
@@ -1055,6 +1057,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                           -1
                 }));
           }
+          // handle and conditions
+          if (andConditons?['conditions']?.length > 0) {
+            String localKey = andConditons?['key'] ?? '';
+            this._values[localKey] = Validation.handleAndConditions(
+                this._values,
+                andConditons['conditions'],
+                andConditons['returnType']);
+            setState(() {
+              _selectedRole[localKey] = this._values[localKey];
+            });
+          }
           if (matches.length > 0) {
             matches.forEach((each) => {
                   if (each!['unHide']!.length > 0)
@@ -1097,12 +1110,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     setState(() {
       _selectedRole['isSSI'] = this._values['isSSI'];
     });
-    if (this._values['isSSI'] == 'No') {
-      this.updateFlagForAll(this.allSteps, true, 'SSIDetected');
-    } else if (this._values['isSSI'] == 'Yes') {
-      // this.allSteps = this.originalSteps;
-      this.updateFlagForAll(this.allSteps, false, 'SSIDetected');
-    }
+    // show simple alert
+    // if (this._values['isSSI'] == 'No') {
+    //   this.updateFlagForAll(this.allSteps, true, 'SSIDetected');
+    // } else if (this._values['isSSI'] == 'Yes') {
+    //   // this.allSteps = this.originalSteps;
+    //   this.updateFlagForAll(this.allSteps, false, 'SSIDetected');
+    // }
   }
 
   unHide(List<dynamic> fields, flag) {
