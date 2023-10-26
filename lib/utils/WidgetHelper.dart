@@ -12,6 +12,7 @@ class WidgetHelper {
               text: isRequired ? " *" : "",
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
         ]),
+        softWrap: true, // Allow text
       ),
       SizedBox(height: 4)
     ]);

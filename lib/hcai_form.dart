@@ -626,7 +626,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           ),
           buttonText: Text(''),
           title: hasHelpLabel
-              ? Text(helpLabelText != '' ? helpLabelText : 'Please Select')
+              ? Text(
+                  helpLabelText != '' ? helpLabelText : 'Please Select',
+                  maxLines: 4,
+                  softWrap: true,
+                )
               : Text('Please Select'),
           dialogWidth: MediaQuery.of(context).size.width * 0.9,
           searchable: true,
