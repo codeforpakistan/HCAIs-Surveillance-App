@@ -148,7 +148,7 @@ class Helper {
     } else if (maskType == 'cnic' ||
         maskType == 'number' ||
         maskType == 'float') {
-      return TextInputType.number;
+      return TextInputType.numberWithOptions(decimal: true);
     } else {
       return TextInputType.text;
     }

@@ -7,7 +7,7 @@ class Validation {
       return isLessThan(value1, value2, comparisionType);
     } else if (criteria == '==') {
       return isEqual(value1, value2, comparisionType);
-    } else if (criteria == 'in' || criteria == 'and') {
+    } else if (criteria == 'in' || criteria == 'and' || criteria == 'nin') {
       //now all values of array 2 which is in value2 must be in 1 otherwise false
       return hasValue1ContainsValue2(value1, value2, criteria);
     } else {
@@ -31,6 +31,11 @@ class Validation {
             !isNullOrEmpty(value) &&
             value1.any(
                 (map) => map.containsKey("index") && map["index"] == value));
+      } else if (criteria == 'nin') {
+        return value2?.any((value) =>
+            !isNullOrEmpty(value) &&
+            value1.any(
+                (map) => map.containsKey("index") && map["index"] != value));
       }
     } else {
       return false;
