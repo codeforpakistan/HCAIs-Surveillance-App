@@ -104,7 +104,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     return WillPopScope(
       onWillPop: () async {
         this._showDialog(context, 'Do you want to close?',
-            'Your Progress will be saved as Draft.', true, false);
+            'Your Progress will be saved as Draft.', true, false, false);
         return false;
       },
       child: Scaffold(
@@ -118,8 +118,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 padding: EdgeInsets.only(right: 20.0),
                 child: GestureDetector(
                   onTap: () {
-                    this._showDialog(context, 'Do you want to close?',
-                        'Your progress will be Saved as Draft.', true, false);
+                    this._showDialog(
+                        context,
+                        'Do you want to close?',
+                        'Your progress will be Saved as Draft.',
+                        true,
+                        false,
+                        false);
                   },
                   child: Icon(Icons.cancel_sharp, color: Colors.white),
                 )),
@@ -328,6 +333,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     key: field['key'].toString(),
                                     options: field['options'],
                                     truncate: field['truncate'] ?? false,
+                                    readOnly: field['readOnly'] ?? false,
                                     helpLabelText: field['hasHelpLabel']
                                         ? field['helpLabelText']
                                         : '',
@@ -475,8 +481,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
-                      _showDialog(
-                          context, "Information", helpLabelText, false, false);
+                      _showDialog(context, "Information", helpLabelText, false,
+                          false, false);
                     },
                   )
                 : null),
@@ -515,7 +521,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     childs.children.add(TextFormField(
         validator: validator,
         keyboardType: Helper.getMaskType(maskType),
-        inputFormatters: Helper.getMask(maskType),
+        // inputFormatters: Helper.getMask(maskType),
         decoration: InputDecoration(
             filled: true,
             fillColor: readOnly
@@ -532,8 +538,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
-                      _showDialog(
-                          context, "Information", helpLabelText, false, false);
+                      _showDialog(context, "Information", helpLabelText, false,
+                          false, false);
                     },
                   )
                 : null),
@@ -699,7 +705,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       icon: Icon(Icons.info_outline),
                       onPressed: () {
                         _showDialog(context, "Information", helpLabelText,
-                            false, false);
+                            false, false, false);
                       },
                     )
                   : null),
@@ -763,8 +769,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 ? IconButton(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
-                      _showDialog(
-                          context, "Information", helpLabelText, false, false);
+                      _showDialog(context, "Information", helpLabelText, false,
+                          false, false);
                     },
                   )
                 : null),
@@ -804,6 +810,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String key,
       required List<dynamic> options,
       required bool truncate,
+      required bool readOnly,
       required String helpLabelText,
       required List<dynamic> hiddenFeilds,
       List<dynamic> conditions = const []}) {
@@ -853,6 +860,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               groupValue: _groupValue,
               selected: options[0]['name'],
               truncate: truncate,
+              readOnly: readOnly,
               helpLabelText: helpLabelText,
               hiddenFeilds: hiddenFeilds,
               conditions: conditions))
@@ -871,6 +879,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required int groupValue,
       String? selected,
       required bool truncate,
+      required bool readOnly,
       required String helpLabelText,
       required List<dynamic> hiddenFeilds,
       List<dynamic> conditions = const []}) {
@@ -879,13 +888,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       value: value,
       activeColor: Color(0xFF6200EE),
       groupValue: _selectedRole[key],
-      title: Text(
-        title,
-        maxLines: 10,
-        softWrap: true,
-      ),
+      title: Text(title,
+          maxLines: 10,
+          softWrap: true,
+          style: readOnly
+              ? TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 13,
+                )
+              : null),
       onChanged: (Object? value) {
-        if (this.mounted) {
+        if (this.mounted && !readOnly) {
           setState(() {
             _selectedRole[key] = value;
             _values[key] = title;
@@ -1121,10 +1134,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     if (this._values['isSSI'] == 'No') {
       this._showDialog(
           context,
-          'If SSI Event Criteria is No, you dont need to fill the other data',
-          'Your Progress will be saved.',
+          'Surgical Site Infection (SSI) event criteria has not been met. SSI does not exist.',
+          'Your data will be saved.',
           true,
-          true);
+          true,
+          false);
     }
     // if (this._values['isSSI'] == 'No') {
     //   this.updateFlagForAll(this.allSteps, true, 'SSIDetected');
@@ -1265,18 +1279,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
-  _showDialog(context, String alertTitle, String alertMsg, bool showCancel,
-      bool shouldSave) {
+  _showDialog(context, String alertTitle, String alertMsg, bool showOnlyCancel,
+      bool shouldSave, bool showOnlyClose) {
     List<Widget> buttons = [];
-    if (showCancel) {
+    if (showOnlyClose) {
       buttons.add(new MaterialButton(
         child: Text("No"),
         onPressed: () {
           Navigator.of(context, rootNavigator: true).pop('dialog');
         },
       ));
+    }
+    if (showOnlyCancel) {
       buttons.add(new MaterialButton(
-        child: Text("Close Anyway"),
+        child: Text("Close"),
         onPressed: () {
           if (shouldSave) {
             sendData(context, this._values, true);
