@@ -465,7 +465,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     if (this._values[selectedDateKey] == null) {
       this._values[selectedDateKey] = '';
     }
-    Column childs = WidgetHelper.buildColumn(hint.toString(), isRequired);
+    Column childs =
+        WidgetHelper.buildColumn(hint.toString(), isRequired, context);
     childs.children.add(DateTimeFormField(
         decoration: InputDecoration(
             filled: true,
@@ -517,7 +518,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     if (myController.text == '' && this._values[key] != null) {
       myController.text = this._values[key];
     }
-    Column childs = WidgetHelper.buildColumn(labelText.toString(), isRequired);
+    Column childs =
+        WidgetHelper.buildColumn(labelText.toString(), isRequired, context);
     childs.children.add(TextFormField(
         validator: validator,
         keyboardType: Helper.getMaskType(maskType),
@@ -610,7 +612,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               ? options.where((i) => i!['selected'] == true).toList()
               : this._values[key]) ??
           [];
-      Column childs = WidgetHelper.buildColumn(label.toString(), isRequired);
+      Column childs = WidgetHelper.buildColumn(label.toString(), isRequired,
+          context, hasHelpLabel ? helpLabelText : '');
       childs.children.add(MultiSelectDialogField(
           buttonIcon: Icon(Icons.arrow_drop_down),
           onConfirm: (val) {
@@ -631,13 +634,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             color: Color.fromRGBO(242, 242, 242, 1),
           ),
           buttonText: Text(''),
-          title: hasHelpLabel
-              ? Text(
-                  helpLabelText != '' ? helpLabelText : 'Please Select',
-                  maxLines: 4,
-                  softWrap: true,
-                )
-              : Text('Please Select'),
+          title: Text('Please Select'),
           dialogWidth: MediaQuery.of(context).size.width * 0.9,
           searchable: true,
           items: _options,
@@ -685,7 +682,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               {items.add(each['title'])}
           });
       Column childs =
-          WidgetHelper.buildColumn(labelText.toString(), isRequired);
+          WidgetHelper.buildColumn(labelText.toString(), isRequired, context);
       childs.children.add(DropdownSearch<String>(
         items: items,
         enabled: true,
@@ -753,7 +750,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             : this._values[key][0]['name'];
       }
       Column childs =
-          WidgetHelper.buildColumn(labelText.toString(), isRequired);
+          WidgetHelper.buildColumn(labelText.toString(), isRequired, context);
       childs.children.add(DropdownButtonFormField(
         decoration: InputDecoration(
             filled: true,

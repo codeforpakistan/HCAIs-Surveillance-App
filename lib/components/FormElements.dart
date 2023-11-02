@@ -22,7 +22,8 @@ class FormElements {
     // if (myController.text == '' && this._values[key] != null) {
     //   myController.text = this._values[key];
     // }
-    Column childs = WidgetHelper.buildColumn(labelText.toString(), isRequired);
+    Column childs =
+        WidgetHelper.buildColumn(labelText.toString(), isRequired, null);
     childs.children.add(TextFormField(
         validator: validator,
         keyboardType: Helper.getMaskType(maskType),
