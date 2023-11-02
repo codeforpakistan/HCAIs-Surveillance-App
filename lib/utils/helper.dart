@@ -142,6 +142,12 @@ class Helper {
       ? name.trim().split(' ').map((l) => l[0]).take(3).join()
       : '';
 
+  static String getContentbyParentheses(String name) {
+    RegExp regex = RegExp(r'\((.*?)\)');
+    RegExpMatch? match = regex.firstMatch(name);
+    return match != null ? match.group(1) ?? '' : '';
+  }
+
   static TextInputType getMaskType(maskType) {
     if (maskType == 'phone') {
       return TextInputType.phone;

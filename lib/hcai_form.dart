@@ -110,7 +110,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(193, 30, 47, 1),
-          title: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
+          title: Text(
+              Helper.getContentbyParentheses(args.hcaiTitle.toUpperCase()),
               style: TextStyle(fontSize: 20, color: Colors.white)),
           automaticallyImplyLeading: false,
           actions: <Widget>[
@@ -175,14 +176,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             if (stepIndex == 0)
               {
                 data.add(Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                  padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
                   child: Text(
-                    hcaiForm['description'].toString(),
+                    hcaiForm['description'].toString().replaceAll(r'\n', '\n'),
                     textAlign: TextAlign.justify,
-                    style:
-                        TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                )),
+                ))
               },
             if (step['fields'] is List)
               {

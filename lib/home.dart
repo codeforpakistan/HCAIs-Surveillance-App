@@ -82,10 +82,14 @@ class _HomePagePageState extends State<HomePage> {
                             return Container();
                           }
                           if (snapshot.hasData) {
-                            if (snapshot.data![0]!['user']!['hospitals']!
+                            if (snapshot.data![0]!['user']!['hospitals']
                                         .length >
                                     1 &&
                                 this.selectedHospital == '') {
+                              List<dynamic> hospitals =
+                                  snapshot.data![0]!['user']!['hospitals'];
+                              hospitals.sort((a, b) => a['name'].compareTo(b[
+                                  'name'])); // Assuming 'name' is the property you want to sort by
                               return Flexible(
                                   child: _buildDropDown(
                                       hasHelpLabel: true,
@@ -93,8 +97,8 @@ class _HomePagePageState extends State<HomePage> {
                                       index: 0,
                                       isRequired: true,
                                       labelText: 'Select Hospital',
-                                      options: snapshot
-                                          .data![0]!['user']!['hospitals'],
+                                      options:
+                                          hospitals, // Pass the sorted list to the dropdown
                                       key: 'hospital',
                                       data: snapshot.data,
                                       context: context));
