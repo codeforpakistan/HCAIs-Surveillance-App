@@ -110,7 +110,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromRGBO(193, 30, 47, 1),
-          title: Text(Helper.getInitials(args.hcaiTitle.toUpperCase()),
+          title: Text(args.hcaiTitle.toUpperCase(),
               style: TextStyle(fontSize: 20, color: Colors.white)),
           automaticallyImplyLeading: false,
           actions: <Widget>[
@@ -1068,7 +1068,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   'unHide': each!['unHide'],
                   'childHiddenFields': each['childHiddenFields'] ?? [],
                   'shouldHide': this._values[each!['key']] is String
-                      ? this._values[each!['key']] == each[each!['key']]
+                      ? (this._values[each!['key']] == each[each!['key']] ||
+                          each[each!['key']] == 'all')
                       : this._values[each!['key']]!.indexWhere((eachIndex) =>
                               eachIndex!['name'] == each[each!['key']]) >
                           -1

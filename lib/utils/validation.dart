@@ -32,9 +32,9 @@ class Validation {
             value1.any(
                 (map) => map.containsKey("index") && map["index"] == value));
       } else if (criteria == 'nin') {
-        return value2?.any((value) =>
+        return value2?.every((value) =>
             !isNullOrEmpty(value) &&
-            value1.any(
+            value1.every(
                 (map) => map.containsKey("index") && map["index"] != value));
       }
     } else {
