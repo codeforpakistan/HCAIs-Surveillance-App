@@ -205,7 +205,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               data.add(Padding(
                                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                 child: _buildTextField(
-                                    key: field['key'].toString(),
+                                    key: field['key']!.toString(),
                                     isRequired: field!['isRequired'] == true,
                                     labelText: field['label'].toString(),
                                     validator: (value) {
@@ -290,8 +290,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   isRequired: field!['isRequired'] == true,
                                   key: field['key'].toString(),
                                   options: field['options'],
-                                  hasHelpLabel: false,
-                                  helpLabelText: '',
+                                  hasHelpLabel: field['hasHelpLabel'] ?? false,
+                                  helpLabelText: field['helpLabelText'] ?? '',
                                   labelText: field['label'].toString(),
                                   value: '',
                                   onChange: field['onChange'] ?? '',
@@ -365,7 +365,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     helpLabelText: field['helpLabelText'] ??
                                         'Please select a date',
                                     type: 'date',
-                                    selectedDate: DateTime.now()),
+                                    selectedDate: DateTime.now(),
+                                    calculateDates:
+                                        field!['calculateDates'] ?? {}),
                               ))
                             }
                           else if (field['type'] == 'timefield')
@@ -380,7 +382,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                     helpLabelText: field['helpLabelText'] ??
                                         'Please select a date',
                                     type: 'time',
-                                    selectedDate: DateTime.now()),
+                                    selectedDate: DateTime.now(),
+                                    calculateDates:
+                                        field!['calculateDates'] ?? {}),
                               ))
                             }
                           else if (field['type'] == 'divider')
@@ -461,7 +465,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String helpLabelText,
       String? type,
       required DateTime selectedDate,
-      required bool isRequired}) {
+      required bool isRequired,
+      calculateDates = const {}}) {
     if (this._values[selectedDateKey] == null) {
       this._values[selectedDateKey] = '';
     }
@@ -498,7 +503,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             setState(() {
               this._values[selectedDateKey] = value.toIso8601String();
             });
-            _setCompleteField(selectedDateKey, value.toIso8601String(), [], []);
+            _setCompleteField(selectedDateKey, value.toIso8601String(), [], [],
+                [], [], calculateDates);
           }
         }));
     return childs;
@@ -506,7 +512,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   Widget _buildTextField(
       {String? labelText,
-      String? key,
+      required String key,
       FormFieldValidator<String>? validator,
       required TextEditingController myController,
       required bool hasHelpLabel,
@@ -601,6 +607,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 }
             });
       }
+      if (key == 'superficialSurgicalSiteInfection')
+        options[0]['selected'] = true;
+      }
       final _options = options
           .map((each) => MultiSelectItem(
               each,
@@ -608,10 +617,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   ? each['name'].toString()
                   : each['title'].toString()))
           .toList();
-      var initialValue = (isEditedView
+
+      var initialValue = isEditedView
               ? options.where((i) => i!['selected'] == true).toList()
-              : this._values[key]) ??
-          [];
+              : this._values[key] ?? [];
       Column childs = WidgetHelper.buildColumn(label.toString(), isRequired,
           context, hasHelpLabel ? helpLabelText : '');
       childs.children.add(MultiSelectDialogField(
@@ -681,8 +690,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             else if (each['title'] != null)
               {items.add(each['title'])}
           });
-      Column childs =
-          WidgetHelper.buildColumn(labelText.toString(), isRequired, context);
+      Column childs = WidgetHelper.buildColumn(labelText.toString(), isRequired,
+          context, hasHelpLabel ? helpLabelText : '');
       childs.children.add(DropdownSearch<String>(
         items: items,
         enabled: true,
@@ -950,12 +959,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 
-  void _setCompleteField(String? key, String? value, List<dynamic> options,
+  void _setCompleteField(String key, String? value, List<dynamic> options,
       List<dynamic> hiddenFields,
       [List<dynamic> conditions = const [],
-      andConditons = const {'conditions': []}]) async {
+      andConditons = const {'conditions': []},
+      calculateDates = const []]) async {
     try {
       var matches = [];
+      print(key.runtimeType);
       switch (key) {
         case 'isSSI':
           {
@@ -1076,7 +1087,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 }));
           }
           // handle and conditions
-          if (andConditons?['conditions']?.length > 0) {
+          if (andConditons.length > 0 &&
+              andConditons?['conditions']?.length > 0) {
             String localKey = andConditons?['key'] ?? '';
             this._values[localKey] = Validation.handleAndConditions(
                 this._values,
@@ -1098,10 +1110,22 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     }
                 });
           }
+          if (calculateDates.length > 0) {
+            calculateDates.forEach((eachCalculation) => {
+                  _values[eachCalculation['calculatedKey']] =
+                      Helper.daysBetweenDate(
+                              _values[eachCalculation!['to']] ?? '',
+                              _values[eachCalculation!['from']] ?? '',
+                              'days')
+                          .toString(),
+                  print(_values[eachCalculation['calculatedKey']])
+                });
+          }
           break;
       }
-    } catch (e) {
-      print('error in switch' + e.toString());
+    } catch (e, stacktrace) {
+      print('Exception: ' + e.toString());
+      print('Stacktrace: ' + stacktrace.toString());
     }
   }
 
