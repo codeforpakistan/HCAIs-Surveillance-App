@@ -7,8 +7,9 @@ class WidgetHelper {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(
         children: [
-          RichText(
-            textAlign: TextAlign.center,
+          Flexible(
+              child: RichText(
+            textAlign: TextAlign.left,
             text: TextSpan(children: <TextSpan>[
               TextSpan(
                   text: label.toString(),
@@ -16,10 +17,13 @@ class WidgetHelper {
               TextSpan(
                   text: isRequired ? " *" : "",
                   style: TextStyle(
-                      color: Colors.red, fontWeight: FontWeight.bold)),
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  )),
             ]),
-            softWrap: true, // Allow text
-          ),
+            softWrap: true,
+            maxLines: 10,
+          )),
           Visibility(
             visible: helperText != '',
             child: SizedBox(width: 8), // Add some space between Icon and Text

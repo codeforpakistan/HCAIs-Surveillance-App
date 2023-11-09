@@ -122,20 +122,21 @@ class _DraftState extends State<DraftView> {
                                                           .data![index]
                                                               ?['createdAt']!
                                                           .substring(0, 10)),
-                                                      trailing: new IconButton(
-                                                        icon: new Icon(
-                                                            Icons.delete),
-                                                        onPressed: () async {
-                                                          this
-                                                              .dataService
-                                                              .deleteDraft(
-                                                                  snapshot.data![
-                                                                          index]
-                                                                      ['_id']);
-                                                          await this
-                                                              .getDrafts();
-                                                        },
-                                                      ),
+                                                      trailing: null,
+// new IconButton(
+//                                                         icon: new Icon(
+//                                                             Icons.delete),
+//                                                         onPressed: () async {
+//                                                           this
+//                                                               .dataService
+//                                                               .deleteDraft(
+//                                                                   snapshot.data![
+//                                                                           index]
+//                                                                       ['_id']);
+//                                                           await this
+//                                                               .getDrafts();
+//                                                         },
+//                                                       ),
                                                       onTap: () {
                                                         Navigator.of(context)
                                                             .pushNamed(

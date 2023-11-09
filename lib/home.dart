@@ -157,7 +157,7 @@ class _HomePagePageState extends State<HomePage> {
         arguments: new Arguments(
             hcaiId: data?[index]['_id'],
             hospitalId: this.selectedHospital,
-            hcaiTitle: data?[index]['title'],
+            hcaiTitle: data?[index]['category'] ?? data?[index]['title'],
             userId: data![0]!['user']['_id'] ?? '',
             goodToGo: true,
             values: values,
