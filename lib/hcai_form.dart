@@ -576,6 +576,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText}) {
     try {
+      bool isWithInRange = false;
       if (options.length <= 0) {
         return Container();
       }
@@ -584,8 +585,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         this._values[key] = [this._values[key]];
       }
       List<dynamic> found = [];
-      if (isEditedView) {
+      if (key == 'superficialSurgicalSiteInfection' ||
+          key == 'deepSurgicalSiteInfection') {
+        isWithInRange =
+            Helper.isGreaterThan30(this._values['infectionSurveyTime']);
+      }
+      if (isEditedView || isWithInRange) {
         String name = '';
+        int counter = 0;
         options.forEach((each) => {
               name = each['name'] != null
                   ? each['name'].toString()
@@ -604,11 +611,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               if (found.length > 0)
                 {
                   each['selected'] = true,
-                }
+                },
+              if (counter == 0 && isWithInRange)
+                {
+                  each['selected'] = true,
+                },
+              counter++,
             });
-      }
-      if (key == 'superficialSurgicalSiteInfection')
-        options[0]['selected'] = true;
       }
       final _options = options
           .map((each) => MultiSelectItem(
@@ -618,9 +627,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   : each['title'].toString()))
           .toList();
 
-      var initialValue = isEditedView
-              ? options.where((i) => i!['selected'] == true).toList()
-              : this._values[key] ?? [];
+      var initialValue = (isEditedView || isWithInRange)
+          ? options.where((i) => i!['selected'] == true).toList()
+          : this._values[key] ?? [];
       Column childs = WidgetHelper.buildColumn(label.toString(), isRequired,
           context, hasHelpLabel ? helpLabelText : '');
       childs.children.add(MultiSelectDialogField(
@@ -966,7 +975,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       calculateDates = const []]) async {
     try {
       var matches = [];
-      print(key.runtimeType);
       switch (key) {
         case 'isSSI':
           {
@@ -1072,20 +1080,29 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             break;
           }
         default:
+          var allForceHidden = [];
           if (conditions.length > 0) {
             // ignore: unnecessary_set_literal
-            conditions.forEach((each) => matches.add({
-                  'key': each!['key'],
-                  'unHide': each!['unHide'],
-                  'childHiddenFields': each['childHiddenFields'] ?? [],
-                  'shouldHide': this._values[each!['key']] is String
-                      ? (this._values[each!['key']] == each[each!['key']] ||
-                          each[each!['key']] == 'all')
-                      : this._values[each!['key']]!.indexWhere((eachIndex) =>
-                              eachIndex!['name'] == each[each!['key']]) >
-                          -1
-                }));
+            conditions.forEach((each) => {
+                  matches.add({
+                    'key': each!['key'],
+                    'unHide': each!['unHide'],
+                    'childHiddenFields': each['childHiddenFields'] ?? [],
+                    'shouldHide': this._values[each!['key']] is String
+                        ? (this._values[each!['key']] == each[each!['key']] ||
+                            each[each!['key']] == 'all')
+                        : this._values[each!['key']]!.indexWhere((eachIndex) =>
+                                eachIndex!['name'] == each[each!['key']]) >
+                            -1
+                  }),
+                  if (!Helper.isNullOrEmpty(each!['forceHide']) &&
+                      each!['forceHide']!.length > 0)
+                    {
+                      allForceHidden.addAll(each['forceHide']),
+                    }
+                });
           }
+          // force hidden fields
           // handle and conditions
           if (andConditons.length > 0 &&
               andConditons?['conditions']?.length > 0) {
@@ -1110,6 +1127,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     }
                 });
           }
+          if (allForceHidden.length > 0) {
+            this.unHide(allForceHidden, true);
+          }
           if (calculateDates.length > 0) {
             calculateDates.forEach((eachCalculation) => {
                   _values[eachCalculation['calculatedKey']] =
@@ -1117,8 +1137,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               _values[eachCalculation!['to']] ?? '',
                               _values[eachCalculation!['from']] ?? '',
                               'days')
-                          .toString(),
-                  print(_values[eachCalculation['calculatedKey']])
+                          .toString()
                 });
           }
           break;

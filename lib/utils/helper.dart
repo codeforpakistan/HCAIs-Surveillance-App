@@ -172,4 +172,12 @@ class Helper {
   static bool isNullOrEmpty(value) {
     return value == null || value == '';
   }
+
+  static bool isGreaterThan30(infectionSurveyTime) {
+    try {
+      return int.parse(infectionSurveyTime) <= 30;
+    } catch (err) {
+      return false;
+    }
+  }
 }
