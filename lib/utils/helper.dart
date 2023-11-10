@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:intl/intl.dart';
 
 class Helper {
   static int daysBetweenDate(date1, date2, String returnType) {
@@ -178,6 +180,56 @@ class Helper {
       return int.parse(infectionSurveyTime) <= 30;
     } catch (err) {
       return false;
+    }
+  }
+
+  static List<MultiSelectItem> getOptions(
+      List<dynamic> options, String key, int age) {
+    if (key == 'signsorSymptoms') {
+      if (age <= 1) {
+        options = [
+          {"name": "Fever (>38°C)"},
+          {"name": "Hypothermia"},
+          {"name": "Apnea"},
+          {"name": "Bradycardia"},
+          {"name": "Lethargy"},
+          {"name": "Vomiting"},
+          {"name": "Suprapubic Tenderness"}
+        ];
+      } else {
+        options = [
+          {"name": "Fever (>38°C)"},
+          {"name": "Suprapubic Tenderness"},
+          {"name": "Costovertebral Angle Pain or Tenderness"},
+          {"name": "Urinary Urgency"},
+          {"name": "Urinary Frequency"},
+          {"name": "Dysuria"},
+        ];
+      }
+    }
+    return options
+        .map<MultiSelectItem<Object?>>((each) => MultiSelectItem(
+            each,
+            each['name'] != null
+                ? each['name'].toString()
+                : each['title'].toString()))
+        .toList();
+  }
+
+  static String rangeInText(_values) {
+    try {
+      var dateToConsider =
+          _values['sameDateforSigns/Symptoms&UrineSampleCollection'] == 'Yes'
+              ? _values['dateofAppearanceofFirstSignsorSymptoms']
+              : _values['dateofUrineSampleCollectionforCulture'];
+      if (isNullOrEmpty(dateToConsider)) return '';
+      dateToConsider = DateTime.parse(dateToConsider);
+      DateTime startDate = dateToConsider.subtract(Duration(days: 3));
+      DateTime endDate = dateToConsider.add(Duration(days: 3));
+      return '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('d').format(endDate)}';
+    } catch (e) {
+      print(e);
+      return '';
     }
   }
 }

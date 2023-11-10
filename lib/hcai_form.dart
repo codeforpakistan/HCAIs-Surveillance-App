@@ -619,14 +619,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               counter++,
             });
       }
-      final _options = options
-          .map((each) => MultiSelectItem(
-              each,
-              each['name'] != null
-                  ? each['name'].toString()
-                  : each['title'].toString()))
-          .toList();
-
+      final _options =
+          Helper.getOptions(options, key, this._values['ageDiff'] ?? -1);
       var initialValue = (isEditedView || isWithInRange)
           ? options.where((i) => i!['selected'] == true).toList()
           : this._values[key] ?? [];
@@ -1025,11 +1019,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           }
         case 'patientDateOfBirth':
           {
-            this._values['patientAge'] = Helper.daysBetweenDate(
-                    this._values['patientDateOfBirth'],
-                    new DateTime.now().toString(),
-                    'years')
-                .toString();
+            this._values['ageDiff'] = Helper.daysBetweenDate(
+                this._values['patientDateOfBirth'],
+                new DateTime.now().toString(),
+                'years');
+            this._values['patientAge'] = this._values['ageDiff'].toString();
             break;
           }
         case 'patientWeight':
@@ -1079,68 +1073,69 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             break;
           }
-        default:
-          var allForceHidden = [];
-          if (conditions.length > 0) {
-            // ignore: unnecessary_set_literal
-            conditions.forEach((each) => {
-                  matches.add({
-                    'key': each!['key'],
-                    'unHide': each!['unHide'],
-                    'childHiddenFields': each['childHiddenFields'] ?? [],
-                    'shouldHide': this._values[each!['key']] is String
-                        ? (this._values[each!['key']] == each[each!['key']] ||
-                            each[each!['key']] == 'all')
-                        : this._values[each!['key']]!.indexWhere((eachIndex) =>
-                                eachIndex!['name'] == each[each!['key']]) >
-                            -1
-                  }),
-                  if (!Helper.isNullOrEmpty(each!['forceHide']) &&
-                      each!['forceHide']!.length > 0)
-                    {
-                      allForceHidden.addAll(each['forceHide']),
-                    }
-                });
+        case 'sameDateforSigns/Symptoms&UrineSampleCollection':
+        case 'dateofAppearanceofFirstSignsorSymptoms':
+        case 'dateofUrineSampleCollectionforCulture':
+          {
+            this._values['infectionWindowPeriod'] =
+                Helper.rangeInText(this._values);
+            break;
           }
-          // force hidden fields
-          // handle and conditions
-          if (andConditons.length > 0 &&
-              andConditons?['conditions']?.length > 0) {
-            String localKey = andConditons?['key'] ?? '';
-            this._values[localKey] = Validation.handleAndConditions(
-                this._values,
-                andConditons['conditions'],
-                andConditons['returnType']);
-            setState(() {
-              _selectedRole[localKey] = this._values[localKey];
+      }
+      var allForceHidden = [];
+      if (conditions.length > 0) {
+        // ignore: unnecessary_set_literal
+        conditions.forEach((each) => {
+              matches.add({
+                'key': each!['key'],
+                'unHide': each!['unHide'],
+                'childHiddenFields': each['childHiddenFields'] ?? [],
+                'shouldHide': this._values[each!['key']] is String
+                    ? (this._values[each!['key']] == each[each!['key']] ||
+                        each[each!['key']] == 'all')
+                    : this._values[each!['key']]!.indexWhere((eachIndex) =>
+                            eachIndex!['name'] == each[each!['key']]) >
+                        -1
+              }),
+              if (!Helper.isNullOrEmpty(each!['forceHide']) &&
+                  each!['forceHide']!.length > 0)
+                {
+                  allForceHidden.addAll(each['forceHide']),
+                }
             });
-          }
-          if (matches.length > 0) {
-            matches.forEach((each) => {
-                  if (each!['unHide']!.length > 0)
-                    {
-                      // if parent elements are going to hide, hide the child even if they are dependent on subchild
-                      if (each!['shouldHide'] == false &&
-                          each!['childHiddenFields']!.length > 0)
-                        {each!['unHide']!.addAll(each!['childHiddenFields'])},
-                      this.unHide(each!['unHide'], !each!['shouldHide']),
-                    }
-                });
-          }
-          if (allForceHidden.length > 0) {
-            this.unHide(allForceHidden, true);
-          }
-          if (calculateDates.length > 0) {
-            calculateDates.forEach((eachCalculation) => {
-                  _values[eachCalculation['calculatedKey']] =
-                      Helper.daysBetweenDate(
-                              _values[eachCalculation!['to']] ?? '',
-                              _values[eachCalculation!['from']] ?? '',
-                              'days')
-                          .toString()
-                });
-          }
-          break;
+      }
+      // force hidden fields
+      // handle and conditions
+      if (andConditons.length > 0 && andConditons?['conditions']?.length > 0) {
+        String localKey = andConditons?['key'] ?? '';
+        this._values[localKey] = Validation.handleAndConditions(this._values,
+            andConditons['conditions'], andConditons['returnType']);
+        setState(() {
+          _selectedRole[localKey] = this._values[localKey];
+        });
+      }
+      if (matches.length > 0) {
+        matches.forEach((each) => {
+              if (each!['unHide']!.length > 0)
+                {
+                  // if parent elements are going to hide, hide the child even if they are dependent on subchild
+                  if (each!['shouldHide'] == false &&
+                      each!['childHiddenFields']!.length > 0)
+                    {each!['unHide']!.addAll(each!['childHiddenFields'])},
+                  this.unHide(each!['unHide'], !each!['shouldHide']),
+                }
+            });
+      }
+      if (allForceHidden.length > 0) {
+        this.unHide(allForceHidden, true);
+      }
+      if (calculateDates.length > 0) {
+        calculateDates.forEach((eachCalculation) => {
+              _values[eachCalculation['calculatedKey']] =
+                  Helper.daysBetweenDate(_values[eachCalculation!['to']] ?? '',
+                          _values[eachCalculation!['from']] ?? '', 'days')
+                      .toString()
+            });
       }
     } catch (e, stacktrace) {
       print('Exception: ' + e.toString());
@@ -1354,3 +1349,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 }
+
+
+              // "onChange" : "address/get-signs-and-symptoms",
+              //       "populate": "signsorSymptoms",
