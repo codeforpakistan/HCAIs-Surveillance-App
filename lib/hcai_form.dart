@@ -447,7 +447,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               if (value != '')
                 {
                   print(value),
-                  setState(() => this.draftId = value),
+                  if (Helper.isNullOrEmpty(this.draftId))
+                    {
+                      setState(() => this.draftId = value),
+                    }
                 }
             });
       } else {
@@ -1073,7 +1076,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             break;
           }
-        case 'sameDateforSigns/Symptoms&UrineSampleCollection':
         case 'dateofAppearanceofFirstSignsorSymptoms':
         case 'dateofUrineSampleCollectionforCulture':
           {
@@ -1081,61 +1083,72 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 Helper.rangeInText(this._values);
             break;
           }
-      }
-      var allForceHidden = [];
-      if (conditions.length > 0) {
-        // ignore: unnecessary_set_literal
-        conditions.forEach((each) => {
-              matches.add({
-                'key': each!['key'],
-                'unHide': each!['unHide'],
-                'childHiddenFields': each['childHiddenFields'] ?? [],
-                'shouldHide': this._values[each!['key']] is String
-                    ? (this._values[each!['key']] == each[each!['key']] ||
-                        each[each!['key']] == 'all')
-                    : this._values[each!['key']]!.indexWhere((eachIndex) =>
-                            eachIndex!['name'] == each[each!['key']]) >
-                        -1
-              }),
-              if (!Helper.isNullOrEmpty(each!['forceHide']) &&
-                  each!['forceHide']!.length > 0)
-                {
-                  allForceHidden.addAll(each['forceHide']),
-                }
-            });
-      }
-      // force hidden fields
-      // handle and conditions
-      if (andConditons.length > 0 && andConditons?['conditions']?.length > 0) {
-        String localKey = andConditons?['key'] ?? '';
-        this._values[localKey] = Validation.handleAndConditions(this._values,
-            andConditons['conditions'], andConditons['returnType']);
-        setState(() {
-          _selectedRole[localKey] = this._values[localKey];
-        });
-      }
-      if (matches.length > 0) {
-        matches.forEach((each) => {
-              if (each!['unHide']!.length > 0)
-                {
-                  // if parent elements are going to hide, hide the child even if they are dependent on subchild
-                  if (each!['shouldHide'] == false &&
-                      each!['childHiddenFields']!.length > 0)
-                    {each!['unHide']!.addAll(each!['childHiddenFields'])},
-                  this.unHide(each!['unHide'], !each!['shouldHide']),
-                }
-            });
-      }
-      if (allForceHidden.length > 0) {
-        this.unHide(allForceHidden, true);
-      }
-      if (calculateDates.length > 0) {
-        calculateDates.forEach((eachCalculation) => {
-              _values[eachCalculation['calculatedKey']] =
-                  Helper.daysBetweenDate(_values[eachCalculation!['to']] ?? '',
-                          _values[eachCalculation!['from']] ?? '', 'days')
-                      .toString()
-            });
+        default:
+          {
+            var allForceHidden = [];
+            if (conditions.length > 0) {
+              // ignore: unnecessary_set_literal
+              conditions.forEach((each) => {
+                    matches.add({
+                      'key': each!['key'],
+                      'unHide': each!['unHide'],
+                      'childHiddenFields': each['childHiddenFields'] ?? [],
+                      'shouldHide': this._values[each!['key']] is String
+                          ? (this._values[each!['key']] == each[each!['key']] ||
+                              each[each!['key']] == 'all')
+                          : this._values[each!['key']]!.indexWhere(
+                                  (eachIndex) =>
+                                      eachIndex!['name'] ==
+                                      each[each!['key']]) >
+                              -1
+                    }),
+                    if (!Helper.isNullOrEmpty(each!['forceHide']) &&
+                        each!['forceHide']!.length > 0)
+                      {
+                        allForceHidden.addAll(each['forceHide']),
+                      }
+                  });
+            }
+            // force hidden fields
+            // handle and conditions
+            if (andConditons.length > 0 &&
+                andConditons?['conditions']?.length > 0) {
+              String localKey = andConditons?['key'] ?? '';
+              this._values[localKey] = Validation.handleAndConditions(
+                  this._values,
+                  andConditons['conditions'],
+                  andConditons['returnType']);
+              setState(() {
+                _selectedRole[localKey] = this._values[localKey];
+              });
+            }
+            if (matches.length > 0) {
+              matches.forEach((each) => {
+                    if (each!['unHide']!.length > 0)
+                      {
+                        // if parent elements are going to hide, hide the child even if they are dependent on subchild
+                        if (each!['shouldHide'] == false &&
+                            each!['childHiddenFields']!.length > 0)
+                          {each!['unHide']!.addAll(each!['childHiddenFields'])},
+                        this.unHide(each!['unHide'], !each!['shouldHide']),
+                      }
+                  });
+            }
+            if (allForceHidden.length > 0) {
+              this.unHide(allForceHidden, true);
+            }
+            if (calculateDates.length > 0) {
+              calculateDates.forEach((eachCalculation) => {
+                    _values[eachCalculation['calculatedKey']] =
+                        Helper.daysBetweenDate(
+                                _values[eachCalculation!['to']] ?? '',
+                                _values[eachCalculation!['from']] ?? '',
+                                'days')
+                            .toString()
+                  });
+            }
+            break;
+          }
       }
     } catch (e, stacktrace) {
       print('Exception: ' + e.toString());

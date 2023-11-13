@@ -183,7 +183,7 @@ class Helper {
     }
   }
 
-  static List<MultiSelectItem> getOptions(
+  static List<MultiSelectItem<dynamic>> getOptions(
       List<dynamic> options, String key, int age) {
     if (key == 'signsorSymptoms') {
       if (age <= 1) {
@@ -196,19 +196,10 @@ class Helper {
           {"name": "Vomiting"},
           {"name": "Suprapubic Tenderness"}
         ];
-      } else {
-        options = [
-          {"name": "Fever (>38°C)"},
-          {"name": "Suprapubic Tenderness"},
-          {"name": "Costovertebral Angle Pain or Tenderness"},
-          {"name": "Urinary Urgency"},
-          {"name": "Urinary Frequency"},
-          {"name": "Dysuria"},
-        ];
       }
     }
     return options
-        .map<MultiSelectItem<Object?>>((each) => MultiSelectItem(
+        .map<MultiSelectItem>((each) => MultiSelectItem(
             each,
             each['name'] != null
                 ? each['name'].toString()
@@ -219,9 +210,9 @@ class Helper {
   static String rangeInText(_values) {
     try {
       var dateToConsider =
-          _values['sameDateforSigns/Symptoms&UrineSampleCollection'] == 'Yes'
-              ? _values['dateofAppearanceofFirstSignsorSymptoms']
-              : _values['dateofUrineSampleCollectionforCulture'];
+          _values['sameDateforSigns/Symptoms&UrineSampleCollection'] == 'No'
+              ? _values['dateofUrineSampleCollectionforCulture']
+              : _values['dateofAppearanceofFirstSignsorSymptoms'];
       if (isNullOrEmpty(dateToConsider)) return '';
       dateToConsider = DateTime.parse(dateToConsider);
       DateTime startDate = dateToConsider.subtract(Duration(days: 3));
