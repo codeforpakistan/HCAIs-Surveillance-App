@@ -103,8 +103,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
     return WillPopScope(
       onWillPop: () async {
-        this._showDialog(context, 'Do you want to close?',
-            'Your Progress will be saved as Draft.', true, false, false);
+        this._showDialog(
+            context,
+            'Do you want to close?',
+            !args.isEditedView ? 'Your Progress will be saved as Draft.' : '',
+            true,
+            false,
+            false);
         return false;
       },
       child: Scaffold(
@@ -121,7 +126,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     this._showDialog(
                         context,
                         'Do you want to close?',
-                        'Your progress will be Saved as Draft.',
+                        !args.isEditedView
+                            ? 'Your progress will be Saved as Draft.'
+                            : '',
                         true,
                         false,
                         false);
@@ -440,6 +447,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   handleDraft() async {
     try {
+      if (args.isEditedView) {
+        return;
+      }
       this._values['draftName'] =
           this._values['pcnOrMrNumber'] ?? '' + DateTime.now().toString();
       if (this.draftId == '') {
@@ -579,6 +589,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText}) {
     try {
+      // ignore: unused_local_variable
       bool isWithInRange = false;
       if (options.length <= 0) {
         return Container();
@@ -593,14 +604,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         isWithInRange =
             Helper.isGreaterThan30(this._values['infectionSurveyTime']);
       }
-      final _options =
-          Helper.getOptions(options, key, this._values['ageDiff'] ?? -1);
       if (isEditedView || isWithInRange) {
         String name = '';
         int counter = 0;
-        _options.forEach((each) => {
-              name = each.label.toString(),
-              each.selected = false,
+        options.forEach((each) => {
+              name = each['name'] != null
+                  ? each['name'].toString()
+                  : each['title'].toString(),
+              each['selected'] = false,
               found = this._values[key] != null
                   ? this
                       ._values[key]!
@@ -613,17 +624,19 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   : [],
               if (found.length > 0)
                 {
-                  each.selected = true,
+                  each['selected'] = true,
                 },
               if (counter == 0 && isWithInRange)
                 {
-                  each.selected = true,
+                  each['selected'] = true,
                 },
               counter++,
             });
       }
+      final _options =
+          Helper.getOptions(options, key, this._values['ageDiff'] ?? -1);
       var initialValue = (isEditedView || isWithInRange)
-          ? _options.where((i) => i.selected == true).toList()
+          ? options.where((i) => i!['selected'] == true).toList()
           : this._values[key] ?? [];
       Column childs = WidgetHelper.buildColumn(label.toString(), isRequired,
           context, hasHelpLabel ? helpLabelText : '');

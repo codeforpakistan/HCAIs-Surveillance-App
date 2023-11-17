@@ -206,10 +206,21 @@ class Helper {
       if (age <= 1) {
         options = optionsToKeepAge1s
             .where((option2) =>
-                options.any((option1) => option1["name"] == option2["name"]))
+                options.any((option1) => option1["name"] != option2["name"]))
             .toList();
       }
     }
+    return options
+        .map<MultiSelectItem>((each) => MultiSelectItem(
+            each,
+            each['name'] != null
+                ? each['name'].toString()
+                : each['title'].toString()))
+        .toList();
+  }
+
+  static List<MultiSelectItem> mapOptions(
+      List<dynamic> options, bool selected) {
     return options
         .map<MultiSelectItem>((each) => MultiSelectItem(
             each,
