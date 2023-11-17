@@ -365,16 +365,19 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               data.add(Padding(
                                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                 child: _buildDateField(
-                                    isRequired: field!['isRequired'] == true,
-                                    hint: field['label'].toString(),
-                                    selectedDateKey: field['key'],
-                                    hasHelpLabel: field['hasHelpLabel'],
-                                    helpLabelText: field['helpLabelText'] ??
-                                        'Please select a date',
-                                    type: 'date',
-                                    selectedDate: DateTime.now(),
-                                    calculateDates:
-                                        field!['calculateDates'] ?? {}),
+                                  isRequired: field!['isRequired'] == true,
+                                  hint: field['label'].toString(),
+                                  selectedDateKey: field['key'],
+                                  hasHelpLabel: field['hasHelpLabel'],
+                                  helpLabelText: field['helpLabelText'] ??
+                                      'Please select a date',
+                                  type: 'date',
+                                  selectedDate: DateTime.now(),
+                                  calculateDates:
+                                      field!['calculateDates'] ?? {},
+                                  andConditions: field!['andConditions'] ??
+                                      {'conditions': []},
+                                ),
                               ))
                             }
                           else if (field['type'] == 'timefield')
@@ -471,15 +474,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
-  Widget _buildDateField(
-      {required String hint,
-      required String selectedDateKey,
-      required bool hasHelpLabel,
-      required String helpLabelText,
-      String? type,
-      required DateTime selectedDate,
-      required bool isRequired,
-      calculateDates = const {}}) {
+  Widget _buildDateField({
+    required String hint,
+    required String selectedDateKey,
+    required bool hasHelpLabel,
+    required String helpLabelText,
+    String? type,
+    required DateTime selectedDate,
+    required bool isRequired,
+    calculateDates = const {},
+    andConditions = const {},
+  }) {
     if (this._values[selectedDateKey] == null) {
       this._values[selectedDateKey] = '';
     }
@@ -517,7 +522,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               this._values[selectedDateKey] = value.toIso8601String();
             });
             _setCompleteField(selectedDateKey, value.toIso8601String(), [], [],
-                [], [], calculateDates);
+                [], andConditions, calculateDates);
           }
         }));
     return childs;
@@ -1121,6 +1126,16 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       }
                   });
             }
+            if (calculateDates.length > 0) {
+              calculateDates.forEach((eachCalculation) => {
+                    _values[eachCalculation['calculatedKey']] =
+                        Helper.daysBetweenDate(
+                                _values[eachCalculation!['to']] ?? '',
+                                _values[eachCalculation!['from']] ?? '',
+                                'days')
+                            .toString()
+                  });
+            }
             // force hidden fields
             // handle and conditions
             if (andConditons.length > 0 &&
@@ -1148,16 +1163,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             if (allForceHidden.length > 0) {
               this.unHide(allForceHidden, true);
-            }
-            if (calculateDates.length > 0) {
-              calculateDates.forEach((eachCalculation) => {
-                    _values[eachCalculation['calculatedKey']] =
-                        Helper.daysBetweenDate(
-                                _values[eachCalculation!['to']] ?? '',
-                                _values[eachCalculation!['from']] ?? '',
-                                'days')
-                            .toString()
-                  });
             }
             break;
           }

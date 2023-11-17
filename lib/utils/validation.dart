@@ -76,7 +76,7 @@ class Validation {
             _currentValue[eachOR?['key']],
             (eachOR?['type'] == 'mutual'
                 ? _currentValue[eachOR?[eachOR?['key']]]
-                : eachOR?['selecteds'] ?? -1),
+                : eachOR?['selecteds'] ?? eachOR[eachOR?['key']]),
             eachOR?['comparisionType'] ?? '',
             eachOR?['criteria'] ?? '');
         if (!isValid) {
