@@ -8,6 +8,23 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:intl/intl.dart';
 
 class Helper {
+  static List<dynamic> optionsToKeepAdults = [
+    {"name": "Fever (>38°C)"},
+    {"name": "Suprapubic Tenderness"},
+    {"name": "Costovertebral Angle Pain or Tenderness"},
+    {"name": "Urinary Urgency"},
+    {"name": "Urinary Frequency"},
+    {"name": "Dysuria"},
+  ];
+  static List<dynamic> optionsToKeepAge1s = [
+    {"name": "Fever (>38°C)"},
+    {"name": "Hypothermia"},
+    {"name": "Apnea"},
+    {"name": "Bradycardia"},
+    {"name": "Lethargy"},
+    {"name": "Vomiting"},
+    {"name": "Suprapubic Tenderness"}
+  ];
   static int daysBetweenDate(date1, date2, String returnType) {
     try {
       if (isNullOrEmpty(date1) || isNullOrEmpty(date2)) {
@@ -187,15 +204,10 @@ class Helper {
       List<dynamic> options, String key, int age) {
     if (key == 'signsorSymptoms') {
       if (age <= 1) {
-        options = [
-          {"name": "Fever (>38°C)"},
-          {"name": "Hypothermia"},
-          {"name": "Apnea"},
-          {"name": "Bradycardia"},
-          {"name": "Lethargy"},
-          {"name": "Vomiting"},
-          {"name": "Suprapubic Tenderness"}
-        ];
+        options = optionsToKeepAge1s
+            .where((option2) =>
+                options.any((option1) => option1["name"] == option2["name"]))
+            .toList();
       }
     }
     return options

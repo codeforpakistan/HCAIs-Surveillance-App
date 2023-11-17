@@ -593,14 +593,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         isWithInRange =
             Helper.isGreaterThan30(this._values['infectionSurveyTime']);
       }
+      final _options =
+          Helper.getOptions(options, key, this._values['ageDiff'] ?? -1);
       if (isEditedView || isWithInRange) {
         String name = '';
         int counter = 0;
-        options.forEach((each) => {
-              name = each['name'] != null
-                  ? each['name'].toString()
-                  : each['title'].toString(),
-              each['selected'] = false,
+        _options.forEach((each) => {
+              name = each.label.toString(),
+              each.selected = false,
               found = this._values[key] != null
                   ? this
                       ._values[key]!
@@ -613,19 +613,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   : [],
               if (found.length > 0)
                 {
-                  each['selected'] = true,
+                  each.selected = true,
                 },
               if (counter == 0 && isWithInRange)
                 {
-                  each['selected'] = true,
+                  each.selected = true,
                 },
               counter++,
             });
       }
-      final _options =
-          Helper.getOptions(options, key, this._values['ageDiff'] ?? -1);
       var initialValue = (isEditedView || isWithInRange)
-          ? options.where((i) => i!['selected'] == true).toList()
+          ? _options.where((i) => i.selected == true).toList()
           : this._values[key] ?? [];
       Column childs = WidgetHelper.buildColumn(label.toString(), isRequired,
           context, hasHelpLabel ? helpLabelText : '');
@@ -655,8 +653,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           items: _options,
           initialValue: initialValue));
       return childs;
-    } catch (err) {
+    } catch (err, stacktrace) {
       print(err);
+      print(stacktrace.toString());
       return Container();
     }
   }
