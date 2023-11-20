@@ -17,13 +17,13 @@ class Helper {
     {"name": "Dysuria"},
   ];
   static List<dynamic> optionsToKeepAge1s = [
-    {"name": "Fever (>38°C)"},
-    {"name": "Hypothermia"},
-    {"name": "Apnea"},
-    {"name": "Bradycardia"},
-    {"name": "Lethargy"},
-    {"name": "Vomiting"},
-    {"name": "Suprapubic Tenderness"}
+    {"name": "Fever (>38°C)", "index": 0},
+    {"name": "Hypothermia", "index": 1},
+    {"name": "Apnea", "index": 2},
+    {"name": "Bradycardia", "index": 3},
+    {"name": "Lethargy", "index": 4},
+    {"name": "Vomiting", "index": 5},
+    {"name": "Suprapubic Tenderness", "index": 6}
   ];
   static int daysBetweenDate(date1, date2, String returnType) {
     try {
