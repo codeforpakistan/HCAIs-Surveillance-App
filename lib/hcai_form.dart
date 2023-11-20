@@ -326,6 +326,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   helpLabelText: field['helpLabelText'] ??
                                       'Please select an option',
                                   index: field['index'],
+                                  andConditions: field!['andConditions'] ??
+                                      {'conditions': []},
                                   conditions: field!['conditions'] ?? [],
                                 ),
                               )),
@@ -774,6 +776,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String helpLabelText,
       required int index,
       required bool isRequired,
+      andConditions = const {},
       List<dynamic> conditions = const []}) {
     try {
       if (this._values[key] != null && this._values[key].runtimeType == List) {
@@ -810,7 +813,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (this.mounted)
             {
               setState(() => this._values[key] = newValue),
-              _setCompleteField(key, newValue, options, [], conditions),
+              _setCompleteField(
+                  key, newValue, options, [], conditions, andConditions),
             }
         },
         items: options.map((option) {

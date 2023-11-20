@@ -10,6 +10,8 @@ class Validation {
     } else if (criteria == 'in' || criteria == 'and' || criteria == 'nin') {
       //now all values of array 2 which is in value2 must be in 1 otherwise false
       return hasValue1ContainsValue2(value1, value2, criteria);
+    } else if (criteria == 'or') {
+      return handSingleDropDown(value1, value2, criteria);
     } else {
       return false;
     }
@@ -39,6 +41,14 @@ class Validation {
       }
     } else {
       return false;
+    }
+  }
+
+  static handSingleDropDown(value1, value2, criteria) {
+    if (criteria == 'or') {
+      // for single dropdown
+      return value2?.any((value) =>
+          !isNullOrEmpty(value) && !isNullOrEmpty(value1) && value1 == value);
     }
   }
 
@@ -84,9 +94,10 @@ class Validation {
         }
       }
       return returnType == 'bool' ? isValid : (isValid ? 'Yes' : 'No');
-    } catch (err) {
-      print(err);
-      return returnType == 'bool' ? false : '';
+    } catch (e, stacktrace) {
+      print('error in handleAndConditions');
+      print('Exception: ' + e.toString());
+      print('Stacktrace: ' + stacktrace.toString());
     }
   }
 }
