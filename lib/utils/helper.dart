@@ -16,15 +16,17 @@ class Helper {
     {"name": "Urinary Frequency"},
     {"name": "Dysuria"},
   ];
+
   static List<dynamic> optionsToKeepAge1s = [
-    {"name": "Fever (>38°C)", "index": 0},
-    {"name": "Hypothermia", "index": 1},
-    {"name": "Apnea", "index": 2},
-    {"name": "Bradycardia", "index": 3},
-    {"name": "Lethargy", "index": 4},
-    {"name": "Vomiting", "index": 5},
-    {"name": "Suprapubic Tenderness", "index": 6}
+    {"name": "Fever (>38°C)"},
+    {"name": "Hypothermia"},
+    {"name": "Apnea"},
+    {"name": "Bradycardia"},
+    {"name": "Lethargy"},
+    {"name": "Vomiting"},
+    {"name": "Suprapubic Tenderness"}
   ];
+
   static int daysBetweenDate(date1, date2, String returnType) {
     try {
       if (isNullOrEmpty(date1) || isNullOrEmpty(date2)) {
@@ -244,6 +246,31 @@ class Helper {
     } catch (e) {
       print(e);
       return '';
+    }
+  }
+
+  static greaterThanDate(dateList, criteria, _values) {
+    try {
+      if (criteria == 'smallest') {}
+      if (dateList.isEmpty) {
+        throw Exception('The date list is empty.');
+      }
+      var poulatedList = [];
+      dateList.forEach((each) => {
+            if (isNullOrEmpty(_values[each]) == false)
+              {poulatedList.add(DateTime.parse(_values[each]))}
+          });
+      DateTime smallestDate = poulatedList.reduce((current, next) {
+        if (current is DateTime && next is DateTime) {
+          return current.isBefore(next) ? current : next;
+        } else {
+          return null;
+        }
+      });
+      return smallestDate;
+    } catch (e) {
+      print('Error: $e');
+      return null;
     }
   }
 }

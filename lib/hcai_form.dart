@@ -379,6 +379,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                       field!['calculateDates'] ?? {},
                                   andConditions: field!['andConditions'] ??
                                       {'conditions': []},
+                                  setDate: field!['setDate'] ?? {},
                                 ),
                               ))
                             }
@@ -476,17 +477,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
   }
 
-  Widget _buildDateField({
-    required String hint,
-    required String selectedDateKey,
-    required bool hasHelpLabel,
-    required String helpLabelText,
-    String? type,
-    required DateTime selectedDate,
-    required bool isRequired,
-    calculateDates = const {},
-    andConditions = const {},
-  }) {
+  Widget _buildDateField(
+      {required String hint,
+      required String selectedDateKey,
+      required bool hasHelpLabel,
+      required String helpLabelText,
+      String? type,
+      required DateTime selectedDate,
+      required bool isRequired,
+      calculateDates = const {},
+      andConditions = const {},
+      setDate = const {}}) {
     if (this._values[selectedDateKey] == null) {
       this._values[selectedDateKey] = '';
     }
@@ -524,7 +525,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               this._values[selectedDateKey] = value.toIso8601String();
             });
             _setCompleteField(selectedDateKey, value.toIso8601String(), [], [],
-                [], andConditions, calculateDates);
+                [], andConditions, calculateDates, setDate);
           }
         }));
     return childs;
@@ -990,7 +991,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       List<dynamic> hiddenFields,
       [List<dynamic> conditions = const [],
       andConditons = const {'conditions': []},
-      calculateDates = const []]) async {
+      calculateDates = const [],
+      setDate = const {}]) async {
     try {
       var matches = [];
       switch (key) {
@@ -1097,13 +1099,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             break;
           }
-        case 'dateofAppearanceofFirstSignsorSymptoms':
-        case 'dateofUrineSampleCollectionforCulture':
-          {
-            this._values['infectionWindowPeriod'] =
-                Helper.rangeInText(this._values);
-            break;
-          }
+        // case 'dateofAppearanceofFirstSignsorSymptoms':
+        // case 'dateofUrineSampleCollectionforCulture':
+        //   {
+        //     this._values['infectionWindowPeriod'] =
+        //         Helper.rangeInText(this._values);
+        //     break;
+        //   }
         default:
           {
             var allForceHidden = [];
@@ -1132,13 +1134,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             if (calculateDates.length > 0) {
               calculateDates.forEach((eachCalculation) => {
-                    _values[eachCalculation['calculatedKey']] =
+                    this._values[eachCalculation['calculatedKey']] =
                         Helper.daysBetweenDate(
-                                _values[eachCalculation!['to']] ?? '',
-                                _values[eachCalculation!['from']] ?? '',
+                                this._values[eachCalculation!['to']] ?? '',
+                                this._values[eachCalculation!['from']] ?? '',
                                 'days')
                             .toString()
                   });
+            }
+            if (setDate.length > 0) {
+              var dateToConsider = Helper.greaterThanDate(
+                  setDate['dates'], setDate['criteria'], this._values);
+              if (dateToConsider != null) {
+                this._values[setDate['calculatedKey']] =
+                    dateToConsider.toString();
+              }
             }
             // force hidden fields
             // handle and conditions
