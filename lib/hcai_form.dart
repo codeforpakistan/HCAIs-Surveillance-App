@@ -1132,6 +1132,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       }
                   });
             }
+            if (setDate.length > 0) {
+              var dateToConsider = Helper.greaterThanDate(
+                  setDate['dates'], setDate['criteria'], this._values);
+              if (dateToConsider != null) {
+                this._values[setDate['calculatedKey']] =
+                    dateToConsider.toString();
+              }
+            }
             if (calculateDates.length > 0) {
               calculateDates.forEach((eachCalculation) => {
                     this._values[eachCalculation['calculatedKey']] =
@@ -1142,14 +1150,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                             .toString()
                   });
             }
-            if (setDate.length > 0) {
-              var dateToConsider = Helper.greaterThanDate(
-                  setDate['dates'], setDate['criteria'], this._values);
-              if (dateToConsider != null) {
-                this._values[setDate['calculatedKey']] =
-                    dateToConsider.toString();
-              }
-            }
+
             // force hidden fields
             // handle and conditions
             if (andConditons.length > 0 &&
