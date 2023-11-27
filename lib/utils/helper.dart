@@ -8,23 +8,14 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:intl/intl.dart';
 
 class Helper {
-  static List<dynamic> optionsToKeepAdults = [
-    {"name": "Fever (>38°C)"},
-    {"name": "Suprapubic Tenderness"},
-    {"name": "Costovertebral Angle Pain or Tenderness"},
-    {"name": "Urinary Urgency"},
-    {"name": "Urinary Frequency"},
-    {"name": "Dysuria"},
-  ];
-
   static List<dynamic> optionsToKeepAge1s = [
-    {"name": "Fever (>38°C)"},
-    {"name": "Hypothermia"},
-    {"name": "Apnea"},
-    {"name": "Bradycardia"},
-    {"name": "Lethargy"},
-    {"name": "Vomiting"},
-    {"name": "Suprapubic Tenderness"}
+    {"name": "Fever (>38°C)", "index": 1},
+    {"name": "Hypothermia", "index": 2},
+    {"name": "Apnea", "index": 3},
+    {"name": "Bradycardia", "index": 4},
+    {"name": "Lethargy", "index": 5},
+    {"name": "Vomiting", "index": 6},
+    {"name": "Suprapubic Tenderness", "index": 7}
   ];
 
   static int daysBetweenDate(date1, date2, String returnType) {

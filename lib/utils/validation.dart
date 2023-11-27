@@ -53,8 +53,8 @@ class Validation {
   }
 
   static isLessThan(val, val1, comparisionType) {
-    if (isNullOrEmpty(val ?? '') && isNullOrEmpty(val1 ?? '')) {
-      return comparisionType == 'int' ? -1 : false;
+    if (isNullOrEmpty(val ?? '') || isNullOrEmpty(val1 ?? '')) {
+      return false;
     }
     if (comparisionType == 'int') {
       return int.parse(val) < int.parse(val1);
@@ -83,10 +83,11 @@ class Validation {
       bool isValid = false;
       for (var eachOR in conditions) {
         isValid = handleCriteria(
-            _currentValue[eachOR?['key']],
+            _currentValue[eachOR?['key']] ?? '',
             (eachOR?['type'] == 'mutual'
-                ? _currentValue[eachOR?[eachOR?['key']]]
-                : eachOR?['selecteds'] ?? eachOR[eachOR?['key']]),
+                    ? _currentValue[eachOR?[eachOR?['key']]]
+                    : eachOR?['selecteds'] ?? eachOR[eachOR?['key']]) ??
+                '',
             eachOR?['comparisionType'] ?? '',
             eachOR?['criteria'] ?? '');
         if (!isValid) {
