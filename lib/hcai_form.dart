@@ -1099,13 +1099,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             break;
           }
-        // case 'dateofAppearanceofFirstSignsorSymptoms':
-        // case 'dateofUrineSampleCollectionforCulture':
-        //   {
-        //     this._values['infectionWindowPeriod'] =
-        //         Helper.rangeInText(this._values);
-        //     break;
-        //   }
         default:
           {
             var allForceHidden = [];
@@ -1138,6 +1131,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               if (dateToConsider != null) {
                 this._values[setDate['calculatedKey']] =
                     dateToConsider.toString();
+                if (setDate['calculatedKey'] == 'dateofCautiEvent') {
+                  this._values['infectionWindowPeriod'] =
+                      Helper.rangeInText(this._values);
+                }
               }
             }
             if (calculateDates.length > 0) {
