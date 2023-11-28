@@ -8,23 +8,16 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:intl/intl.dart';
 
 class Helper {
-  static List<dynamic> optionsToKeepAdults = [
-    {"name": "Fever (>38°C)"},
-    {"name": "Suprapubic Tenderness"},
-    {"name": "Costovertebral Angle Pain or Tenderness"},
-    {"name": "Urinary Urgency"},
-    {"name": "Urinary Frequency"},
-    {"name": "Dysuria"},
-  ];
   static List<dynamic> optionsToKeepAge1s = [
-    {"name": "Fever (>38°C)"},
-    {"name": "Hypothermia"},
-    {"name": "Apnea"},
-    {"name": "Bradycardia"},
-    {"name": "Lethargy"},
-    {"name": "Vomiting"},
-    {"name": "Suprapubic Tenderness"}
+    {"name": "Fever (>38°C)", "index": 1},
+    {"name": "Hypothermia", "index": 2},
+    {"name": "Apnea", "index": 3},
+    {"name": "Bradycardia", "index": 4},
+    {"name": "Lethargy", "index": 5},
+    {"name": "Vomiting", "index": 6},
+    {"name": "Suprapubic Tenderness", "index": 7}
   ];
+
   static int daysBetweenDate(date1, date2, String returnType) {
     try {
       if (isNullOrEmpty(date1) || isNullOrEmpty(date2)) {
@@ -206,10 +199,21 @@ class Helper {
       if (age <= 1) {
         options = optionsToKeepAge1s
             .where((option2) =>
-                options.any((option1) => option1["name"] == option2["name"]))
+                options.any((option1) => option1["name"] != option2["name"]))
             .toList();
       }
     }
+    return options
+        .map<MultiSelectItem>((each) => MultiSelectItem(
+            each,
+            each['name'] != null
+                ? each['name'].toString()
+                : each['title'].toString()))
+        .toList();
+  }
+
+  static List<MultiSelectItem> mapOptions(
+      List<dynamic> options, bool selected) {
     return options
         .map<MultiSelectItem>((each) => MultiSelectItem(
             each,
@@ -233,6 +237,31 @@ class Helper {
     } catch (e) {
       print(e);
       return '';
+    }
+  }
+
+  static greaterThanDate(dateList, criteria, _values) {
+    try {
+      if (criteria == 'smallest') {}
+      if (dateList.isEmpty) {
+        throw Exception('The date list is empty.');
+      }
+      var poulatedList = [];
+      dateList.forEach((each) => {
+            if (isNullOrEmpty(_values[each]) == false)
+              {poulatedList.add(DateTime.parse(_values[each]))}
+          });
+      DateTime smallestDate = poulatedList.reduce((current, next) {
+        if (current is DateTime && next is DateTime) {
+          return current.isBefore(next) ? current : next;
+        } else {
+          return null;
+        }
+      });
+      return smallestDate;
+    } catch (e) {
+      print('Error: $e');
+      return null;
     }
   }
 }

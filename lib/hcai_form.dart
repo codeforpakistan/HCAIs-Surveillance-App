@@ -103,8 +103,13 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     }
     return WillPopScope(
       onWillPop: () async {
-        this._showDialog(context, 'Do you want to close?',
-            'Your Progress will be saved as Draft.', true, false, false);
+        this._showDialog(
+            context,
+            'Do you want to close?',
+            !args.isEditedView ? 'Your Progress will be saved as Draft.' : '',
+            true,
+            false,
+            false);
         return false;
       },
       child: Scaffold(
@@ -121,7 +126,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     this._showDialog(
                         context,
                         'Do you want to close?',
-                        'Your progress will be Saved as Draft.',
+                        !args.isEditedView
+                            ? 'Your progress will be Saved as Draft.'
+                            : '',
                         true,
                         false,
                         false);
@@ -319,6 +326,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                                   helpLabelText: field['helpLabelText'] ??
                                       'Please select an option',
                                   index: field['index'],
+                                  andConditions: field!['andConditions'] ??
+                                      {'conditions': []},
                                   conditions: field!['conditions'] ?? [],
                                 ),
                               )),
@@ -358,16 +367,20 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                               data.add(Padding(
                                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                 child: _buildDateField(
-                                    isRequired: field!['isRequired'] == true,
-                                    hint: field['label'].toString(),
-                                    selectedDateKey: field['key'],
-                                    hasHelpLabel: field['hasHelpLabel'],
-                                    helpLabelText: field['helpLabelText'] ??
-                                        'Please select a date',
-                                    type: 'date',
-                                    selectedDate: DateTime.now(),
-                                    calculateDates:
-                                        field!['calculateDates'] ?? {}),
+                                  isRequired: field!['isRequired'] == true,
+                                  hint: field['label'].toString(),
+                                  selectedDateKey: field['key'],
+                                  hasHelpLabel: field['hasHelpLabel'],
+                                  helpLabelText: field['helpLabelText'] ??
+                                      'Please select a date',
+                                  type: 'date',
+                                  selectedDate: DateTime.now(),
+                                  calculateDates:
+                                      field!['calculateDates'] ?? {},
+                                  andConditions: field!['andConditions'] ??
+                                      {'conditions': []},
+                                  setDate: field!['setDate'] ?? {},
+                                ),
                               ))
                             }
                           else if (field['type'] == 'timefield')
@@ -440,6 +453,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
 
   handleDraft() async {
     try {
+      if (args.isEditedView) {
+        return;
+      }
       this._values['draftName'] =
           this._values['pcnOrMrNumber'] ?? '' + DateTime.now().toString();
       if (this.draftId == '') {
@@ -469,7 +485,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       String? type,
       required DateTime selectedDate,
       required bool isRequired,
-      calculateDates = const {}}) {
+      calculateDates = const {},
+      andConditions = const {},
+      setDate = const {}}) {
     if (this._values[selectedDateKey] == null) {
       this._values[selectedDateKey] = '';
     }
@@ -507,7 +525,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               this._values[selectedDateKey] = value.toIso8601String();
             });
             _setCompleteField(selectedDateKey, value.toIso8601String(), [], [],
-                [], [], calculateDates);
+                [], andConditions, calculateDates, setDate);
           }
         }));
     return childs;
@@ -579,6 +597,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool hasHelpLabel,
       required String helpLabelText}) {
     try {
+      // ignore: unused_local_variable
       bool isWithInRange = false;
       if (options.length <= 0) {
         return Container();
@@ -593,14 +612,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         isWithInRange =
             Helper.isGreaterThan30(this._values['infectionSurveyTime']);
       }
-      final _options =
-          Helper.getOptions(options, key, this._values['ageDiff'] ?? -1);
       if (isEditedView || isWithInRange) {
         String name = '';
         int counter = 0;
-        _options.forEach((each) => {
-              name = each.label.toString(),
-              each.selected = false,
+        options.forEach((each) => {
+              name = each['name'] != null
+                  ? each['name'].toString()
+                  : each['title'].toString(),
+              each['selected'] = false,
               found = this._values[key] != null
                   ? this
                       ._values[key]!
@@ -613,17 +632,19 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   : [],
               if (found.length > 0)
                 {
-                  each.selected = true,
+                  each['selected'] = true,
                 },
               if (counter == 0 && isWithInRange)
                 {
-                  each.selected = true,
+                  each['selected'] = true,
                 },
               counter++,
             });
       }
+      final _options =
+          Helper.getOptions(options, key, this._values['ageDiff'] ?? -1);
       var initialValue = (isEditedView || isWithInRange)
-          ? _options.where((i) => i.selected == true).toList()
+          ? options.where((i) => i!['selected'] == true).toList()
           : this._values[key] ?? [];
       Column childs = WidgetHelper.buildColumn(label.toString(), isRequired,
           context, hasHelpLabel ? helpLabelText : '');
@@ -756,6 +777,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required String helpLabelText,
       required int index,
       required bool isRequired,
+      andConditions = const {},
       List<dynamic> conditions = const []}) {
     try {
       if (this._values[key] != null && this._values[key].runtimeType == List) {
@@ -792,7 +814,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
           if (this.mounted)
             {
               setState(() => this._values[key] = newValue),
-              _setCompleteField(key, newValue, options, [], conditions),
+              _setCompleteField(
+                  key, newValue, options, [], conditions, andConditions),
             }
         },
         items: options.map((option) {
@@ -968,7 +991,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       List<dynamic> hiddenFields,
       [List<dynamic> conditions = const [],
       andConditons = const {'conditions': []},
-      calculateDates = const []]) async {
+      calculateDates = const [],
+      setDate = const {}]) async {
     try {
       var matches = [];
       switch (key) {
@@ -1075,13 +1099,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             break;
           }
-        case 'dateofAppearanceofFirstSignsorSymptoms':
-        case 'dateofUrineSampleCollectionforCulture':
-          {
-            this._values['infectionWindowPeriod'] =
-                Helper.rangeInText(this._values);
-            break;
-          }
         default:
           {
             var allForceHidden = [];
@@ -1108,6 +1125,29 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       }
                   });
             }
+            if (setDate.length > 0) {
+              var dateToConsider = Helper.greaterThanDate(
+                  setDate['dates'], setDate['criteria'], this._values);
+              if (dateToConsider != null) {
+                this._values[setDate['calculatedKey']] =
+                    dateToConsider.toString();
+                if (setDate['calculatedKey'] == 'dateofCautiEvent') {
+                  this._values['infectionWindowPeriod'] =
+                      Helper.rangeInText(this._values);
+                }
+              }
+            }
+            if (calculateDates.length > 0) {
+              calculateDates.forEach((eachCalculation) => {
+                    this._values[eachCalculation['calculatedKey']] =
+                        Helper.daysBetweenDate(
+                                this._values[eachCalculation!['to']] ?? '',
+                                this._values[eachCalculation!['from']] ?? '',
+                                'days')
+                            .toString()
+                  });
+            }
+
             // force hidden fields
             // handle and conditions
             if (andConditons.length > 0 &&
@@ -1135,16 +1175,6 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
             }
             if (allForceHidden.length > 0) {
               this.unHide(allForceHidden, true);
-            }
-            if (calculateDates.length > 0) {
-              calculateDates.forEach((eachCalculation) => {
-                    _values[eachCalculation['calculatedKey']] =
-                        Helper.daysBetweenDate(
-                                _values[eachCalculation!['to']] ?? '',
-                                _values[eachCalculation!['from']] ?? '',
-                                'days')
-                            .toString()
-                  });
             }
             break;
           }
