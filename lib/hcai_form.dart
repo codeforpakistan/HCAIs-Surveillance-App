@@ -1391,6 +1391,3 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 }
-
-// "onChange" : "address/get-signs-and-symptoms",
-//       "populate": "signsorSymptoms",
