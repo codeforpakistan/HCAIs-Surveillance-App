@@ -82,6 +82,13 @@ class Validation {
     bool isValid = false;
     try {
       for (var eachOR in conditions) {
+        if (!isNullOrEmpty(eachOR['conditionalCount']) &&
+            eachOR['conditionalCount'] &&
+            shouldIgnoreDates(_currentValue['iucReinserted'],
+                _currentValue['totalNumberofDaysbetweenDOIRNandDOIR'])) {
+          isValid = true;
+          continue;
+        }
         isValid = handleCriteria(
             _currentValue[eachOR?['key']] ?? '',
             (eachOR?['type'] == 'mutual'
@@ -105,6 +112,19 @@ class Validation {
     return isNullOrEmpty(value1) || isNullOrEmpty(value2);
   }
 
+  static bool shouldIgnoreDates(
+      iucReinserted, totalNumberofDaysbetweenDOIRNandDOIR) {
+    try {
+      if (!isNullOrEmpty(iucReinserted)) {
+        int? diff = int.tryParse(totalNumberofDaysbetweenDOIRNandDOIR);
+        return diff! < 2;
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static handleAndConditions(_currentValue, conditions, String returnType) {
     try {
       bool isValid = false;
@@ -113,6 +133,7 @@ class Validation {
             eachOR['ignore'] &&
             shouldIgnoreNull(_currentValue[eachOR['key']],
                 _currentValue[eachOR?[eachOR?['key']]])) {
+          isValid = true;
           continue;
         }
         if (!isNullOrEmpty(eachOR['or'])) {
