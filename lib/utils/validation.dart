@@ -101,10 +101,20 @@ class Validation {
     return isValid;
   }
 
+  static bool shouldIgnoreNull(value1, value2) {
+    return isNullOrEmpty(value1) || isNullOrEmpty(value2);
+  }
+
   static handleAndConditions(_currentValue, conditions, String returnType) {
     try {
       bool isValid = false;
       for (var eachOR in conditions) {
+        if (!isNullOrEmpty(eachOR['ignore']) &&
+            eachOR['ignore'] &&
+            shouldIgnoreNull(_currentValue[eachOR['key']],
+                _currentValue[eachOR?[eachOR?['key']]])) {
+          continue;
+        }
         if (!isNullOrEmpty(eachOR['or'])) {
           {
             isValid = handleOr(_currentValue, eachOR['or']);
