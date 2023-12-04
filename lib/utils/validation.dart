@@ -78,9 +78,9 @@ class Validation {
     return value == null || value == '';
   }
 
-  static handleAndConditions(_currentValue, conditions, String returnType) {
+  static bool handleOr(_currentValue, conditions) {
+    bool isValid = false;
     try {
-      bool isValid = false;
       for (var eachOR in conditions) {
         isValid = handleCriteria(
             _currentValue[eachOR?['key']] ?? '',
@@ -90,15 +90,53 @@ class Validation {
                 '',
             eachOR?['comparisionType'] ?? '',
             eachOR?['criteria'] ?? '');
+        if (isValid) {
+          break;
+        }
+      }
+    } catch (e) {
+      print('error in or');
+      print(e);
+    }
+    return isValid;
+  }
+
+  static bool shouldIgnoreNull(value1, value2) {
+    return isNullOrEmpty(value1) || isNullOrEmpty(value2);
+  }
+
+  static handleAndConditions(_currentValue, conditions, String returnType) {
+    try {
+      bool isValid = false;
+      for (var eachOR in conditions) {
+        if (!isNullOrEmpty(eachOR['ignore']) &&
+            eachOR['ignore'] &&
+            shouldIgnoreNull(_currentValue[eachOR['key']],
+                _currentValue[eachOR?[eachOR?['key']]])) {
+          continue;
+        }
+        if (!isNullOrEmpty(eachOR['or'])) {
+          {
+            isValid = handleOr(_currentValue, eachOR['or']);
+          }
+        } else {
+          isValid = handleCriteria(
+              _currentValue[eachOR?['key']] ?? '',
+              (eachOR?['type'] == 'mutual'
+                      ? _currentValue[eachOR?[eachOR?['key']]]
+                      : eachOR?['selecteds'] ?? eachOR[eachOR?['key']]) ??
+                  '',
+              eachOR?['comparisionType'] ?? '',
+              eachOR?['criteria'] ?? '');
+        }
         if (!isValid) {
           break;
         }
       }
       return returnType == 'bool' ? isValid : (isValid ? 'Yes' : 'No');
-    } catch (e, stacktrace) {
-      print('error in handleAndConditions');
-      print('Exception: ' + e.toString());
-      print('Stacktrace: ' + stacktrace.toString());
+    } catch (e) {
+      // Handle the exception here
+      print(e);
     }
   }
 }

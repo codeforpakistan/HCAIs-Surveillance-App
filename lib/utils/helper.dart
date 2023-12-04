@@ -21,7 +21,7 @@ class Helper {
   static int daysBetweenDate(date1, date2, String returnType) {
     try {
       if (isNullOrEmpty(date1) || isNullOrEmpty(date2)) {
-        return 0;
+        return -1;
       }
       final startDate = DateTime.parse(date1.toString());
       final endDate = DateTime.parse(date2.toString());

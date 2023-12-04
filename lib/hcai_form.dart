@@ -513,9 +513,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                     },
                   )
                 : null),
-        lastDate: DateTime.now(),
-        initialValue:
-            DateTime.tryParse(this._values[selectedDateKey]), //Add this in your
+        initialValue: !Helper.isNullOrEmpty(this._values[selectedDateKey])
+            ? DateTime.tryParse(this._values[selectedDateKey])
+            : null, //Add this in your
         mode: type == 'time'
             ? DateTimeFieldPickerMode.time
             : DateTimeFieldPickerMode.date,
@@ -1138,13 +1138,17 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
               }
             }
             if (calculateDates.length > 0) {
+              int inBetween = -1;
               calculateDates.forEach((eachCalculation) => {
-                    this._values[eachCalculation['calculatedKey']] =
-                        Helper.daysBetweenDate(
-                                this._values[eachCalculation!['to']] ?? '',
-                                this._values[eachCalculation!['from']] ?? '',
-                                'days')
-                            .toString()
+                    inBetween = Helper.daysBetweenDate(
+                        this._values[eachCalculation!['to']] ?? '',
+                        this._values[eachCalculation!['from']] ?? '',
+                        'days'),
+                    if (inBetween > -1)
+                      {
+                        this._values[eachCalculation['calculatedKey']] =
+                            inBetween.toString()
+                      }
                   });
             }
 
@@ -1391,6 +1395,3 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
     );
   }
 }
-
-// "onChange" : "address/get-signs-and-symptoms",
-//       "populate": "signsorSymptoms",
