@@ -1134,6 +1134,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 if (setDate['calculatedKey'] == 'dateofCautiEvent') {
                   this._values['infectionWindowPeriod'] =
                       Helper.rangeInText(this._values);
+                  this._values['repeatInfectionTimeframe'] =
+                      Helper.longRange(this._values);
+                  this._values['secondaryBloodAttributionPeriod'] =
+                      Helper.longRange(this._values);
                 }
               }
             }
