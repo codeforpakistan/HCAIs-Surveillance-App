@@ -240,6 +240,20 @@ class Helper {
     }
   }
 
+  static String longRange(_values) {
+    try {
+      var dateToConsider = _values['dateofCautiEvent'];
+      if (isNullOrEmpty(dateToConsider)) return '';
+      dateToConsider = DateTime.parse(dateToConsider);
+      DateTime startDate = dateToConsider;
+      DateTime endDate = dateToConsider.add(Duration(days: 13));
+      return '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('d').format(endDate)}';
+    } catch (e) {
+      print(e);
+      return '';
+    }
+  }
+
   static greaterThanDate(dateList, criteria, _values) {
     try {
       if (criteria == 'smallest') {}
