@@ -1130,10 +1130,14 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   setDate['dates'], setDate['criteria'], this._values);
               if (dateToConsider != null) {
                 this._values[setDate['calculatedKey']] =
-                    dateToConsider.toString();
+                    dateToConsider.toIso8601String();
+                setState(() {
+                  this._values[setDate['calculatedKey']] =
+                      dateToConsider.toIso8601String();
+                });
                 if (setDate['calculatedKey'] == 'dateofCautiEvent') {
                   this._values['infectionWindowPeriod'] =
-                      Helper.rangeInText(this._values);
+                      Helper.rangeInText(this._values['dateofCautiEvent']);
                 }
               }
             }
