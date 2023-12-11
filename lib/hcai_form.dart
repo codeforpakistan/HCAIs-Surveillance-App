@@ -16,6 +16,7 @@ import 'components/alertDialog_widget.dart';
 import 'home.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:intl/intl.dart';
 
 class MultiSelect {
   final int id;
@@ -1130,12 +1131,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   setDate['dates'], setDate['criteria'], this._values);
               if (dateToConsider != null) {
                 this._values[setDate['calculatedKey']] =
-                    dateToConsider.toIso8601String();
-                setState(() {
-                  this._values[setDate['calculatedKey']] =
-                      dateToConsider.toIso8601String();
-                });
+                    dateToConsider.toString();
                 if (setDate['calculatedKey'] == 'dateofCautiEvent') {
+                  this._values['dateOfCautiEvent'] =
+                      DateFormat('MMMM d, y').format(dateToConsider);
                   this._values['infectionWindowPeriod'] =
                       Helper.rangeInText(this._values['dateofCautiEvent']);
                 }
