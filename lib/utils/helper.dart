@@ -223,12 +223,8 @@ class Helper {
         .toList();
   }
 
-  static String rangeInText(_values) {
+  static String rangeInText(dateToConsider) {
     try {
-      var dateToConsider =
-          _values['sameDateforSigns/Symptoms&UrineSampleCollection'] == 'No'
-              ? _values['dateofUrineSampleCollectionforCulture']
-              : _values['dateofAppearanceofFirstSignsorSymptoms'];
       if (isNullOrEmpty(dateToConsider)) return '';
       dateToConsider = DateTime.parse(dateToConsider);
       DateTime startDate = dateToConsider.subtract(Duration(days: 3));
