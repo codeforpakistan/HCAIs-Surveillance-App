@@ -1137,6 +1137,10 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                       DateFormat('MMMM d, y').format(dateToConsider);
                   this._values['infectionWindowPeriod'] =
                       Helper.rangeInText(this._values['dateofCautiEvent']);
+                  this._values['repeatInfectionTimeframe'] =
+                      Helper.longRange(this._values);
+                  this._values['secondaryBloodAttributionPeriod'] =
+                      Helper.longRange(this._values);
                 }
               }
             }
