@@ -229,7 +229,7 @@ class Helper {
       dateToConsider = DateTime.parse(dateToConsider);
       DateTime startDate = dateToConsider.subtract(Duration(days: 3));
       DateTime endDate = dateToConsider.add(Duration(days: 3));
-      return '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('d').format(endDate)}';
+      return '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('MMMM d').format(endDate)}';
     } catch (e) {
       print(e);
       return '';
@@ -243,7 +243,7 @@ class Helper {
       dateToConsider = DateTime.parse(dateToConsider);
       DateTime startDate = dateToConsider;
       DateTime endDate = dateToConsider.add(Duration(days: 13));
-      return '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('d').format(endDate)}';
+      return '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('MMMM d').format(endDate)}';
     } catch (e) {
       print(e);
       return '';
