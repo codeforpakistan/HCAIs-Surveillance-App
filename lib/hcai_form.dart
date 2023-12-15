@@ -1135,8 +1135,8 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                 if (setDate['calculatedKey'] == 'dateofCautiEvent') {
                   this._values['dateOfCautiEvent'] =
                       DateFormat('MMMM d, y').format(dateToConsider);
-                  this._values['infectionWindowPeriod'] =
-                      Helper.rangeInText(this._values['dateofCautiEvent']);
+                  this._values['infectionWindowPeriod'] = Helper.rangeInText(
+                      this._values['dateofUrineSampleCollectionforCulture']);
                   this._values['repeatInfectionTimeframe'] =
                       Helper.longRange(this._values);
                   this._values['secondaryBloodAttributionPeriod'] =
@@ -1151,11 +1151,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         this._values[eachCalculation!['to']] ?? '',
                         this._values[eachCalculation!['from']] ?? '',
                         'days'),
-                    if (inBetween > -1)
-                      {
-                        this._values[eachCalculation['calculatedKey']] =
-                            inBetween.toString()
-                      }
+                    // if (inBetween > -1)
+                    //   {
+                    this._values[eachCalculation['calculatedKey']] =
+                        inBetween.toString()
+                    // }
                   });
             }
 
