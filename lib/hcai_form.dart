@@ -1151,11 +1151,11 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                         this._values[eachCalculation!['to']] ?? '',
                         this._values[eachCalculation!['from']] ?? '',
                         'days'),
-                    // if (inBetween > -1)
-                    //   {
-                    this._values[eachCalculation['calculatedKey']] =
-                        inBetween.toString()
-                    // }
+                    if (inBetween != -1000)
+                      {
+                        this._values[eachCalculation['calculatedKey']] =
+                            inBetween.toString()
+                      }
                   });
             }
 
