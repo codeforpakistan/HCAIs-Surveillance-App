@@ -18,10 +18,10 @@ class Helper {
     {"name": "Suprapubic Tenderness", "index": 7}
   ];
 
-  static int daysBetweenDate(date1, date2, String returnType) {
+  static daysBetweenDate(date1, date2, String returnType) {
     try {
       if (isNullOrEmpty(date1) || isNullOrEmpty(date2)) {
-        return -1;
+        return -1000;
       }
       final startDate = DateTime.parse(date1.toString());
       final endDate = DateTime.parse(date2.toString());
@@ -36,7 +36,7 @@ class Helper {
       }
     } catch (e) {
       print('date range failed' + e.toString());
-      return -1;
+      return -1000;
     }
   }
 
