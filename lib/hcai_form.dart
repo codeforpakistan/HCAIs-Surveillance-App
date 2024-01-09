@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:html';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
@@ -613,6 +614,9 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         isWithInRange =
             Helper.isGreaterThan30(this._values['infectionSurveyTime']);
       }
+      if (key == 'dateofBSI') {
+        isWithInRange = Helper.isBSI(this._values);
+      }
       if (isEditedView || isWithInRange) {
         String name = '';
         int counter = 0;
@@ -780,6 +784,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
       required bool isRequired,
       andConditions = const {},
       List<dynamic> conditions = const []}) {
+    options = Helper.getRadioOptions(options, key, this._values['ageDiff']);
     try {
       if (this._values[key] != null && this._values[key].runtimeType == List) {
         this._values[key] = this._values[key][0]['title'] != ''
@@ -885,6 +890,7 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
         SizedBox(width: 8), // Add some spacing/ Title
       ],
     ));
+    // options = Helper.getRadioOptions(options, key, this._values['ageDiff']);
     options.asMap().forEach((index, each) => {
           if (this._values[key] != null && this._values[key] == each['name'])
             {this._selectedRole[key] = index},
@@ -1142,21 +1148,83 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   this._values['secondaryBloodAttributionPeriod'] =
                       Helper.longRange(this._values);
                 }
+                if (setDate['calculatedKey'] == 'dateofCLABSIEvent') {
+                  this._values['infectionWindowPeriodClabsi'] =
+                      Helper.rangeInText(
+                          this._values['DateFirstPositiveBloodCulture']);
+
+                  if (this._values['CLABSICriteria'] == "Criteria LCBI 1") {
+                    DateTime date = DateTime.parse(
+                        this._values['DateFirstPositiveBloodCulture']);
+                    this._values['dateofCLABSIEvent'] =
+                        DateFormat('MMMM d, y').format(date);
+                  } else {
+                    this._values['dateofCLABSIEvent'] =
+                        DateFormat('MMMM d, y').format(dateToConsider);
+                  }
+                }
               }
             }
-            if (calculateDates.length > 0) {
-              int inBetween = -1;
-              calculateDates.forEach((eachCalculation) => {
+
+            // if (calculateDates.length > 0) {
+            //   int inBetween = -1;
+            //   calculateDates.forEach((eachCalculation) => {
+            //         inBetween = Helper.daysBetweenDate(
+            //             this._values[eachCalculation!['to']] ?? '',
+            //             this._values[eachCalculation!['from']] ?? '',
+            //             'days'),
+            //         if (inBetween != -1000)
+            //           {
+            //             this._values[eachCalculation['calculatedKey']] =
+            //                 inBetween.toString()
+            //           }
+            //       });
+            // }
+
+            if (calculateDates.isNotEmpty) {
+              calculateDates.forEach((eachCalculation) {
+                String fromValue = this._values[eachCalculation['from']] ?? '';
+                String toValue = this._values[eachCalculation['to']] ?? '';
+                if (eachCalculation.containsKey('optionalFrom')) {
+                  var optionalFromDate = Helper.greaterThanDate([
+                    eachCalculation['optionalFrom'],
+                    eachCalculation['from']
+                  ], 'smallest', this._values);
+
+                  if (optionalFromDate != null) {
+                    int inBetween = Helper.daysBetweenDate(
+                        toValue, optionalFromDate.toString(), 'days');
+
+                    if (inBetween != -1000) {
+                      this._values[eachCalculation['calculatedKey']] =
+                          inBetween.toString();
+                    }
+                  }
+                } else if (eachCalculation.containsKey('optional')) {
+                  String optionalValue =
+                      this._values[eachCalculation['optional']] ?? '';
+                  int inBetween;
+                  if (!Helper.isNullOrEmpty(
+                      this._values[eachCalculation['optional']])) {
                     inBetween = Helper.daysBetweenDate(
-                        this._values[eachCalculation!['to']] ?? '',
-                        this._values[eachCalculation!['from']] ?? '',
-                        'days'),
-                    if (inBetween != -1000)
-                      {
-                        this._values[eachCalculation['calculatedKey']] =
-                            inBetween.toString()
-                      }
-                  });
+                        optionalValue, fromValue, 'days');
+                  } else {
+                    inBetween =
+                        Helper.daysBetweenDate(toValue, fromValue, 'days');
+                  }
+                  if (inBetween != -1000) {
+                    this._values[eachCalculation['calculatedKey']] =
+                        inBetween.toString();
+                  }
+                } else {
+                  int inBetween =
+                      Helper.daysBetweenDate(toValue, fromValue, 'days');
+                  if (inBetween != -1000) {
+                    this._values[eachCalculation['calculatedKey']] =
+                        inBetween.toString();
+                  }
+                }
+              });
             }
 
             // force hidden fields

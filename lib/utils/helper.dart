@@ -23,8 +23,10 @@ class Helper {
       if (isNullOrEmpty(date1) || isNullOrEmpty(date2)) {
         return -1000;
       }
-      final startDate = DateTime.parse(date1.toString());
-      final endDate = DateTime.parse(date2.toString());
+      // final startDate = DateTime.parse(date1.toString());
+      final startDate = parseDate(date1);
+      // final endDate = DateTime.parse(date2.toString());
+      final endDate = parseDate(date2);
       final days = endDate.difference(startDate).inDays;
       switch (returnType) {
         case 'days':
@@ -38,6 +40,20 @@ class Helper {
       print('date range failed' + e.toString());
       return -1000;
     }
+  }
+
+  static DateTime parseDate(String dateString) {
+    List<String> formats = [
+      'MMMM d, y',
+      'yyyy-MM-ddTHH:mm:ss.SSS',
+      'yyyy-MM-dd HH:mm:ss.SSS'
+    ];
+    for (String format in formats) {
+      try {
+        return DateFormat(format).parse(dateString);
+      } catch (e) {}
+    }
+    throw FormatException('Unsupported date format: $dateString');
   }
 
   static bool isInfectionLessThanRecomended(
@@ -193,6 +209,14 @@ class Helper {
     }
   }
 
+  static bool isBSI(values) {
+    var days = int.parse(values['totalDaysBetweenInsertionandOnsetofCLABSI']);
+    if (days >= 2) {
+      return true;
+    }
+    return false;
+  }
+
   static List<MultiSelectItem<dynamic>> getOptions(
       List<dynamic> options, String key, int age) {
     if (key == 'signsorSymptoms') {
@@ -221,6 +245,24 @@ class Helper {
                 ? each['name'].toString()
                 : each['title'].toString()))
         .toList();
+  }
+
+  static List<dynamic> getRadioOptions(
+      List<dynamic> options, String key, int? age) {
+    if (key == "CLABSICriteria") {
+      if (age != null) {
+        if (age > 1) {
+          return options
+              .where((option) => option["name"] != "Criteria LCBI 3")
+              .toList();
+        } else {
+          return options
+              .where((option) => option["name"] != "Criteria LCBI 2")
+              .toList();
+        }
+      }
+    }
+    return options;
   }
 
   static String rangeInText(dateToConsider) {
@@ -259,8 +301,9 @@ class Helper {
       var poulatedList = [];
       dateList.forEach((each) => {
             if (isNullOrEmpty(_values[each]) == false)
-              {poulatedList.add(DateTime.parse(_values[each]))}
+              {poulatedList.add(parseDate(_values[each]))}
           });
+      print(poulatedList);
       DateTime smallestDate = poulatedList.reduce((current, next) {
         if (current is DateTime && next is DateTime) {
           return current.isBefore(next) ? current : next;
