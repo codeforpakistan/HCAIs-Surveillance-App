@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cool_stepper/cool_stepper.dart';
 import 'package:flutter/material.dart';
