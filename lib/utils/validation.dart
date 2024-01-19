@@ -125,6 +125,18 @@ class Validation {
     }
   }
 
+  static bool ignoreCondition(totalDays) {
+    try {
+      if (!isNullOrEmpty(totalDays)) {
+        int? diff = int.tryParse(totalDays);
+        return diff! < 2;
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static handleAndConditions(_currentValue, conditions, String returnType) {
     try {
       bool isValid = false;
@@ -133,6 +145,12 @@ class Validation {
             eachOR['ignore'] &&
             shouldIgnoreNull(_currentValue[eachOR['key']],
                 _currentValue[eachOR?[eachOR?['key']]])) {
+          isValid = true;
+          continue;
+        }
+        if (!isNullOrEmpty(eachOR['hasValue']) &&
+            eachOR['hasValue'] &&
+            ignoreCondition(_currentValue[eachOR?['key']])) {
           isValid = true;
           continue;
         }

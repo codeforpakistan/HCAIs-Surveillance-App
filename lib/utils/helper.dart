@@ -278,9 +278,9 @@ class Helper {
     }
   }
 
-  static String longRange(_values) {
+  static String longRange(value) {
     try {
-      var dateToConsider = _values['dateofCautiEvent'];
+      var dateToConsider = value;
       if (isNullOrEmpty(dateToConsider)) return '';
       dateToConsider = DateTime.parse(dateToConsider);
       DateTime startDate = dateToConsider;
