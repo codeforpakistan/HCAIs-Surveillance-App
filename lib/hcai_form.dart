@@ -1143,14 +1143,18 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   this._values['infectionWindowPeriod'] = Helper.rangeInText(
                       this._values['dateofUrineSampleCollectionforCulture']);
                   this._values['repeatInfectionTimeframe'] =
-                      Helper.longRange(this._values);
+                      Helper.longRange(this._values['dateofCautiEvent']);
                   this._values['secondaryBloodAttributionPeriod'] =
-                      Helper.longRange(this._values);
+                      Helper.longRange(this._values['dateofCautiEvent']);
                 }
                 if (setDate['calculatedKey'] == 'dateofCLABSIEvent') {
                   this._values['infectionWindowPeriodClabsi'] =
                       Helper.rangeInText(
                           this._values['DateFirstPositiveBloodCulture']);
+                  this._values['repeatInfectionTimeframe'] =
+                      Helper.longRange(this._values['dateofCLABSIEvent']);
+                  this._values['secondaryBloodAttributionPeriod'] =
+                      Helper.longRange(this._values['dateofCLABSIEvent']);
 
                   if (this._values['CLABSICriteria'] == "Criteria LCBI 1") {
                     DateTime date = DateTime.parse(
@@ -1193,6 +1197,21 @@ class _HcaiFormPageState extends State<HcaiFormPage> {
                   if (optionalFromDate != null) {
                     int inBetween = Helper.daysBetweenDate(
                         toValue, optionalFromDate.toString(), 'days');
+
+                    if (inBetween != -1000) {
+                      this._values[eachCalculation['calculatedKey']] =
+                          inBetween.toString();
+                    }
+                  }
+                } else if (eachCalculation.containsKey('optionalTo')) {
+                  var optionalToDate = Helper.greaterThanDate(
+                      [eachCalculation['optionalTo'], eachCalculation['to']],
+                      'smallest',
+                      this._values);
+
+                  if (optionalToDate != null) {
+                    int inBetween = Helper.daysBetweenDate(
+                        optionalToDate.toString(), fromValue, 'days');
 
                     if (inBetween != -1000) {
                       this._values[eachCalculation['calculatedKey']] =
